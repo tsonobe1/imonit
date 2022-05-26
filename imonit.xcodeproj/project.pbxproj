@@ -7,15 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C04C7D3283CA2A400B36008 /* TaskRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C04C7D2283CA2A400B36008 /* TaskRow.swift */; };
+		0C04C7D5283CB61A00B36008 /* TaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C04C7D4283CB61A00B36008 /* TaskDetail.swift */; };
 		0CA2CFCF283453EF00B65F2B /* imonitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2CFCE283453EF00B65F2B /* imonitApp.swift */; };
 		0CA2CFD1283453EF00B65F2B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2CFD0283453EF00B65F2B /* ContentView.swift */; };
 		0CA2CFD3283453F000B65F2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CA2CFD2283453F000B65F2B /* Assets.xcassets */; };
 		0CA2CFD6283453F000B65F2B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CA2CFD5283453F000B65F2B /* Preview Assets.xcassets */; };
 		0CA2CFD8283453F000B65F2B /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2CFD7283453F000B65F2B /* Persistence.swift */; };
 		0CA2CFDB283453F000B65F2B /* imonit.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2CFD9283453F000B65F2B /* imonit.xcdatamodeld */; };
+		0CDA7286283CF44100BA614B /* TaskList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDA7285283CF44100BA614B /* TaskList.swift */; };
+		0CDA7288283CF6D900BA614B /* TaskAddSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDA7287283CF6D900BA614B /* TaskAddSheet.swift */; };
+		0CDA728F283E4E6800BA614B /* MicroTask+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDA728B283E4E6800BA614B /* MicroTask+CoreDataClass.swift */; };
+		0CDA7290283E4E6800BA614B /* MicroTask+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDA728C283E4E6800BA614B /* MicroTask+CoreDataProperties.swift */; };
+		0CDA7291283E4E6800BA614B /* Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDA728D283E4E6800BA614B /* Task+CoreDataClass.swift */; };
+		0CDA7292283E4E6800BA614B /* Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDA728E283E4E6800BA614B /* Task+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0C04C7D2283CA2A400B36008 /* TaskRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRow.swift; sourceTree = "<group>"; };
+		0C04C7D4283CB61A00B36008 /* TaskDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetail.swift; sourceTree = "<group>"; };
 		0CA2CFCB283453EF00B65F2B /* imonit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = imonit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CA2CFCE283453EF00B65F2B /* imonitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = imonitApp.swift; sourceTree = "<group>"; };
 		0CA2CFD0283453EF00B65F2B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -23,6 +33,12 @@
 		0CA2CFD5283453F000B65F2B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0CA2CFD7283453F000B65F2B /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		0CA2CFDA283453F000B65F2B /* imonit.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = imonit.xcdatamodel; sourceTree = "<group>"; };
+		0CDA7285283CF44100BA614B /* TaskList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskList.swift; sourceTree = "<group>"; };
+		0CDA7287283CF6D900BA614B /* TaskAddSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAddSheet.swift; sourceTree = "<group>"; };
+		0CDA728B283E4E6800BA614B /* MicroTask+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MicroTask+CoreDataClass.swift"; sourceTree = "<group>"; };
+		0CDA728C283E4E6800BA614B /* MicroTask+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MicroTask+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		0CDA728D283E4E6800BA614B /* Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataClass.swift"; sourceTree = "<group>"; };
+		0CDA728E283E4E6800BA614B /* Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +55,10 @@
 		0CA2CFC2283453EF00B65F2B = {
 			isa = PBXGroup;
 			children = (
+				0CDA728B283E4E6800BA614B /* MicroTask+CoreDataClass.swift */,
+				0CDA728C283E4E6800BA614B /* MicroTask+CoreDataProperties.swift */,
+				0CDA728D283E4E6800BA614B /* Task+CoreDataClass.swift */,
+				0CDA728E283E4E6800BA614B /* Task+CoreDataProperties.swift */,
 				0CA2CFCD283453EF00B65F2B /* imonit */,
 				0CA2CFCC283453EF00B65F2B /* Products */,
 			);
@@ -57,6 +77,10 @@
 			children = (
 				0CA2CFCE283453EF00B65F2B /* imonitApp.swift */,
 				0CA2CFD0283453EF00B65F2B /* ContentView.swift */,
+				0CDA7285283CF44100BA614B /* TaskList.swift */,
+				0CDA7287283CF6D900BA614B /* TaskAddSheet.swift */,
+				0C04C7D2283CA2A400B36008 /* TaskRow.swift */,
+				0C04C7D4283CB61A00B36008 /* TaskDetail.swift */,
 				0CA2CFD2283453F000B65F2B /* Assets.xcassets */,
 				0CA2CFD7283453F000B65F2B /* Persistence.swift */,
 				0CA2CFD9283453F000B65F2B /* imonit.xcdatamodeld */,
@@ -143,10 +167,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CDA7286283CF44100BA614B /* TaskList.swift in Sources */,
+				0C04C7D3283CA2A400B36008 /* TaskRow.swift in Sources */,
+				0CDA7288283CF6D900BA614B /* TaskAddSheet.swift in Sources */,
+				0CDA7290283E4E6800BA614B /* MicroTask+CoreDataProperties.swift in Sources */,
+				0C04C7D5283CB61A00B36008 /* TaskDetail.swift in Sources */,
 				0CA2CFD8283453F000B65F2B /* Persistence.swift in Sources */,
 				0CA2CFD1283453EF00B65F2B /* ContentView.swift in Sources */,
 				0CA2CFCF283453EF00B65F2B /* imonitApp.swift in Sources */,
+				0CDA7291283E4E6800BA614B /* Task+CoreDataClass.swift in Sources */,
 				0CA2CFDB283453F000B65F2B /* imonit.xcdatamodeld in Sources */,
+				0CDA7292283E4E6800BA614B /* Task+CoreDataProperties.swift in Sources */,
+				0CDA728F283E4E6800BA614B /* MicroTask+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
