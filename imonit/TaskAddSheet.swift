@@ -10,6 +10,9 @@ import SwiftUI
 struct TaskAddSheet: View {
     // Task Model
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.editMode) var editMode
+    
+    
     @State private var task = ""
     @State private var detail = ""
     @State private var id = UUID()
@@ -23,67 +26,116 @@ struct TaskAddSheet: View {
     // timer
     @State var minutes = 10
     
-    var minutesSelection: [Int] {
-        get{
-            var minuitsArray: [Int] = []
-            for i in stride(from: 0, to: 65, by: 5){
-                minuitsArray.append(i)
-            }
-            minuitsArray.removeFirst()
-            return minuitsArray
-        }
-    }
+//    var minutesSelection: [Int] {
+//        get{
+//            var minuitsArray: [Int] = []
+//            for i in stride(from: 0, to: 62, by: 2){
+//                minuitsArray.append(i)
+//            }
+//            minuitsArray.removeFirst()
+//            return minuitsArray
+//        }
+//    }
+    
+    @State private var showingAlert = false
+    
+    
     
     var body: some View {
         NavigationView{
             VStack{
                 Form {
-                    Section(header: Text("Task").bold().font(.body)){
+                    // MARK: Form - Task
+                    Section(header: Text("Task")){
                         TextField("Task Title", text: $task)
                         TextField("Task Detail", text: $detail)
                         DatePicker("Starts", selection: $startDate)
                         DatePicker("Ends", selection: $endDate)
-                    }.textCase(nil)
+                    }
+                    .textCase(nil)
+
                     
-                    
-                    Section(header: Text("Micro Tasks").bold().font(.body)){
+                    // MARK: Form - Micro Task
+                    Section(header: HStack{
+                        Text("Micro Tasks")
+                        Spacer()
+                        // help message
+                        Button(action: {
+                            showingAlert.toggle()
+                        }){
+                            Text(Image(systemName: "questionmark.circle"))
+                            
+                        }
+                        .alert(isPresented: $showingAlert) {
+                            Alert(title: Text("What is Micro Task"),
+                                  message: Text("Break tasks into smaller microtasks to make them easier to act on."))
+                        }
+                    },footer: HStack{
+                        Button(action: {
+                            addMicroTask()
+                        }){
+                            Spacer()
+                            Text("Add micro tasks")
+                                .font(.callout)
+                                .padding(.top,5)
+                            Spacer()
+                        }
+                        .disabled(microTask.isEmpty)
+                    }){
                         HStack{
-                            TextField("Micro Task", text:$microTask)
+                            TextField("Micro Task Title", text: $microTask)
                             Picker(selection: $minutes, label:Text("Select")){
-                                // 5 ~ 60 by 5
-                                ForEach(minutesSelection, id: \.self) { i in
+                                Spacer()
+                                ForEach(1..<60, id: \.self) { i in
                                     Text("\(i) min").tag(i)
                                 }
                             }.pickerStyle(MenuPickerStyle())
                         }
-                        Button("Add") {
-                            addMicroTask()
-                        }.disabled(microTask.isEmpty)
                         
-                    }.textCase(nil)
+                        //.multilineTextAlignment(.center)
+                    }
+                    .textCase(nil)
                     
-                    
+                    // MARK: List - Micro Task
                     List{
-                        ForEach(0..<microTaskTouple.count, id: \.self){ index in
-                            HStack{
-                                Text("\(index)")
-                                Text(microTaskTouple[index].0)
-                                Text("\(microTaskTouple[index].1)")
+                        Section(header:
+                                    EditButton()
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .overlay(Text("Header"), alignment: .leading)
+                        ){
+                            // If microtasks are not added.
+                            if microTaskTouple.count == 0 {
+                                Text("No Item").foregroundColor(Color.secondary)
+                            } else {
+                                ForEach(0..<microTaskTouple.count, id: \.self){ index in
+                                    HStack{
+                                        Text("\(index+1) : ").font(.caption)
+                                        Text(microTaskTouple[index].0)
+                                        Spacer()
+                                        Text("\(microTaskTouple[index].1) min").font(.caption)
+                                    }
+                                }
+                                .onMove(perform: rowReplace)
+                                .onDelete(perform: rowRemove)
                             }
                         }
+                        .textCase(nil)
                     }
-                    .listStyle(.automatic)
-                    
-                    
-                    
                 }
                 .navigationTitle("Add Task")
                 Button("Add") {
                     addTask()
                 }
-                
             }
         }
+    }
+    
+    private func rowRemove(offsets: IndexSet) {
+        microTaskTouple.remove(atOffsets: offsets)
+    }
+    
+    private func rowReplace(_ from: IndexSet, _ to: Int) {
+        microTaskTouple.move(fromOffsets: from, toOffset: to)
     }
     
     private func addMicroTask(){
@@ -94,8 +146,6 @@ struct TaskAddSheet: View {
     
     private func addTask() {
         withAnimation {
-            print(task)
-            
             let newTask = Task(context: viewContext)
             newTask.createdAt = Date()
             newTask.task = task
@@ -110,7 +160,7 @@ struct TaskAddSheet: View {
                     let newMicroTasks = MicroTask(context: viewContext)
                     newMicroTasks.microTask = i.0
                     newMicroTasks.timer = i.1
-                    newMicroTasks.order = Int16(index)
+                    newMicroTasks.order = Int16(index+1)
                     newMicroTasks.createdAt = Date()
                     newMicroTasks.id = UUID()
                     newMicroTasks.isDone = false
@@ -122,8 +172,6 @@ struct TaskAddSheet: View {
             do {
                 try viewContext.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }

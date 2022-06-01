@@ -21,17 +21,17 @@ struct TaskList: View {
     
     
     var body: some View {
-        NavigationView {
             ScrollView{
                 ForEach(tasks) { task in
                     NavigationLink {
-                        TaskDetail(withChild: task)
+                        TaskDetail(task: task)
+                            .padding()
                     } label: {
                         VStack{
                             HStack{
                                 if taskEditMode == true{
                                     Button("Delete") {
-                                        /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Action@*/ /*@END_MENU_TOKEN@*/
+                                        viewContext.delete(task)
                                     }
                                 }
                                 TaskRow(task: task)
@@ -58,7 +58,7 @@ struct TaskList: View {
                 }
             }
             .navigationTitle("Tasks")
-        }
+        
     }
     
     
@@ -77,6 +77,9 @@ struct TaskList: View {
             }
         }
     }
+    
+    
+    
     
 }
 

@@ -21,7 +21,7 @@ extension MicroTask {
     @NSManaged public var createdAt: Date?
     @NSManaged public var detail: String?
     @NSManaged public var expectedDifficultyLevel: Int16
-    @NSManaged public var expectedSatisfied: Int64
+    @NSManaged public var expectedSatisfied: Int16
     @NSManaged public var feedback: String?
     @NSManaged public var id: UUID?
     @NSManaged public var isDone: Bool

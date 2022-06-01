@@ -9,27 +9,76 @@ import SwiftUI
 
 struct TaskRow: View {
     @ObservedObject var task : Task
-    
+    @Environment(\.managedObjectContext) private var viewContext
+
     var body: some View {
         
         VStack(alignment: .leading){
 
-            HStack{
-                Text(Image(systemName: "circle"))
+            VStack(alignment: .leading){
                 Text(task.task!)
                     .font(.headline)
+                    .multilineTextAlignment(.leading)
+                Text(task.detail!)
+                    .font(.caption)
+                    .lineLimit(2)
+                    .foregroundColor(Color.secondary)
+                    .multilineTextAlignment(.leading)
+            }
             
-            }.padding(20)
+            Spacer()
             
+            HStack(alignment: .bottom){
+                Text("from")
+                Text(startDateFormatter(date: task.startDate!))
+                Text("to")
+                Text(endDateFormatter(date: task.endDate!))
+                Spacer()
+                Text(Image(systemName: task.isDone ?  "checkmark.circle.fill" : "circle")).font(.title).onTapGesture {
+                    toggleDone(task: task)
+                }
+            }
+            .font(.caption)
+            .foregroundColor(Color.secondary)
+
         }
         .foregroundColor(.primary)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(height: 60)
-        .background(Color(.secondarySystemFill))
+//        .frame(height: 60)
+        .padding()
+        .background(Color(.systemGray3).opacity(0.3))
         .cornerRadius(10)
         
         
         
+        
+    }
+    func toggleDone(task: Task){
+        print(task.isDone)
+        task.isDone.toggle()
+        
+        
+print(task.isDone)
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
+    
+    func startDateFormatter(date: Date) -> String{
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "M/d HH:mm"
+        let dateString = dateFormatter.string(from: date)
+        return dateString
+    }
+    
+    func endDateFormatter(date: Date) -> String{
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "HH:mm"
+        let dateString = dateFormatter.string(from: date)
+        return dateString
     }
 }
 
