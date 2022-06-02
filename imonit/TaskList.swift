@@ -21,6 +21,7 @@ struct TaskList: View {
     
     
     var body: some View {
+        NavigationView {
             ScrollView{
                 ForEach(tasks) { task in
                     NavigationLink {
@@ -38,6 +39,7 @@ struct TaskList: View {
                             }
                         }
                     }
+                    
                 }
                 .onDelete(perform: deleteItems)
             }
@@ -58,7 +60,7 @@ struct TaskList: View {
                 }
             }
             .navigationTitle("Tasks")
-        
+        }
     }
     
     
@@ -86,6 +88,31 @@ struct TaskList: View {
 
 struct TaskList_Previews: PreviewProvider {
     static var previews: some View {
-        TaskList()
+        
+        let result = PersistenceController(inMemory: true)
+        let viewContext = result.container.viewContext
+        
+
+        let newTask = Task(context: viewContext)
+        newTask.task = "Quis nostrud exercitation ullamco"
+        newTask.isDone = false
+        newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+        newTask.createdAt = Date()
+        newTask.id = UUID()
+        newTask.startDate = Date()
+        newTask.endDate = Date()
+        
+        let newMicroTask = MicroTask(context: viewContext)
+        newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
+        newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+        newMicroTask.id = UUID()
+        newMicroTask.isDone = false
+        newMicroTask.timer = 10
+        newMicroTask.createdAt = Date()
+        newMicroTask.order = 0
+        newMicroTask.task = newTask
+        
+        return TaskList()
+            .environment(\.managedObjectContext, viewContext)
     }
 }

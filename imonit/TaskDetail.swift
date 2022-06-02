@@ -35,11 +35,15 @@ struct TaskDetail: View {
                 
                 MicroTaskList(withChild: task)
                 
-                    
                 
+//                    .padding(.vertical, -20)
+//                    .padding(.leading, -100)
+//                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+
             }
+        //            .background(Color.blue)
         
-        .navigationBarTitleDisplayMode(.inline)
+        
     }
     
     func startDateFormatter(date: Date) -> String{
@@ -59,3 +63,38 @@ struct TaskDetail: View {
 }
 
 
+import CoreData
+
+struct TaskDetail_Previews: PreviewProvider {
+    static var previews: some View {
+        
+        let result = PersistenceController(inMemory: true)
+        let viewContext = result.container.viewContext
+        
+
+        let newTask = Task(context: viewContext)
+        newTask.task = "Quis nostrud exercitation ullamco"
+        newTask.isDone = false
+        newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+        newTask.createdAt = Date()
+        newTask.id = UUID()
+        newTask.startDate = Date()
+        newTask.endDate = Date()
+        
+        let newMicroTask = MicroTask(context: viewContext)
+        newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
+        newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+        newMicroTask.id = UUID()
+        newMicroTask.isDone = false
+        newMicroTask.timer = 10
+        newMicroTask.createdAt = Date()
+        newMicroTask.order = 0
+        newMicroTask.task = newTask
+        
+        return NavigationView {
+            
+        TaskDetail(task: newTask)
+            .environment(\.managedObjectContext, viewContext)
+        }
+    }
+}

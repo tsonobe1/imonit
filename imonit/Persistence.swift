@@ -7,6 +7,9 @@
 
 import CoreData
 
+
+
+
 struct PersistenceController {
     static let shared = PersistenceController()
 
@@ -17,6 +20,37 @@ struct PersistenceController {
 //            let newItem = Item(context: viewContext)
 //            newItem.timestamp = Date()
 //        }
+        
+        let newTask = Task(context: viewContext)
+        newTask.task = "Quis nostrud exercitation ullamco"
+        newTask.isDone = false
+        newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+        newTask.createdAt = Date()
+        newTask.id = UUID()
+        newTask.startDate = Date()
+        newTask.endDate = Date()
+        
+        let newMicroTask = MicroTask(context: viewContext)
+        newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
+        newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+        newMicroTask.id = UUID()
+        newMicroTask.isDone = false
+        newMicroTask.timer = 10
+        newMicroTask.createdAt = Date()
+        newMicroTask.order = 0
+        newMicroTask.task = newTask
+        
+        let newMicroTask2 = MicroTask(context: viewContext)
+        newMicroTask2.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
+        newMicroTask2.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+        newMicroTask2.id = UUID()
+        newMicroTask2.isDone = false
+        newMicroTask2.timer = 10
+        newMicroTask2.createdAt = Date()
+        newMicroTask2.order = 0
+        newMicroTask2.task = newTask
+        
+        
         do {
             try viewContext.save()
         } catch {

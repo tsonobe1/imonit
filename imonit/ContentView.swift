@@ -10,7 +10,6 @@ import CoreData
 
 struct ContentView: View {
     var body: some View {
-        NavigationView {
 
         TabView{
             TaskList() //1枚目の子ビュー
@@ -23,7 +22,7 @@ struct ContentView: View {
                     Image(systemName: "circle")
                 }
         }
-        }
+        
     }
     
 }

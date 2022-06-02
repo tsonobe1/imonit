@@ -25,13 +25,14 @@ struct MicroTaskList: View {
         )
     }
     
-    @State private var showingAddMicroTaskTextField = false
+    @State private var showingAddMicroTaskTextField = true
     @State private var microTask = ""
     @State private var minutes = 10
     
     var body: some View {
+        ZStack(alignment: .bottom){
         // MARK: MicroTask is Not Exist
-        if microTasks.isEmpty {
+        if microTasks.isEmpty && !showingAddMicroTaskTextField {
             Button("Add Micro Tasks"){
                 withAnimation(.default){
                     openAddMicroTaskTextField()
@@ -55,79 +56,90 @@ struct MicroTaskList: View {
                     Spacer()
                     // Add Button
                     Button("Add") {
-                        withAnimation(.default){
+                        withAnimation(.easeInOut){
                             openAddMicroTaskTextField()
                         }
                     }
                     // Edit Button
                     Button("Edit") {
-                    withAnimation() {
-                        if editMode?.wrappedValue == .inactive{
-                            editMode?.wrappedValue = .active
-                        }else if editMode?.wrappedValue == .active {
-                            editMode?.wrappedValue = .inactive
+                        withAnimation() {
+                            if editMode?.wrappedValue == .inactive{
+                                editMode?.wrappedValue = .active
+                            }else if editMode?.wrappedValue == .active {
+                                editMode?.wrappedValue = .inactive
+                            }
                         }
-                    }
-                }.disabled(microTasks.isEmpty)
-            }) {
-                // MARK: List - Micro Tasks
-                ForEach(microTasks){ microTask in
-                    NavigationLink{
-                        MicroTaskDetail(microTask: microTask)
-                    } label: {
-                        HStack{
-                            Text("  \(microTask.order) : ").font(.caption)
-                            Text("\(microTask.microTask!)").font(.callout)
-                            Spacer()
-                            Text("\(microTask.timer) min").font(.caption)
+                    }.disabled(microTasks.isEmpty)
+                }) {
+                    // MARK: List - Micro Tasks
+                    ForEach(microTasks){ microTask in
+                        NavigationLink{
+                            MicroTaskDetail(microTask: microTask)
+                        } label: {
+                            HStack{
+                                Text("  \(microTask.order) : ").font(.caption)
+                                Text("\(microTask.microTask!)").font(.callout)
+                                Spacer()
+                                Text("\(microTask.timer) min").font(.caption)
+                            }
                         }
+                        // Delete List Padding
+                        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     }
-                    // Delete List Padding
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                    .onDelete(perform: deleteMicroTasks)
+                    .onMove(perform: moveMicroTasks)
+                    
                 }
-                .onDelete(perform: deleteMicroTasks)
-                .onMove(perform: moveMicroTasks)
-                
+                .listRowSeparator(.hidden)
             }
-            .listRowSeparator(.hidden)
-        }
             .listStyle(.plain)
-        }
+            .zIndex(1)
             
+        }
+        
         
         // MARK: Form - Add Micro Tasks
         if showingAddMicroTaskTextField {
-            Form{
-                Section(footer: HStack{
-                    Button(action: {
-                        addMicroTasks()
-                    }){
-                        Spacer()
-                        Text("Add micro tasks")
-                            .font(.callout)
-                            .padding(.top,5)
-                        Spacer()
-                    }
-                    .disabled(microTask.isEmpty)
+            VStack{
+                Section(footer:
+                            Button(action: {
+                    addMicroTasks()
                 }){
-                    VStack{
-                        HStack{
-                            TextField("Micro Task Title", text: $microTask)
-                            Picker(selection: $minutes, label:Text("Select")){
-                                Spacer()
-                                ForEach(1..<60, id: \.self) { i in
-                                    Text("\(i) min").tag(i)
-                                }
-                            }.pickerStyle(MenuPickerStyle())
-                        }
+                    Spacer()
+                    Text("Add micro tasks")
+                        .font(.callout)
+                        .padding(.top,3)
+                        .foregroundColor(Color.accentColor)
+                    Spacer()
+                }
+                    .disabled(microTask.isEmpty)
+                ){
+                    HStack(spacing: 0){
+                        TextField("Micro Task Title", text: $microTask)
+                        Picker(selection: $minutes, label:Text("Select")){
+                            Spacer()
+                            ForEach(1..<60, id: \.self) { i in
+                                Text("\(i) min").tag(i)
+                            }
+                        }.pickerStyle(MenuPickerStyle())
                     }
-                    .frame(maxWidth: .infinity)
-                    
+                    .padding(.horizontal)
+                    .padding(.vertical, 5)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.secondary, lineWidth: 1)
+                    )
                 }
             }
-            .frame(height: 120)
+            .padding()
+            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
+            .frame(maxHeight: 100)
+            .offset(y: 5)
             .transition(.move(edge: .bottom))
+            .zIndex(2)
         }
+    }
+               
     }
     
     // MARK: Function
@@ -179,7 +191,6 @@ struct MicroTaskList: View {
         }
     }
     
-    
     private func moveMicroTasks(from source: IndexSet, to destination: Int) {
         print("source first = \(source.first!)")
         print("destination = \(destination)")
@@ -194,7 +205,7 @@ struct MicroTaskList: View {
         else if source.first! > destination {
             let objectsShouldChange:[Int] = Array(destination..<source.first!)
             print("objectsShouldChange \(objectsShouldChange)")
-
+            
             for i in objectsShouldChange{
                 microTasks[i].order = Int16(i + 2)
             }
@@ -204,11 +215,39 @@ struct MicroTaskList: View {
         try? self.viewContext.save()
     }
     
-
+    
 }
 
 struct MicroTaskList_Previews: PreviewProvider {
     static var previews: some View {
-        MicroTaskList(withChild: Task())
+        
+        let result = PersistenceController(inMemory: true)
+        let viewContext = result.container.viewContext
+        
+
+        let newTask = Task(context: viewContext)
+        newTask.task = "Quis nostrud exercitation ullamco"
+        newTask.isDone = false
+        newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+        newTask.createdAt = Date()
+        newTask.id = UUID()
+        newTask.startDate = Date()
+        newTask.endDate = Date()
+        
+        let newMicroTask = MicroTask(context: viewContext)
+        newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
+        newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+        newMicroTask.id = UUID()
+        newMicroTask.isDone = false
+        newMicroTask.timer = 10
+        newMicroTask.createdAt = Date()
+        newMicroTask.order = 0
+        newMicroTask.task = newTask
+        
+        return NavigationView {
+        MicroTaskList(withChild: newTask)
+                .environment(\.managedObjectContext, viewContext)
+        }
     }
 }
+

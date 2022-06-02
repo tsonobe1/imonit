@@ -26,16 +26,16 @@ struct TaskAddSheet: View {
     // timer
     @State var minutes = 10
     
-//    var minutesSelection: [Int] {
-//        get{
-//            var minuitsArray: [Int] = []
-//            for i in stride(from: 0, to: 62, by: 2){
-//                minuitsArray.append(i)
-//            }
-//            minuitsArray.removeFirst()
-//            return minuitsArray
-//        }
-//    }
+    //    var minutesSelection: [Int] {
+    //        get{
+    //            var minuitsArray: [Int] = []
+    //            for i in stride(from: 0, to: 62, by: 2){
+    //                minuitsArray.append(i)
+    //            }
+    //            minuitsArray.removeFirst()
+    //            return minuitsArray
+    //        }
+    //    }
     
     @State private var showingAlert = false
     
@@ -53,7 +53,7 @@ struct TaskAddSheet: View {
                         DatePicker("Ends", selection: $endDate)
                     }
                     .textCase(nil)
-
+                    
                     
                     // MARK: Form - Micro Task
                     Section(header: HStack{
