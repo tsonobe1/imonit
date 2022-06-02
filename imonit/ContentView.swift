@@ -9,7 +9,11 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
+    @State var showingAddMicroTaskTextField = false
+
+    
     var body: some View {
+        
 
         TabView{
             TaskList() //1枚目の子ビュー
@@ -34,8 +38,8 @@ private let itemFormatter: DateFormatter = {
     return formatter
 }()
 
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-//    }
-//}
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView().preferredColorScheme(.dark).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    }
+}

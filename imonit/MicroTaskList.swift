@@ -11,10 +11,13 @@ struct MicroTaskList: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) private var editMode
     @ObservedObject var task : Task
+    @Binding var showingAddMicroTaskTextField: Bool
     
     @State private var showingAddSheet = false
     @FetchRequest var microTasks: FetchedResults<MicroTask>
-    init(withChild task: Task) {
+    init(withChild task: Task, showingAddMicroTaskTextField: Binding<Bool>) {
+        
+        self._showingAddMicroTaskTextField = showingAddMicroTaskTextField
         self.task = task
         _microTasks = FetchRequest(
             entity: MicroTask.entity(),
@@ -25,7 +28,11 @@ struct MicroTaskList: View {
         )
     }
     
-    @State private var showingAddMicroTaskTextField = true
+//    extension init(){
+//        self._showingAddMicroTaskTextField = showingAddMicroTaskTextField
+//    }
+    
+//    @State var showingAddMicroTaskTextField = false
     @State private var microTask = ""
     @State private var minutes = 10
     
@@ -92,6 +99,7 @@ struct MicroTaskList: View {
                 }
                 .listRowSeparator(.hidden)
             }
+//            .offset(y: !showingAddMicroTaskTextField ? 0 : -110)
             .listStyle(.plain)
             .zIndex(1)
             
@@ -131,16 +139,23 @@ struct MicroTaskList: View {
                     )
                 }
             }
-            .padding()
-            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
-            .frame(maxHeight: 100)
-            .offset(y: 5)
             .transition(.move(edge: .bottom))
+            .padding()
+            .background{
+                Color.black.opacity(0.87).blur(radius: 10, opaque: false)
+            }
+            //            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
+            .offset(y: 5)
+            .frame(maxHeight: 100)
             .zIndex(2)
+            
         }
     }
                
     }
+    
+
+    
     
     // MARK: Function
     private func addMicroTasks(){
@@ -218,6 +233,8 @@ struct MicroTaskList: View {
     
 }
 
+
+
 struct MicroTaskList_Previews: PreviewProvider {
     static var previews: some View {
         
@@ -245,9 +262,10 @@ struct MicroTaskList_Previews: PreviewProvider {
         newMicroTask.task = newTask
         
         return NavigationView {
-        MicroTaskList(withChild: newTask)
+MicroTaskList(withChild: newTask, showingAddMicroTaskTextField:  .constant(false))
                 .environment(\.managedObjectContext, viewContext)
-        }
+        }.navigationTitle("TEST")
+        .preferredColorScheme(.dark)
     }
 }
 

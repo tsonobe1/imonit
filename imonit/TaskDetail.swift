@@ -13,13 +13,18 @@ struct TaskDetail: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) private var editMode
     @ObservedObject var task : Task
+    
+    @State var showingAddMicroTaskTextField = false
 
     
     var body: some View {
        
         
             VStack(alignment: .leading){
+                
+                VStack(alignment: .leading){
                 Text(task.task!).font(.headline).bold()
+                    if !showingAddMicroTaskTextField {
                 HStack{
                     Text("from")
                     Text(startDateFormatter(date: task.startDate!))
@@ -32,17 +37,25 @@ struct TaskDetail: View {
                 Text(task.detail!)
                     .font(.subheadline)
                     .foregroundColor(Color(.systemGray))
-                
-                MicroTaskList(withChild: task)
-                
+                }
+                }
+//                .offset(y: !showingAddMicroTaskTextField ? 0 : -120)
+               
+
+                MicroTaskList(withChild: task, showingAddMicroTaskTextField: $showingAddMicroTaskTextField)
                 
 //                    .padding(.vertical, -20)
 //                    .padding(.leading, -100)
 //                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
 
             }
-        //            .background(Color.blue)
+           
+//
         
+//            .background(Color.blue)
+        
+            .navigationBarTitle("")
+        .navigationBarTitleDisplayMode(.inline)
         
     }
     
@@ -96,5 +109,6 @@ struct TaskDetail_Previews: PreviewProvider {
         TaskDetail(task: newTask)
             .environment(\.managedObjectContext, viewContext)
         }
+        .preferredColorScheme(.dark)
     }
 }

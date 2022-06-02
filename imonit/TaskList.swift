@@ -39,7 +39,6 @@ struct TaskList: View {
                             }
                         }
                     }
-                    
                 }
                 .onDelete(perform: deleteItems)
             }
