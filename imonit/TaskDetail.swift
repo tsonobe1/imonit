@@ -15,46 +15,47 @@ struct TaskDetail: View {
     @ObservedObject var task : Task
     
     @State var showingAddMicroTaskTextField = false
-
+    
     
     var body: some View {
-       
         
+        
+        VStack(alignment: .leading){
+            
             VStack(alignment: .leading){
-                
-                VStack(alignment: .leading){
                 Text(task.task!).font(.headline).bold()
-                    if !showingAddMicroTaskTextField {
-                HStack{
-                    Text("from")
-                    Text(startDateFormatter(date: task.startDate!))
-                    Text("to")
-                    Text(endDateFormatter(date: task.endDate!))
+                if !showingAddMicroTaskTextField {
+                    HStack{
+                        Text("from")
+                        Text(startDateFormatter(date: task.startDate!))
+                        Text("to")
+                        Text(endDateFormatter(date: task.endDate!))
+                    }
+                    .font(.caption)
+                    .foregroundColor(Color.secondary)
+                    .padding(.top, 1)
+                    Text(task.detail!)
+                        .font(.subheadline)
+                        .foregroundColor(Color(.systemGray))
+                    
                 }
-                .font(.caption)
-                .foregroundColor(Color.secondary)
-                
-                Text(task.detail!)
-                    .font(.subheadline)
-                    .foregroundColor(Color(.systemGray))
-                }
-                }
-//                .offset(y: !showingAddMicroTaskTextField ? 0 : -120)
-               
-
-                MicroTaskList(withChild: task, showingAddMicroTaskTextField: $showingAddMicroTaskTextField)
-                
-//                    .padding(.vertical, -20)
-//                    .padding(.leading, -100)
-//                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-
             }
-           
-//
+            //                .offset(y: !showingAddMicroTaskTextField ? 0 : -120)
+            
+            
+            MicroTaskList(withChild: task, showingAddMicroTaskTextField: $showingAddMicroTaskTextField)
+            
+            //                    .padding(.vertical, -20)
+            //                    .padding(.leading, -100)
+            //                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            
+        }
         
-//            .background(Color.blue)
+        //
         
-            .navigationBarTitle("")
+        //            .background(Color.blue)
+        
+        .navigationBarTitle("")
         .navigationBarTitleDisplayMode(.inline)
         
     }
@@ -72,7 +73,7 @@ struct TaskDetail: View {
         let dateString = dateFormatter.string(from: date)
         return dateString
     }
-
+    
 }
 
 
@@ -84,7 +85,7 @@ struct TaskDetail_Previews: PreviewProvider {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-
+        
         let newTask = Task(context: viewContext)
         newTask.task = "Quis nostrud exercitation ullamco"
         newTask.isDone = false
@@ -106,8 +107,8 @@ struct TaskDetail_Previews: PreviewProvider {
         
         return NavigationView {
             
-        TaskDetail(task: newTask)
-            .environment(\.managedObjectContext, viewContext)
+            TaskDetail(task: newTask)
+                .environment(\.managedObjectContext, viewContext)
         }
         .preferredColorScheme(.dark)
     }

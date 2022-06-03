@@ -11,6 +11,7 @@ struct TaskAddSheet: View {
     // Task Model
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) var editMode
+    @Environment(\.dismiss) var dismiss
     
     
     @State private var task = ""
@@ -38,6 +39,7 @@ struct TaskAddSheet: View {
     //    }
     
     @State private var showingAlert = false
+    
     
     
     
@@ -123,9 +125,18 @@ struct TaskAddSheet: View {
                     }
                 }
                 .navigationTitle("Add Task")
-                Button("Add") {
-                    addTask()
-                }
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarItems(
+                    leading: Button("Cancel"){
+                        dismiss()
+//                        showingAddSheet = false
+                    },
+                    trailing: Button("Add") {
+                        addTask()
+                    }
+                        .disabled(task.isEmpty)
+                )
+                
             }
         }
     }
@@ -176,6 +187,7 @@ struct TaskAddSheet: View {
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
         }
+        dismiss()
     }
 }
 

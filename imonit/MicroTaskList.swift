@@ -37,7 +37,7 @@ struct MicroTaskList: View {
     @State private var minutes = 10
     
     var body: some View {
-        ZStack(alignment: .bottom){
+        VStack(){
         // MARK: MicroTask is Not Exist
         if microTasks.isEmpty && !showingAddMicroTaskTextField {
             Button("Add Micro Tasks"){
@@ -59,16 +59,17 @@ struct MicroTaskList: View {
             // MARK: List Header - Micro Tasks
             List{
                 Section(header:  HStack(spacing: 20){
-                    Text("Micro tasks")
+                    Text("\(microTasks.count)  Micro tasks")
                     Spacer()
                     // Add Button
-                    Button("Add") {
+                    Button(showingAddMicroTaskTextField ? "Done" : "Add") {
                         withAnimation(.easeInOut){
                             openAddMicroTaskTextField()
                         }
                     }
+                    .font(.body)
                     // Edit Button
-                    Button("Edit") {
+                    Button(editMode?.wrappedValue == .active ? "Done" : "Edit") {
                         withAnimation() {
                             if editMode?.wrappedValue == .inactive{
                                 editMode?.wrappedValue = .active
@@ -76,7 +77,9 @@ struct MicroTaskList: View {
                                 editMode?.wrappedValue = .inactive
                             }
                         }
-                    }.disabled(microTasks.isEmpty)
+                    }
+                    .font(.body)
+                    .disabled(microTasks.isEmpty)
                 }) {
                     // MARK: List - Micro Tasks
                     ForEach(microTasks){ microTask in
@@ -144,7 +147,6 @@ struct MicroTaskList: View {
             .background{
                 Color.black.opacity(0.87).blur(radius: 10, opaque: false)
             }
-            //            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
             .offset(y: 5)
             .frame(maxHeight: 100)
             .zIndex(2)

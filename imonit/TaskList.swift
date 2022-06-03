@@ -91,7 +91,7 @@ struct TaskList_Previews: PreviewProvider {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-
+        
         let newTask = Task(context: viewContext)
         newTask.task = "Quis nostrud exercitation ullamco"
         newTask.isDone = false
