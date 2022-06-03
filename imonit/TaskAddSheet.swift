@@ -129,7 +129,6 @@ struct TaskAddSheet: View {
                 .navigationBarItems(
                     leading: Button("Cancel"){
                         dismiss()
-//                        showingAddSheet = false
                     },
                     trailing: Button("Add") {
                         addTask()

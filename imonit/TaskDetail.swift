@@ -13,15 +13,11 @@ struct TaskDetail: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) private var editMode
     @ObservedObject var task : Task
-    
     @State var showingAddMicroTaskTextField = false
-    
-    
+    @State private var showingEditSheet = false
+
     var body: some View {
-        
-        
         VStack(alignment: .leading){
-            
             VStack(alignment: .leading){
                 Text(task.task!).font(.headline).bold()
                 if !showingAddMicroTaskTextField {
@@ -37,27 +33,23 @@ struct TaskDetail: View {
                     Text(task.detail!)
                         .font(.subheadline)
                         .foregroundColor(Color(.systemGray))
-                    
                 }
             }
-            //                .offset(y: !showingAddMicroTaskTextField ? 0 : -120)
-            
-            
             MicroTaskList(withChild: task, showingAddMicroTaskTextField: $showingAddMicroTaskTextField)
-            
-            //                    .padding(.vertical, -20)
-            //                    .padding(.leading, -100)
-            //                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-            
         }
-        
-        //
-        
-        //            .background(Color.blue)
-        
         .navigationBarTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Edit") {
+                    self.showingEditSheet.toggle()
+                }
+                    .fullScreenCover(isPresented: $showingEditSheet){
+                        TaskEditSheet(task: task)
+                    }
+                }
+            }
+        }
     }
     
     func startDateFormatter(date: Date) -> String{
@@ -74,7 +66,7 @@ struct TaskDetail: View {
         return dateString
     }
     
-}
+
 
 
 import CoreData

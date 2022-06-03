@@ -28,135 +28,134 @@ struct MicroTaskList: View {
         )
     }
     
-//    extension init(){
-//        self._showingAddMicroTaskTextField = showingAddMicroTaskTextField
-//    }
+    //    extension init(){
+    //        self._showingAddMicroTaskTextField = showingAddMicroTaskTextField
+    //    }
     
-//    @State var showingAddMicroTaskTextField = false
+    //    @State var showingAddMicroTaskTextField = false
     @State private var microTask = ""
     @State private var minutes = 10
     
     var body: some View {
         VStack(){
-        // MARK: MicroTask is Not Exist
-        if microTasks.isEmpty && !showingAddMicroTaskTextField {
-            Button("Add Micro Tasks"){
-                withAnimation(.default){
-                    openAddMicroTaskTextField()
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 50)
-            .padding(10)
-            .accentColor(Color.white)
-            .background(Color.blue)
-            .cornerRadius(15)
-            .padding()
-            Spacer()
-            
-        }else{
-            // MARK: MicroTask is Exist
-            // MARK: List Header - Micro Tasks
-            List{
-                Section(header:  HStack(spacing: 20){
-                    Text("\(microTasks.count)  Micro tasks")
-                    Spacer()
-                    // Add Button
-                    Button(showingAddMicroTaskTextField ? "Done" : "Add") {
-                        withAnimation(.easeInOut){
-                            openAddMicroTaskTextField()
-                        }
+            // MARK: MicroTask is Not Exist
+            if microTasks.isEmpty && !showingAddMicroTaskTextField {
+                Button("Add Micro Tasks"){
+                    withAnimation(.default){
+                        openAddMicroTaskTextField()
                     }
-                    .font(.body)
-                    // Edit Button
-                    Button(editMode?.wrappedValue == .active ? "Done" : "Edit") {
-                        withAnimation() {
-                            if editMode?.wrappedValue == .inactive{
-                                editMode?.wrappedValue = .active
-                            }else if editMode?.wrappedValue == .active {
-                                editMode?.wrappedValue = .inactive
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .padding(10)
+                .accentColor(Color.white)
+                .background(Color.blue)
+                .cornerRadius(15)
+                .padding()
+                Spacer()
+                
+            }else{
+                // MARK: MicroTask is Exist
+                // MARK: List Header - Micro Tasks
+                List{
+                    Section(header:  HStack(spacing: 20){
+                        Text("\(microTasks.count)  Micro tasks")
+                        Spacer()
+                        // Add Button
+                        Button(showingAddMicroTaskTextField ? "Done" : "Add") {
+                            withAnimation(.easeInOut){
+                                openAddMicroTaskTextField()
                             }
                         }
+                        .font(.body)
+                        // Edit Button
+                        Button(editMode?.wrappedValue == .active ? "Done" : "Edit") {
+                            withAnimation() {
+                                if editMode?.wrappedValue == .inactive{
+                                    editMode?.wrappedValue = .active
+                                }else if editMode?.wrappedValue == .active {
+                                    editMode?.wrappedValue = .inactive
+                                }
+                            }
+                        }
+                        .font(.body)
+                        .disabled(microTasks.isEmpty)
+                    }) {
+                        // MARK: List - Micro Tasks
+                        ForEach(microTasks){ microTask in
+                            NavigationLink{
+                                MicroTaskDetail(microTask: microTask)
+                            } label: {
+                                HStack{
+                                    Text("  \(microTask.order) : ").font(.caption)
+                                    Text("\(microTask.microTask!)").font(.callout)
+                                    Spacer()
+                                    Text("\(microTask.timer) min").font(.caption)
+                                }
+                            }
+                            // Delete List Padding
+                            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        }
+                        .onDelete(perform: deleteMicroTasks)
+                        .onMove(perform: moveMicroTasks)
+                        
                     }
-                    .font(.body)
-                    .disabled(microTasks.isEmpty)
-                }) {
-                    // MARK: List - Micro Tasks
-                    ForEach(microTasks){ microTask in
-                        NavigationLink{
-                            MicroTaskDetail(microTask: microTask)
-                        } label: {
-                            HStack{
-                                Text("  \(microTask.order) : ").font(.caption)
-                                Text("\(microTask.microTask!)").font(.callout)
+                    .listRowSeparator(.hidden)
+                }
+                //            .offset(y: !showingAddMicroTaskTextField ? 0 : -110)
+                .listStyle(.plain)
+                .zIndex(1)
+                
+            }
+            
+            
+            // MARK: Form - Add Micro Tasks
+            if showingAddMicroTaskTextField {
+                VStack{
+                    Section(footer:
+                                Button(action: {
+                        addMicroTasks()
+                    }){
+                        Spacer()
+                        Text("Add micro tasks")
+                            .font(.callout)
+                            .padding(.top,3)
+                            .foregroundColor(Color.accentColor)
+                        Spacer()
+                    }
+                        .disabled(microTask.isEmpty)
+                    ){
+                        HStack(spacing: 0){
+                            TextField("Micro Task Title", text: $microTask)
+                            Picker(selection: $minutes, label:Text("Select")){
                                 Spacer()
-                                Text("\(microTask.timer) min").font(.caption)
-                            }
+                                ForEach(1..<60, id: \.self) { i in
+                                    Text("\(i) min").tag(i)
+                                }
+                            }.pickerStyle(MenuPickerStyle())
                         }
-                        // Delete List Padding
-                        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .padding(.horizontal)
+                        .padding(.vertical, 5)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.secondary, lineWidth: 1)
+                        )
                     }
-                    .onDelete(perform: deleteMicroTasks)
-                    .onMove(perform: moveMicroTasks)
-                    
                 }
-                .listRowSeparator(.hidden)
+                .transition(.move(edge: .bottom))
+                .padding()
+                .background{
+                    Color.black.opacity(0.87).blur(radius: 10, opaque: false)
+                }
+                .offset(y: 5)
+                .frame(maxHeight: 100)
+                .zIndex(2)
+                
             }
-//            .offset(y: !showingAddMicroTaskTextField ? 0 : -110)
-            .listStyle(.plain)
-            .zIndex(1)
-            
         }
-        
-        
-        // MARK: Form - Add Micro Tasks
-        if showingAddMicroTaskTextField {
-            VStack{
-                Section(footer:
-                            Button(action: {
-                    addMicroTasks()
-                }){
-                    Spacer()
-                    Text("Add micro tasks")
-                        .font(.callout)
-                        .padding(.top,3)
-                        .foregroundColor(Color.accentColor)
-                    Spacer()
-                }
-                    .disabled(microTask.isEmpty)
-                ){
-                    HStack(spacing: 0){
-                        TextField("Micro Task Title", text: $microTask)
-                        Picker(selection: $minutes, label:Text("Select")){
-                            Spacer()
-                            ForEach(1..<60, id: \.self) { i in
-                                Text("\(i) min").tag(i)
-                            }
-                        }.pickerStyle(MenuPickerStyle())
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 5)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.secondary, lineWidth: 1)
-                    )
-                }
-            }
-            .transition(.move(edge: .bottom))
-            .padding()
-            .background{
-                Color.black.opacity(0.87).blur(radius: 10, opaque: false)
-            }
-            .offset(y: 5)
-            .frame(maxHeight: 100)
-            .zIndex(2)
-            
-        }
-    }
-               
     }
     
-
+    
     
     
     // MARK: Function
@@ -228,11 +227,8 @@ struct MicroTaskList: View {
             }
             microTasks[source.first!].order = Int16(destination + 1)
         }
-        
         try? self.viewContext.save()
     }
-    
-    
 }
 
 
@@ -243,7 +239,7 @@ struct MicroTaskList_Previews: PreviewProvider {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-
+        
         let newTask = Task(context: viewContext)
         newTask.task = "Quis nostrud exercitation ullamco"
         newTask.isDone = false
@@ -264,10 +260,10 @@ struct MicroTaskList_Previews: PreviewProvider {
         newMicroTask.task = newTask
         
         return NavigationView {
-MicroTaskList(withChild: newTask, showingAddMicroTaskTextField:  .constant(false))
+            MicroTaskList(withChild: newTask, showingAddMicroTaskTextField:  .constant(false))
                 .environment(\.managedObjectContext, viewContext)
         }.navigationTitle("TEST")
-        .preferredColorScheme(.dark)
+            .preferredColorScheme(.dark)
     }
 }
 

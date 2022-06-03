@@ -24,6 +24,7 @@
 		0CDA7290283E4E6800BA614B /* MicroTask+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDA728C283E4E6800BA614B /* MicroTask+CoreDataProperties.swift */; };
 		0CDA7291283E4E6800BA614B /* Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDA728D283E4E6800BA614B /* Task+CoreDataClass.swift */; };
 		0CDA7292283E4E6800BA614B /* Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDA728E283E4E6800BA614B /* Task+CoreDataProperties.swift */; };
+		0CEE2DD4284A2FB3001B8D76 /* TaskEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEE2DD3284A2FB3001B8D76 /* TaskEditSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		0CDA728C283E4E6800BA614B /* MicroTask+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MicroTask+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		0CDA728D283E4E6800BA614B /* Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataClass.swift"; sourceTree = "<group>"; };
 		0CDA728E283E4E6800BA614B /* Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		0CEE2DD3284A2FB3001B8D76 /* TaskEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +89,7 @@
 				0C04C7D2283CA2A400B36008 /* TaskRow.swift */,
 				0CDA7287283CF6D900BA614B /* TaskAddSheet.swift */,
 				0C04C7D4283CB61A00B36008 /* TaskDetail.swift */,
+				0CEE2DD3284A2FB3001B8D76 /* TaskEditSheet.swift */,
 				0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */,
 				0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */,
 				0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */,
@@ -176,6 +179,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CEE2DD4284A2FB3001B8D76 /* TaskEditSheet.swift in Sources */,
 				0CDA7286283CF44100BA614B /* TaskList.swift in Sources */,
 				0C04C7D3283CA2A400B36008 /* TaskRow.swift in Sources */,
 				0CDA7288283CF6D900BA614B /* TaskAddSheet.swift in Sources */,

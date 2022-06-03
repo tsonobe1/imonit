@@ -53,7 +53,7 @@ struct TaskList: View {
                     Button("Add") {
                         self.showingAddSheet.toggle()
                     }
-                    .sheet(isPresented: $showingAddSheet){
+                    .fullScreenCover(isPresented: $showingAddSheet){
                         TaskAddSheet()
                     }
                 }
@@ -67,7 +67,6 @@ struct TaskList: View {
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { tasks[$0] }.forEach(viewContext.delete)
-            
             do {
                 try viewContext.save()
             } catch {
