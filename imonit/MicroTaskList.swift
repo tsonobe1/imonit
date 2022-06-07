@@ -33,11 +33,11 @@ struct MicroTaskList: View {
     //    }
     
     //    @State var showingAddMicroTaskTextField = false
-    @State private var microTask = ""
+    @State private var newMicroTask = ""
     @State private var minutes = 10
     
     var body: some View {
-        VStack(){
+        VStack(alignment: .leading){
             // MARK: MicroTask is Not Exist
             if microTasks.isEmpty && !showingAddMicroTaskTextField {
                 Button("Add Micro Tasks"){
@@ -57,6 +57,7 @@ struct MicroTaskList: View {
             }else{
                 // MARK: MicroTask is Exist
                 // MARK: List Header - Micro Tasks
+                ScrollViewReader{ scrollProxy in
                 List{
                     Section(header:  HStack(spacing: 20){
                         Text("\(microTasks.count)  Micro tasks")
@@ -87,27 +88,31 @@ struct MicroTaskList: View {
                                 MicroTaskDetail(microTask: microTask)
                             } label: {
                                 HStack{
-                                    Text("  \(microTask.order) : ").font(.caption)
+                                    Text("\(microTask.order) : ").font(.caption)
                                     Text("\(microTask.microTask!)").font(.callout)
                                     Spacer()
                                     Text("\(microTask.timer) min").font(.caption)
                                 }
                             }
-                            // Delete List Padding
-                            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         }
                         .onDelete(perform: deleteMicroTasks)
                         .onMove(perform: moveMicroTasks)
-                        
+                        // Scroll to bottom when add microtask
+                        .onChange(of: microTasks.count) { _ in
+                            withAnimation{
+                                scrollProxy.scrollTo(microTasks.last?.id)
+                            }
+                        }
                     }
                     .listRowSeparator(.hidden)
                 }
+
                 //            .offset(y: !showingAddMicroTaskTextField ? 0 : -110)
                 .listStyle(.plain)
                 .zIndex(1)
                 
             }
-            
+            }
             
             // MARK: Form - Add Micro Tasks
             if showingAddMicroTaskTextField {
@@ -123,10 +128,10 @@ struct MicroTaskList: View {
                             .foregroundColor(Color.accentColor)
                         Spacer()
                     }
-                        .disabled(microTask.isEmpty)
+                        .disabled(newMicroTask.isEmpty)
                     ){
                         HStack(spacing: 0){
-                            TextField("Micro Task Title", text: $microTask)
+                            TextField("Micro Task Title", text: $newMicroTask)
                             Picker(selection: $minutes, label:Text("Select")){
                                 Spacer()
                                 ForEach(1..<60, id: \.self) { i in
@@ -153,6 +158,7 @@ struct MicroTaskList: View {
                 
             }
         }
+        .frame(maxWidth: .infinity)
     }
     
     
@@ -161,7 +167,7 @@ struct MicroTaskList: View {
     // MARK: Function
     private func addMicroTasks(){
         let newMicroTasks = MicroTask(context: viewContext)
-        newMicroTasks.microTask = microTask
+        newMicroTasks.microTask = newMicroTask
         newMicroTasks.timer = Int16(minutes)
         newMicroTasks.order = Int16(microTasks.count+1)
         newMicroTasks.createdAt = Date()
@@ -171,7 +177,7 @@ struct MicroTaskList: View {
         
         do {
             try viewContext.save()
-            microTask = ""
+            newMicroTask = ""
             minutes = 10
         } catch {
             let nsError = error as NSError

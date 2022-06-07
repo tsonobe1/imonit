@@ -11,14 +11,14 @@ struct TaskEditSheet: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
     private var task: Task
-
+    
     // for text field
     @State private var taskTitle: String
     @State private var detail: String
     @State private var startDate: Date
     @State private var endDate: Date
-
-
+    
+    // Task Entity -->> @State property
     init(task: Task) {
         self.task = task
         _taskTitle = State(initialValue: task.task ?? "")

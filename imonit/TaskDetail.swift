@@ -15,11 +15,13 @@ struct TaskDetail: View {
     @ObservedObject var task : Task
     @State var showingAddMicroTaskTextField = false
     @State private var showingEditSheet = false
-
+    
     var body: some View {
         VStack(alignment: .leading){
             VStack(alignment: .leading){
-                Text(task.task!).font(.headline).bold()
+                Text(task.task!)
+                    .font(.headline)
+                    .bold()
                 if !showingAddMicroTaskTextField {
                     HStack{
                         Text("from")
@@ -35,6 +37,7 @@ struct TaskDetail: View {
                         .foregroundColor(Color(.systemGray))
                 }
             }
+            .padding()
             MicroTaskList(withChild: task, showingAddMicroTaskTextField: $showingAddMicroTaskTextField)
         }
         .navigationBarTitle("")
@@ -44,28 +47,28 @@ struct TaskDetail: View {
                 Button("Edit") {
                     self.showingEditSheet.toggle()
                 }
-                    .fullScreenCover(isPresented: $showingEditSheet){
-                        TaskEditSheet(task: task)
-                    }
+                .fullScreenCover(isPresented: $showingEditSheet){
+                    TaskEditSheet(task: task)
                 }
             }
         }
     }
-    
-    func startDateFormatter(date: Date) -> String{
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "M/d HH:mm"
-        let dateString = dateFormatter.string(from: date)
-        return dateString
-    }
-    
-    func endDateFormatter(date: Date) -> String{
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm"
-        let dateString = dateFormatter.string(from: date)
-        return dateString
-    }
-    
+}
+
+func startDateFormatter(date: Date) -> String{
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "M/d HH:mm"
+    let dateString = dateFormatter.string(from: date)
+    return dateString
+}
+
+func endDateFormatter(date: Date) -> String{
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "HH:mm"
+    let dateString = dateFormatter.string(from: date)
+    return dateString
+}
+
 
 
 

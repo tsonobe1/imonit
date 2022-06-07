@@ -26,7 +26,6 @@ struct TaskList: View {
                 ForEach(tasks) { task in
                     NavigationLink {
                         TaskDetail(task: task)
-                            .padding()
                     } label: {
                         VStack{
                             HStack{
