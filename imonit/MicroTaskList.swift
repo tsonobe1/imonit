@@ -28,13 +28,16 @@ struct MicroTaskList: View {
         )
     }
     
-    //    extension init(){
-    //        self._showingAddMicroTaskTextField = showingAddMicroTaskTextField
-    //    }
-    
-    //    @State var showingAddMicroTaskTextField = false
     @State private var newMicroTask = ""
     @State private var minutes = 10
+    
+    // for ScrollViewReader
+    // Scroll to the buttom of the List only when adding microtasks.
+    var microTasksCount: Int {
+        get{
+            microTasks.count
+        }
+    }
     
     var body: some View {
         VStack(alignment: .leading){
@@ -98,9 +101,13 @@ struct MicroTaskList: View {
                         .onDelete(perform: deleteMicroTasks)
                         .onMove(perform: moveMicroTasks)
                         // Scroll to bottom when add microtask
-                        .onChange(of: microTasks.count) { _ in
+                        // but it doesn't scroll when deleting or moving items.
+                        .onChange(of: microTasks.count) { [microTasksCount] afterMicroTasksCount in
                             withAnimation{
-                                scrollProxy.scrollTo(microTasks.last?.id)
+                                // Only when adding items.
+                                if microTasksCount < afterMicroTasksCount {
+                                    scrollProxy.scrollTo(microTasks.last?.id)
+                                }
                             }
                         }
                     }
