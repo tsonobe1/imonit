@@ -38,7 +38,7 @@ struct MicroTaskList: View {
     var totalTime: Int {
         var total = 0
         for i in microTasks {
-            total += Int(i.timer)
+            total += Int(i.timer/60)
         }
         return total
     }
@@ -72,22 +72,6 @@ struct MicroTaskList: View {
                 // MARK: MicroTask is Exist
                 // MARK: List Header - Micro Tasks
                 ScrollViewReader{ scrollProxy in
-//
-//                                            HStack(alignment: .center){
-//                                            Button{} label: {
-//                                                VStack(alignment: .center){
-//                                                Image(systemName: "play.fill")
-//                                                    .foregroundColor(.green)
-//                                                    .font(.title2)
-//                                                    Text("Start")
-//                                                        .foregroundColor(.green)
-//                                                        .font(.caption)
-//                                                        .padding(.top, 1)
-//                                            }
-//                                            }
-//                                            }
-//                                            .offset(y: 10)
-                    //                                            .border(.red)
                     // Header and Footer
                     List{
                         Section(
@@ -133,7 +117,7 @@ struct MicroTaskList: View {
                                             .fontWeight(.regular)
 //                                            .lineLimit(1)
                                         Spacer()
-                                        Text("\(microTask.timer) min").font(.caption)
+                                        Text("\(microTask.timer/60) min").font(.caption)
                                     }
                                     .padding([.bottom, .top], 10)
                                     .foregroundColor(microTask.isDone ? Color.secondary : Color.primary)
@@ -204,7 +188,7 @@ struct MicroTaskList: View {
                                         TextField("Micro Task Title", text: $newMicroTask)
                                         Picker(selection: $minutes, label:Text("Select")){
                                             Spacer()
-                                            ForEach(1..<60, id: \.self) { i in
+                                            ForEach(1..<61, id: \.self) { i in
                                                 Text("\(i) min").tag(i)
                                             }
                                         }.pickerStyle(MenuPickerStyle())
@@ -270,7 +254,7 @@ struct MicroTaskList: View {
     private func addMicroTasks(){
         let newMicroTasks = MicroTask(context: viewContext)
         newMicroTasks.microTask = newMicroTask
-        newMicroTasks.timer = Int16(minutes)
+        newMicroTasks.timer = Int16(minutes*60)
         newMicroTasks.order = Int16(microTasks.count+1)
         newMicroTasks.createdAt = Date()
         newMicroTasks.id = UUID()
@@ -362,7 +346,7 @@ struct MicroTaskList_Previews: PreviewProvider {
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
         newMicroTask.id = UUID()
         newMicroTask.isDone = false
-        newMicroTask.timer = 10
+        newMicroTask.timer = 600
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
         newMicroTask.task = newTask
