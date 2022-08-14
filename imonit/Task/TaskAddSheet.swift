@@ -20,6 +20,7 @@ struct TaskAddSheet: View {
     @State private var startDate = Date()
     @State private var endDate = Date()
     
+    
     // MicroTask
     @State private var microTask = ""
     @State private var microTaskTouple: [(String, Int16)] = []
@@ -57,72 +58,72 @@ struct TaskAddSheet: View {
                     .textCase(nil)
                     
                     
-                    // MARK: Form - Micro Task
-                    Section(header: HStack{
-                        Text("Micro Tasks")
-                        Spacer()
-                        // help message
-                        Button(action: {
-                            showingAlert.toggle()
-                        }){
-                            Text(Image(systemName: "questionmark.circle"))
-                            
-                        }
-                        .alert(isPresented: $showingAlert) {
-                            Alert(title: Text("What is Micro Task"),
-                                  message: Text("Break tasks into smaller microtasks to make them easier to act on."))
-                        }
-                    },footer: HStack{
-                        Button(action: {
-                            addMicroTask()
-                        }){
-                            Spacer()
-                            Text("Add micro tasks")
-                                .font(.callout)
-                                .padding(.top,5)
-                            Spacer()
-                        }
-                        .disabled(microTask.isEmpty)
-                    }){
-                        HStack{
-                            TextField("Micro Task Title", text: $microTask)
-                            Picker(selection: $minutes, label:Text("Select")){
-                                Spacer()
-                                ForEach(1..<60, id: \.self) { i in
-                                    Text("\(i) min").tag(i)
-                                }
-                            }.pickerStyle(MenuPickerStyle())
-                        }
-                        
-                        //.multilineTextAlignment(.center)
-                    }
-                    .textCase(nil)
-                    
-                    // MARK: List - Micro Task
-                    List{
-                        Section(header:
-                                    EditButton()
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .overlay(Text("Header"), alignment: .leading)
-                        ){
-                            // If microtasks are not added.
-                            if microTaskTouple.count == 0 {
-                                Text("No Item").foregroundColor(Color.secondary)
-                            } else {
-                                ForEach(0..<microTaskTouple.count, id: \.self){ index in
-                                    HStack{
-                                        Text("\(index+1) : ").font(.caption)
-                                        Text(microTaskTouple[index].0)
-                                        Spacer()
-                                        Text("\(microTaskTouple[index].1) min").font(.caption)
-                                    }
-                                }
-                                .onMove(perform: rowReplace)
-                                .onDelete(perform: rowRemove)
-                            }
-                        }
-                        .textCase(nil)
-                    }
+//                    // MARK: Form - Micro Task
+//                    Section(header: HStack{
+//                        Text("Micro Tasks")
+//                        Spacer()
+//                        // help message
+//                        Button(action: {
+//                            showingAlert.toggle()
+//                        }){
+//                            Text(Image(systemName: "questionmark.circle"))
+//
+//                        }
+//                        .alert(isPresented: $showingAlert) {
+//                            Alert(title: Text("What is Micro Task"),
+//                                  message: Text("Break tasks into smaller microtasks to make them easier to act on."))
+//                        }
+//                    },footer: HStack{
+//                        Button(action: {
+//                            addMicroTask()
+//                        }){
+//                            Spacer()
+//                            Text("Add micro tasks")
+//                                .font(.callout)
+//                                .padding(.top,5)
+//                            Spacer()
+//                        }
+//                        .disabled(microTask.isEmpty)
+//                    }){
+//                        HStack{
+//                            TextField("Micro Task Title", text: $microTask)
+//                            Picker(selection: $minutes, label:Text("Select")){
+//                                Spacer()
+//                                ForEach(1..<60, id: \.self) { i in
+//                                    Text("\(i) min").tag(i)
+//                                }
+//                            }.pickerStyle(MenuPickerStyle())
+//                        }
+//
+//                        //.multilineTextAlignment(.center)
+//                    }
+//                    .textCase(nil)
+//
+//                    // MARK: List - Micro Task
+//                    List{
+//                        Section(header:
+//                                    EditButton()
+//                            .frame(maxWidth: .infinity, alignment: .trailing)
+//                            .overlay(Text("Header"), alignment: .leading)
+//                        ){
+//                            // If microtasks are not added.
+//                            if microTaskTouple.count == 0 {
+//                                Text("No Item").foregroundColor(Color.secondary)
+//                            } else {
+//                                ForEach(0..<microTaskTouple.count, id: \.self){ index in
+//                                    HStack{
+//                                        Text("\(index+1) : ").font(.caption)
+//                                        Text(microTaskTouple[index].0)
+//                                        Spacer()
+//                                        Text("\(microTaskTouple[index].1) min").font(.caption)
+//                                    }
+//                                }
+//                                .onMove(perform: rowReplace)
+//                                .onDelete(perform: rowRemove)
+//                            }
+//                        }
+//                        .textCase(nil)
+//                    }
                 }
                 .navigationTitle("Add Task")
                 .navigationBarTitleDisplayMode(.inline)

@@ -23,21 +23,24 @@ struct TaskDetail: View {
                     .font(.headline)
                     .bold()
                 if !showingAddMicroTaskTextField {
-                    HStack{
-                        Text("from")
-                        Text(startDateFormatter(date: task.startDate!))
-                        Text("to")
-                        Text(endDateFormatter(date: task.endDate!))
+                    VStack(alignment: .leading){
+                        Text(dateFormatter(date: task.startDate!))
+                        HStack(spacing: 5){
+                            Text("from")
+                            Text(startDateFormatter(date: task.startDate!))
+                            Text("to")
+                            Text(endDateFormatter(date: task.endDate!))
+                        }
                     }
-                    .font(.caption)
+                    .font(.footnote)
                     .foregroundColor(Color.secondary)
-                    .padding(.top, 1)
+                    .padding([.top, .bottom], 5)
                     Text(task.detail!)
-                        .font(.subheadline)
+                        .font(.footnote)
                         .foregroundColor(Color(.systemGray))
                 }
             }
-            .padding()
+            .padding(.horizontal)
             MicroTaskList(withChild: task, showingAddMicroTaskTextField: $showingAddMicroTaskTextField)
         }
         .navigationBarTitle("")
@@ -55,16 +58,23 @@ struct TaskDetail: View {
     }
 }
 
+func dateFormatter(date: Date) -> String{
+    let dateFormatter = DateFormatter()
+    dateFormatter.setLocalizedDateFormatFromTemplate("yMMMMdEEEE")
+    let dateString = dateFormatter.string(from: date)
+    return dateString
+}
+
 func startDateFormatter(date: Date) -> String{
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "M/d HH:mm"
+    dateFormatter.setLocalizedDateFormatFromTemplate("jm")
     let dateString = dateFormatter.string(from: date)
     return dateString
 }
 
 func endDateFormatter(date: Date) -> String{
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "HH:mm"
+    dateFormatter.setLocalizedDateFormatFromTemplate("jm")
     let dateString = dateFormatter.string(from: date)
     return dateString
 }

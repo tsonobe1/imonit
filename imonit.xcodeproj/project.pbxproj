@@ -60,6 +60,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C757EDA28A878E80063672A /* Task */ = {
+			isa = PBXGroup;
+			children = (
+				0CDA7285283CF44100BA614B /* TaskList.swift */,
+				0CDA7287283CF6D900BA614B /* TaskAddSheet.swift */,
+				0CEE2DD3284A2FB3001B8D76 /* TaskEditSheet.swift */,
+				0C04C7D2283CA2A400B36008 /* TaskRow.swift */,
+				0C04C7D4283CB61A00B36008 /* TaskDetail.swift */,
+				0C757EDB28A879190063672A /* MicroTask */,
+			);
+			path = Task;
+			sourceTree = "<group>";
+		};
+		0C757EDB28A879190063672A /* MicroTask */ = {
+			isa = PBXGroup;
+			children = (
+				0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */,
+				0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */,
+				0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */,
+			);
+			path = MicroTask;
+			sourceTree = "<group>";
+		};
 		0CA2CFC2283453EF00B65F2B = {
 			isa = PBXGroup;
 			children = (
@@ -85,14 +108,7 @@
 			children = (
 				0CA2CFCE283453EF00B65F2B /* imonitApp.swift */,
 				0CA2CFD0283453EF00B65F2B /* ContentView.swift */,
-				0CDA7285283CF44100BA614B /* TaskList.swift */,
-				0C04C7D2283CA2A400B36008 /* TaskRow.swift */,
-				0CDA7287283CF6D900BA614B /* TaskAddSheet.swift */,
-				0C04C7D4283CB61A00B36008 /* TaskDetail.swift */,
-				0CEE2DD3284A2FB3001B8D76 /* TaskEditSheet.swift */,
-				0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */,
-				0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */,
-				0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */,
+				0C757EDA28A878E80063672A /* Task */,
 				0CA2CFD2283453F000B65F2B /* Assets.xcassets */,
 				0CA2CFD7283453F000B65F2B /* Persistence.swift */,
 				0CA2CFD9283453F000B65F2B /* imonit.xcdatamodeld */,

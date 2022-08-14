@@ -15,17 +15,17 @@ struct ContentView: View {
     var body: some View {
         
 
-        TabView{
+//        TabView{
             TaskList() //1枚目の子ビュー
-                .tabItem {
-                    Image(systemName: "1.circle.fill") //タブバーの①
-                }
+//                .tabItem {
+//                    Image(systemName: "1.circle.fill") //タブバーの①
+//                }
             
-            Text("test tab view")
-                .tabItem{
-                    Image(systemName: "circle")
-                }
-        }
+//            Text("test tab view")
+//                .tabItem{
+//                    Image(systemName: "circle")
+//                }
+//        }
         
     }
     

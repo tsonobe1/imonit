@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+
+
 struct TaskList: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
@@ -14,11 +16,7 @@ struct TaskList: View {
         animation: .default)
     private var tasks: FetchedResults<Task>
     @State private var showingAddSheet = false
-    
     @State private var taskEditMode = false
-    
-    
-    
     
     var body: some View {
         NavigationView {
@@ -45,7 +43,9 @@ struct TaskList: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Edit") {
+                        withAnimation{
                         taskEditMode.toggle()
+                        }
                     }
                 }
                 ToolbarItem {

@@ -26,7 +26,7 @@ struct MicroTaskDetail: View {
                     Spacer()
                     // Add Button
                     Button("test") {
-              
+                        
                     }
                     .font(.body)
                     // Edit Button
@@ -34,12 +34,12 @@ struct MicroTaskDetail: View {
                     }
                     .font(.body)
                 }){
-                ForEach(1..<9){ i in
-                    Text("test list")
+                    ForEach(1..<9){ i in
+                        Text("test list")
+                    }
                 }
-            }
             }.listStyle(.plain)
-           
+            
             
             if let isDetail = microTask.detail{
                 Text(isDetail)
@@ -51,7 +51,7 @@ struct MicroTaskDetail: View {
         }
         .navigationBarTitle("")
         .navigationBarTitleDisplayMode(.inline)
-//        .padding()
+        //        .padding()
         
     }
 }
@@ -86,6 +86,6 @@ struct MicroTaskDetail_Previews: PreviewProvider {
             MicroTaskDetail(microTask: newMicroTask)
                 .environment(\.managedObjectContext, viewContext)
         }
-            .preferredColorScheme(.dark)
+        .preferredColorScheme(.dark)
     }
 }
