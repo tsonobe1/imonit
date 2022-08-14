@@ -18,10 +18,11 @@ struct TaskDetail: View {
     
     var body: some View {
         VStack(alignment: .leading){
-            VStack(alignment: .leading){
+            VStack(alignment: .leading){ // Taskの各種情報
                 Text(task.task!)
                     .font(.headline)
                     .bold()
+                //MARK: 子ViewのMicroTaskListから値を貰い、TrueならTaskのDateやDetailを隠す
                 if !showingAddMicroTaskTextField {
                     VStack(alignment: .leading){
                         Text(dateFormatter(date: task.startDate!))
@@ -37,13 +38,13 @@ struct TaskDetail: View {
                     .padding([.top, .bottom], 5)
                     Text(task.detail!)
                         .font(.footnote)
-                        .foregroundColor(Color(.systemGray))
+                        .foregroundColor(Color.secondary)
                 }
             }
             .padding(.horizontal)
             MicroTaskList(withChild: task, showingAddMicroTaskTextField: $showingAddMicroTaskTextField)
         }
-        .navigationBarTitle("")
+        .navigationBarTitle("") // 無駄なスペースを削除
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

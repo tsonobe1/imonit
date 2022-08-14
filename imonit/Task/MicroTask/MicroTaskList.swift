@@ -17,8 +17,9 @@ struct MicroTaskList: View {
     //MARK: 親Viewで選択したTaskを用いて改めてFetchする
     @ObservedObject var task : Task
     @FetchRequest var microTasks: FetchedResults<MicroTask>
-    // このカスタムビューを使う際は、TaskとMicroTaskのAddボタンを押したかどうかを引数に取る
+    // このカスタムビューを使う際は、"Task"と"MicroTaskのAddボタンを押したかどうか"を引数に取る
     init(withChild task: Task, showingAddMicroTaskTextField: Binding<Bool>) {
+        // showingAddMicroTaskTextFieldは、親Viewの表示(TaskのDateやDetail)を隠すのに使われる
         self._showingAddMicroTaskTextField = showingAddMicroTaskTextField
         self.task = task
         _microTasks = FetchRequest(
@@ -42,7 +43,6 @@ struct MicroTaskList: View {
         return total
     }
     
-    // for ScrollViewReader
     // Scroll to the buttom of the List only when adding microtasks.
     var microTasksCount: Int {
         get{
@@ -56,7 +56,7 @@ struct MicroTaskList: View {
             if microTasks.isEmpty && !showingAddMicroTaskTextField {
                 Button("Add Micro Tasks"){
                     withAnimation(.default){
-                        openAddMicroTaskTextField()
+                        showingAddMicroTaskTextField.toggle()
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -87,56 +87,63 @@ struct MicroTaskList: View {
 //                                            }
 //                                            }
 //                                            .offset(y: 10)
-//                                            .border(.red)
-                    
+                    //                                            .border(.red)
+                    // Header and Footer
                     List{
-                        Section(header:  HStack(spacing: 20){
-                            Text("\(microTasks.count)  Micro tasks")
-                                .font(.caption)
-                            Spacer()
-                            // Add Button
-                            Button(showingAddMicroTaskTextField ? "Done" : "Add") {
-                                withAnimation(.easeInOut){
-                                    openAddMicroTaskTextField()
-                                }
-                            }
-                            .font(.body)
-                            // Edit Button
-                            Button(editMode?.wrappedValue == .active ? "Done" : "Edit") {
-                                withAnimation() {
-                                    if editMode?.wrappedValue == .inactive{
-                                        editMode?.wrappedValue = .active
-                                    }else if editMode?.wrappedValue == .active {
-                                        editMode?.wrappedValue = .inactive
+                        Section(
+                            header:  HStack(spacing: 20){
+                                Text("\(microTasks.count)  Micro tasks")
+                                    .font(.caption)
+                                Spacer()
+                                // Add Button
+                                Button(showingAddMicroTaskTextField ? "Done" : "Add") {
+                                    withAnimation(.easeInOut){
+                                        showingAddMicroTaskTextField.toggle()
                                     }
                                 }
+                                .font(.body)
+                                // Edit Button
+                                Button(editMode?.wrappedValue == .active ? "Done" : "Edit") {
+                                    withAnimation() {
+                                        if editMode?.wrappedValue == .inactive{
+                                            editMode?.wrappedValue = .active
+                                        }else if editMode?.wrappedValue == .active {
+                                            editMode?.wrappedValue = .inactive
+                                        }
+                                    }
+                                }
+                                .font(.body)
+                                .disabled(microTasks.isEmpty)
+                            }, footer: HStack{
+                                Spacer()
+                                Text("Total : \(totalTime) min")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Spacer()
                             }
-                            .font(.body)
-                            .disabled(microTasks.isEmpty)
-                        }, footer: HStack{
-                            Spacer()
-                            Text("Total : \(totalTime) min")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Spacer()
-                        }
                         ){
-                            // MARK: List - Micro Tasks
+                            // Micro Tasks
                             ForEach(microTasks){ microTask in
-                                NavigationLink{
-                                    MicroTaskDetail(microTask: microTask)
-                                } label: {
-                                    HStack(){
+
+                                    HStack(alignment: .firstTextBaseline){
                                         Text("\(microTask.order) ").font(.footnote)
+                                            .foregroundColor(.secondary)
                                         Text("\(microTask.microTask!)").font(.subheadline)
                                             .strikethrough(microTask.isDone)
+                                            .fontWeight(.regular)
+//                                            .lineLimit(1)
                                         Spacer()
                                         Text("\(microTask.timer) min").font(.caption)
                                     }
+                                    .padding([.bottom, .top], 10)
                                     .foregroundColor(microTask.isDone ? Color.secondary : Color.primary)
-                                    
-                                }
-                                // MARK: Swipe Action
+                                // .backgroundにNavigationリンクを指定してopacity0にすることでNavigationLinkの矢印>を非表示にする
+                                    .background(                                NavigationLink("", destination: MicroTaskDetail(microTask: microTask))
+                                        .opacity(0)
+                                    )
+                                
+                                
+                                // Swipe Actions
                                 .swipeActions(edge: .leading, allowsFullSwipe: false) {
                                     Button {
                                         isStartMicroTask.toggle()
@@ -151,6 +158,7 @@ struct MicroTaskList: View {
                                         Label("Delete", systemImage: "trash")
                                     }
                                 }
+                                
                             }
                             .onDelete(perform: deleteMicroTasks)
                             .onMove(perform: moveMicroTasks)
