@@ -14,8 +14,9 @@ struct MicroTaskTimer: View {
     @State private var timerRunning = false
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    let microtaskTimerMax: CGFloat
     @State private var remainingTime: CGFloat
+    private let microtaskTimerMax: CGFloat
+    
     
     init(microTask: MicroTask){
         self.microTask = microTask
@@ -34,10 +35,11 @@ struct MicroTaskTimer: View {
                 // Background Circle
                 Circle()
                     .stroke(lineWidth: 30)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
                     .opacity(0.25)
                 
                 // Foreground Circle
+                
                 Circle()
                 // toには正規化した値を指定する
                     .trim(from: 0, to: remainingTime/microtaskTimerMax)
@@ -47,24 +49,42 @@ struct MicroTaskTimer: View {
                     .animation(.easeInOut(duration: 1), value: remainingTime)
                 
                 
-
-                VStack(spacing: 50){
-                    // 経過時間
-                    VStack(spacing: 10){
-                        Text("Elapsed Time")
-                            .opacity(0.7)
-                        Text("0:00")
-                            .font(.title)
-                            .bold()
-                    }
-                    
+                
+                
+                //TODO: Action Button
+                
+                
+                
+                VStack(spacing: 30){
                     // 残り時間
                     VStack(spacing: 10){
-                        Text("Remaining Time")
+                        Text(remainingTime <= -1 ? "Extra Time" : "Remaining Time")
                             .opacity(0.7)
-                        Text(intToMinuteSecond(remainingTime: remainingTime))
-                            .font(.title)
-                            .bold()
+                        HStack(alignment: .lastTextBaseline){
+                            /*
+                             DateComponentsFormatteraのzeroFormattingBehavior=.padに
+                             -1から-59の値を入れるとマイナスがつかないStringを返すが、
+                             -60以降になるとマイナスがついたStringを返す。
+                             バグが仕様か不明だが、上記を考慮した上でTextにマイナス表記を付ける
+                             */
+                            Text(remainingTime <= -1 && remainingTime >= -59 ? "-\(timeSeparate(timerTime: remainingTime))" : timeSeparate(timerTime: remainingTime))
+                                .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 50, weight: .light)))
+                            Text("\\").bold()
+                                .foregroundColor(.secondary)
+                            Text(timeSeparate(timerTime:microtaskTimerMax))
+                                .bold()
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    if remainingTime <= -1 {
+                        VStack(spacing: 15){
+                            Text("Elapsed Time")
+                                .opacity(0.7)
+                            HStack(alignment: .lastTextBaseline){
+                                Text(timeSeparate(timerTime: microtaskTimerMax-remainingTime))
+                                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 20, weight: .light)))
+                            }
+                        }.transition(.opacity)
                     }
                 }
             }
@@ -75,13 +95,16 @@ struct MicroTaskTimer: View {
                 .padding()
                 .font(.title)
                 .onReceive(timer){ _ in
-                    if remainingTime > 0 && timerRunning {
-                        remainingTime -= 1
-                    } else {
-                        timerRunning = false
+                    withAnimation() {
+                        if timerRunning {
+                            remainingTime -= 1
+                        } else {
+                            timerRunning = false
+                        }
                     }
                 }
             
+            //TODO: circleをタップすると開始or一時停止　左右で異なるアクション
             HStack(spacing:30) {
                 Button("Start") {
                     timerRunning = true
@@ -95,14 +118,14 @@ struct MicroTaskTimer: View {
         }
     }
     
-    private func intToMinuteSecond(remainingTime: CGFloat) -> String{
+    // CGFloat -> String XX:XX
+    private func timeSeparate(timerTime: CGFloat) -> String{
         let dateFormatter = DateComponentsFormatter()
-        dateFormatter.unitsStyle = .abbreviated
+        dateFormatter.unitsStyle = .positional
         dateFormatter.allowedUnits = [.minute, .second]
         dateFormatter.zeroFormattingBehavior = .pad
-        
-
-        return dateFormatter.string(from: TimeInterval(remainingTime))!
+        // XX:XX表記のStringを返す
+        return dateFormatter.string(from: TimeInterval(timerTime))!
     }
 }
 
@@ -138,7 +161,7 @@ struct MicroTaskTimer_Previews: PreviewProvider {
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
         newMicroTask.id = UUID()
         newMicroTask.isDone = false
-        newMicroTask.timer = 60
+        newMicroTask.timer = -60
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
         newMicroTask.task = newTask
@@ -147,7 +170,7 @@ struct MicroTaskTimer_Previews: PreviewProvider {
             MicroTaskTimer(microTask: newMicroTask)
                 .environment(\.managedObjectContext, viewContext)
         }
-        .preferredColorScheme(.light)
+        .preferredColorScheme(.dark)
         
     }
 }

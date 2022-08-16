@@ -33,6 +33,7 @@ struct MicroTaskDetail: View {
             
             
             
+            
             Spacer()
         }
         .navigationBarTitle("")
