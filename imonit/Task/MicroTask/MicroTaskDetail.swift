@@ -10,34 +10,48 @@ import SwiftUI
 struct MicroTaskDetail: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var microTask: MicroTask
-    
+    @State private var showingEditSheet = false
+
     
     var body: some View {
         VStack(alignment: .leading){
             
             Text(microTask.microTask!)
-
-            if let isDetail = microTask.detail{
-                Text(isDetail)
-            }else{
-                Text("undefinde")
+                .font(.title3)
+                .bold()
+            
+            VStack{
+                if let isDetail = microTask.detail{
+                    Text(isDetail)
+                }else{
+                    EmptyView()
+                }
             }
-            HStack{
-                Text(Image(systemName: "timer"))
-                Text("\(microTask.timer) min")
-            }
+            .font(.footnote)
+            .padding([.top, .bottom], 5)
+            .foregroundColor(.secondary)
             
             //MARK: Timer
             MicroTaskTimer(microTask: microTask)
-                .padding()
-            
+                .padding(10)
             
             
             
             Spacer()
         }
+        .padding(.horizontal)
         .navigationBarTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Edit") {
+                    self.showingEditSheet.toggle()
+                }
+                .fullScreenCover(isPresented: $showingEditSheet){
+                    MicroTaskEditSheet(microTask: microTask)
+                }
+            }
+        }
         
     }
 }

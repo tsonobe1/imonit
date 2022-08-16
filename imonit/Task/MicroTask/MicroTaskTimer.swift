@@ -161,7 +161,7 @@ struct MicroTaskTimer_Previews: PreviewProvider {
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
         newMicroTask.id = UUID()
         newMicroTask.isDone = false
-        newMicroTask.timer = -60
+        newMicroTask.timer = 5
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
         newMicroTask.task = newTask

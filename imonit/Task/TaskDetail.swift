@@ -20,7 +20,7 @@ struct TaskDetail: View {
         VStack(alignment: .leading){
             VStack(alignment: .leading){ // Taskの各種情報
                 Text(task.task!)
-                    .font(.headline)
+                    .font(.title2)
                     .bold()
                 //MARK: 子ViewのMicroTaskListから値を貰い、TrueならTaskのDateやDetailを隠す
                 if !showingAddMicroTaskTextField {
@@ -34,7 +34,7 @@ struct TaskDetail: View {
                         }
                     }
                     .font(.footnote)
-                    .foregroundColor(Color.secondary)
+                    .foregroundColor(.secondary)
                     .padding([.top, .bottom], 5)
                     Text(task.detail!)
                         .font(.footnote)

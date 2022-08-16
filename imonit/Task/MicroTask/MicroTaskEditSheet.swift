@@ -1,30 +1,27 @@
 //
-//  TaskEditSheet.swift
+//  MicroTaskEditSheet.swift
 //  imonit
 //
-//  Created by 薗部拓人 on 2022/06/03.
+//  Created by 薗部拓人 on 2022/08/17.
 //
 
 import SwiftUI
 
-struct TaskEditSheet: View {
+struct MicroTaskEditSheet: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
-    private var task: Task
+    private var microTask: MicroTask
     
     // for text field
-    @State private var taskTitle: String
+    @State private var microTaskTitle: String
     @State private var detail: String
-    @State private var startDate: Date
-    @State private var endDate: Date
+    @State private var timer: Int16
     
-    // Task Entity -->> @State property
-    init(task: Task) {
-        self.task = task
-        _taskTitle = State(initialValue: task.task ?? "")
-        _detail = State(initialValue: task.detail ?? "")
-        _startDate = State(initialValue: task.startDate ?? Date())
-        _endDate = State(initialValue: task.endDate ?? Date())
+    init(microTask: MicroTask) {
+        self.microTask = microTask
+        _microTaskTitle = State(initialValue: microTask.microTask ?? "")
+        _detail = State(initialValue: microTask.detail ?? "")
+        _timer = State(initialValue: microTask.timer )
     }
     
     
@@ -33,36 +30,44 @@ struct TaskEditSheet: View {
             VStack{
                 Form{
                     // MARK: Form - Task
-                    Section(header: Text("Task")){
-                        TextField("Task Title", text: $taskTitle)
+                    Section(header: Text("MicroTask")){
+                        TextField("Task Title", text: $microTaskTitle)
                         TextEditor(text: $detail)
-                        DatePicker("Starts", selection: $startDate)
-                        DatePicker("Ends", selection: $endDate)
+                        HStack(alignment: .lastTextBaseline){
+                            Text("Timer")
+                            Spacer()
+                            Picker(selection: $timer, label:Text("Select")){
+                                ForEach(1..<61, id: \.self) { i in
+                                    Text("\(i) min").tag(i)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                        }
                     }
                     .textCase(nil)
                 }
-                .navigationTitle("Edit Task")
+                .navigationTitle("Edit MicroTask")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarItems(
                     leading: Button("Cancel"){
                         dismiss()
                     },
                     trailing: Button("Save") {
-                        updateTask()
+                        updateMicroTask()
                         
                     }
-                        .disabled(taskTitle.isEmpty)
+                        .disabled(microTaskTitle.isEmpty)
                 )
             }
         }
+        
     }
     
-    private func updateTask() {
+    private func updateMicroTask() {
         withAnimation {
-            task.task = taskTitle
-            task.detail = detail
-            task.startDate = startDate
-            task.endDate = endDate
+            microTask.microTask = microTaskTitle
+            microTask.detail = detail
+            microTask.timer = timer
             
             do {
                 try viewContext.save()
@@ -74,9 +79,10 @@ struct TaskEditSheet: View {
         dismiss()
     }
     
+    
 }
 
-struct TaskEditSheet_Previews: PreviewProvider {
+struct MicroTaskEditSheet_Previews: PreviewProvider {
     static var previews: some View {
         
         let result = PersistenceController(inMemory: true)
@@ -104,7 +110,7 @@ struct TaskEditSheet_Previews: PreviewProvider {
         
         return NavigationView {
             
-            TaskEditSheet(task: newTask)
+            MicroTaskEditSheet(microTask: newMicroTask)
                 .environment(\.managedObjectContext, viewContext)
         }
         .preferredColorScheme(.dark)
