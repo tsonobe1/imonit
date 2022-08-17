@@ -10,8 +10,8 @@ import SwiftUI
 struct MicroTaskEditSheet: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
-    private var microTask: MicroTask
-    
+    @ObservedObject var microTask: MicroTask
+
     // for text field
     @State private var microTaskTitle: String
     @State private var detail: String
@@ -38,7 +38,7 @@ struct MicroTaskEditSheet: View {
                             Spacer()
                             Picker(selection: $timer, label:Text("Select")){
                                 ForEach(1..<61, id: \.self) { i in
-                                    Text("\(i) min").tag(i)
+                                    Text("\(i) minute").tag(i)
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())

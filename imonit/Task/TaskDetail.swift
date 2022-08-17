@@ -14,11 +14,16 @@ struct TaskDetail: View {
     @Environment(\.editMode) private var editMode
     @ObservedObject var task : Task
     @State var showingAddMicroTaskTextField = false
-    @State private var showingEditSheet = false
+    @State var showingEditSheet = false
     
     var body: some View {
         VStack(alignment: .leading){
-            VStack(alignment: .leading){ // Taskの各種情報
+            //
+            //
+            // 📝 Taskの各種情報の表示
+            //
+            //
+            VStack(alignment: .leading){
                 Text(task.task!)
                     .font(.title2)
                     .bold()
@@ -42,6 +47,11 @@ struct TaskDetail: View {
                 }
             }
             .padding(.horizontal)
+            //
+            //
+            // 📝 MicroTaskのListの表示
+            //
+            //
             MicroTaskList(withChild: task, showingAddMicroTaskTextField: $showingAddMicroTaskTextField)
         }
         .navigationBarTitle("") // 無駄なスペースを削除

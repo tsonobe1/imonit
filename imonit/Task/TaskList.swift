@@ -14,7 +14,7 @@ struct TaskList: View {
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Task.createdAt, ascending: true)],
         animation: .default)
-    private var tasks: FetchedResults<Task>
+    var tasks: FetchedResults<Task>
     @State private var showingAddSheet = false
     @State private var taskEditMode = false
     

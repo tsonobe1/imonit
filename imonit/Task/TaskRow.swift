@@ -14,7 +14,6 @@ struct TaskRow: View {
     var body: some View {
         
         VStack(alignment: .leading){
-
             VStack(alignment: .leading){
                 Text(task.task!)
                     .font(.headline)
@@ -25,7 +24,6 @@ struct TaskRow: View {
                     .foregroundColor(Color.secondary)
                     .multilineTextAlignment(.leading)
             }
-            
             Spacer()
             
             HStack(alignment: .bottom){

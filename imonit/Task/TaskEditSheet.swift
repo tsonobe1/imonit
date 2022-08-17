@@ -10,7 +10,7 @@ import SwiftUI
 struct TaskEditSheet: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
-    private var task: Task
+    @ObservedObject var task : Task
     
     // for text field
     @State private var taskTitle: String

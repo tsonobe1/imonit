@@ -39,7 +39,6 @@ struct MicroTaskTimer: View {
                     .opacity(0.25)
                 
                 // Foreground Circle
-                
                 Circle()
                 // toには正規化した値を指定する
                     .trim(from: 0, to: remainingTime/microtaskTimerMax)
@@ -47,8 +46,6 @@ struct MicroTaskTimer: View {
                 // 開始地点を上部に
                     .rotationEffect(Angle(degrees: 270))
                     .animation(.easeInOut(duration: 1), value: remainingTime)
-                
-                
                 
                 
                 //TODO: Action Button
