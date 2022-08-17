@@ -26,7 +26,7 @@ struct MicroTaskTimer: View {
         self.remainingTime = CGFloat(microTask.timer)
         self.microtaskTimerMax = CGFloat(microTask.timer)
     }
-
+    
     
     var body: some View {
         VStack{
@@ -39,21 +39,24 @@ struct MicroTaskTimer: View {
                     .opacity(0.25)
                 
                 // Foreground Circle
+                
                 if remainingTime >= 0 {
-                Circle()
-                // toには正規化した値を指定する
-                    .trim(from: 0, to: remainingTime/microtaskTimerMax)
-                    .stroke(AngularGradient(gradient: Gradient(colors: [Color(#colorLiteral(red: 0.2434657216, green: 0.6025889516, blue: 1, alpha: 1)), Color(#colorLiteral(red: 0, green: 1, blue: 0.849874258, alpha: 1)),Color(#colorLiteral(red: 0.924164772, green: 0.3744831383, blue: 1, alpha: 1)) ,Color(#colorLiteral(red: 0.2434657216, green: 0.6025889516, blue: 1, alpha: 1))]), center: .center), style: StrokeStyle(lineWidth: 15.0, lineCap : .round, lineJoin: .round))
-                // 開始地点を上部に
-                    .rotationEffect(Angle(degrees: 270))
-                    .animation(.easeInOut(duration: 1), value: remainingTime)
-                }else{
                     Circle()
-                    .trim(from: 1 + remainingTime/microtaskTimerMax, to: 1)
-                    .stroke(AngularGradient(gradient: Gradient(colors: [Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235)), Color(#colorLiteral(red: 1, green: 0.5946068037, blue: 0, alpha: 0.8470588235)),Color(#colorLiteral(red: 1, green: 0, blue: 0, alpha: 0.8470588235)) ,Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235))]), center: .center), style: StrokeStyle(lineWidth: 15.0, lineCap : .round, lineJoin: .round))
-                // 開始地点を上部に
-                    .rotationEffect(Angle(degrees: 270))
-                    .animation(.easeInOut(duration: 1), value: remainingTime)
+                    // toには正規化した値を指定する
+                        .trim(from: 0, to: remainingTime/microtaskTimerMax)
+                        .stroke(AngularGradient(gradient: Gradient(colors: [Color(#colorLiteral(red: 0.2434657216, green: 0.6025889516, blue: 1, alpha: 1)), Color(#colorLiteral(red: 0, green: 1, blue: 0.849874258, alpha: 1)),Color(#colorLiteral(red: 0.924164772, green: 0.3744831383, blue: 1, alpha: 1)) ,Color(#colorLiteral(red: 0.2434657216, green: 0.6025889516, blue: 1, alpha: 1))]), center: .center), style: StrokeStyle(lineWidth: 15.0, lineCap : .round, lineJoin: .round))
+                    // 開始地点を上部に
+                        .rotationEffect(Angle(degrees: 270))
+                        .animation(.easeInOut(duration: 1), value: remainingTime)
+                }
+                // 設定したタイマーを過ぎた場合
+                else{
+                    Circle()
+                        .trim(from: 1 + remainingTime/microtaskTimerMax, to: 1)
+                        .stroke(AngularGradient(gradient: Gradient(colors: [Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235)), Color(#colorLiteral(red: 1, green: 0.5946068037, blue: 0, alpha: 0.8470588235)),Color(#colorLiteral(red: 1, green: 0, blue: 0, alpha: 0.8470588235)) ,Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235))]), center: .center), style: StrokeStyle(lineWidth: 15.0, lineCap : .round, lineJoin: .round))
+                    // 開始地点を上部に
+                        .rotationEffect(Angle(degrees: 270))
+                        .animation(.easeInOut(duration: 1), value: remainingTime)
                 }
                 
                 
@@ -96,7 +99,7 @@ struct MicroTaskTimer: View {
                     }
                 }
             }
-        
+            
             
             
             Text("\(microTask.timer)")
@@ -149,7 +152,7 @@ struct MicroTaskTimer: View {
 
 struct MicroTaskTimer_Previews: PreviewProvider {
     static var previews: some View {
-
+        
         
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext

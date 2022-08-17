@@ -15,6 +15,7 @@ struct TaskDetail: View {
     @ObservedObject var task : Task
     @State var showingAddMicroTaskTextField = false
     @State var showingEditSheet = false
+    @State private var isOpenedDisclosure = true
     
     
     var body: some View {
@@ -30,21 +31,43 @@ struct TaskDetail: View {
                     .bold()
                 //MARK: 子ViewのMicroTaskListから値を貰い、TrueならTaskのDateやDetailを隠す
                 if !showingAddMicroTaskTextField {
-                    VStack(alignment: .leading){
-                        Text(dateFormatter(date: task.startDate!))
-                        HStack(spacing: 5){
-                            Text("from")
-                            Text(dateTimeFormatter(date: task.startDate!))
-                            Text("to")
-                            Text(dateTimeFormatter(date: task.endDate!))
+                    HStack(alignment: .firstTextBaseline){
+                        Image(systemName: "calendar")
+                        VStack(alignment: .leading){
+                            Text(dateFormatter(date: task.startDate!))
+                            HStack(spacing: 5){
+                                Text("from")
+                                Text(dateTimeFormatter(date: task.startDate!))
+                                Text("to")
+                                Text(dateTimeFormatter(date: task.endDate!))
+                            }
                         }
                     }
                     .font(.footnote)
                     .foregroundColor(.secondary)
                     .padding([.top, .bottom], 5)
-                    Text(task.detail!)
+                    
+                    DisclosureGroup("Show Detail", isExpanded: $isOpenedDisclosure){
+                        VStack(alignment: .leading, spacing: 10){
+                            HStack(alignment: .firstTextBaseline){
+                            Image(systemName: "doc.plaintext")
+                            Text(task.detail!)
+                        }
                         .font(.footnote)
-                        .foregroundColor(Color.secondary)
+                        .foregroundColor(.secondary)
+                        
+                        HStack(alignment: .firstTextBaseline){
+                            Image(systemName: "figure.stand")
+                            Text(task.detail!)
+                        }
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(isOpenedDisclosure ? .primary : .secondary)
+                    .accentColor(isOpenedDisclosure ? .primary : .secondary)
                 }
             }
             .padding(.horizontal)
