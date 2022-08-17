@@ -16,6 +16,7 @@ struct TaskDetail: View {
     @State var showingAddMicroTaskTextField = false
     @State var showingEditSheet = false
     
+    
     var body: some View {
         VStack(alignment: .leading){
             //
@@ -33,9 +34,9 @@ struct TaskDetail: View {
                         Text(dateFormatter(date: task.startDate!))
                         HStack(spacing: 5){
                             Text("from")
-                            Text(startDateFormatter(date: task.startDate!))
+                            Text(dateTimeFormatter(date: task.startDate!))
                             Text("to")
-                            Text(endDateFormatter(date: task.endDate!))
+                            Text(dateTimeFormatter(date: task.endDate!))
                         }
                     }
                     .font(.footnote)
@@ -67,27 +68,6 @@ struct TaskDetail: View {
             }
         }
     }
-}
-
-func dateFormatter(date: Date) -> String{
-    let dateFormatter = DateFormatter()
-    dateFormatter.setLocalizedDateFormatFromTemplate("yMMMMdEEEE")
-    let dateString = dateFormatter.string(from: date)
-    return dateString
-}
-
-func startDateFormatter(date: Date) -> String{
-    let dateFormatter = DateFormatter()
-    dateFormatter.setLocalizedDateFormatFromTemplate("jm")
-    let dateString = dateFormatter.string(from: date)
-    return dateString
-}
-
-func endDateFormatter(date: Date) -> String{
-    let dateFormatter = DateFormatter()
-    dateFormatter.setLocalizedDateFormatFromTemplate("jm")
-    let dateString = dateFormatter.string(from: date)
-    return dateString
 }
 
 

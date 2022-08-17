@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MicroTaskList: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.editMode) private var editMode
+    @Environment(\.editMode) private var editMode    
     @Binding var showingAddMicroTaskTextField: Bool
     
     //MARK: 親Viewで選択したTaskを使い、MicroTasksをFetchする
@@ -163,6 +163,7 @@ struct MicroTaskList: View {
                                 }
                                 .disabled(newMicroTask.isEmpty)
                             ){
+                                VStack{
                                 HStack(spacing: 10){
                                     TextField("Micro Task Title", text: $newMicroTask)
                                     Picker(selection: $minutes, label:Text("Select")){
@@ -177,6 +178,7 @@ struct MicroTaskList: View {
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.secondary, lineWidth: 1)
                                 )
+                                }
                             }
                         }
                         .transition(.move(edge: .bottom))

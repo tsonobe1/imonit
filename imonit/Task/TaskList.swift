@@ -17,6 +17,7 @@ struct TaskList: View {
     var tasks: FetchedResults<Task>
     @State private var showingAddSheet = false
     @State private var taskEditMode = false
+
     
     var body: some View {
         NavigationView {
@@ -110,6 +111,7 @@ struct TaskList_Previews: PreviewProvider {
         newMicroTask.task = newTask
         
         return TaskList()
+            .preferredColorScheme(.dark)
             .environment(\.managedObjectContext, viewContext)
     }
 }

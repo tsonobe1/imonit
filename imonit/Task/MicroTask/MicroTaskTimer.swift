@@ -39,6 +39,7 @@ struct MicroTaskTimer: View {
                     .opacity(0.25)
                 
                 // Foreground Circle
+                if remainingTime >= 0 {
                 Circle()
                 // toには正規化した値を指定する
                     .trim(from: 0, to: remainingTime/microtaskTimerMax)
@@ -46,6 +47,16 @@ struct MicroTaskTimer: View {
                 // 開始地点を上部に
                     .rotationEffect(Angle(degrees: 270))
                     .animation(.easeInOut(duration: 1), value: remainingTime)
+                }else{
+                    Circle()
+                    .trim(from: 1 + remainingTime/microtaskTimerMax, to: 1)
+                    .stroke(AngularGradient(gradient: Gradient(colors: [Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235)), Color(#colorLiteral(red: 1, green: 0.5946068037, blue: 0, alpha: 0.8470588235)),Color(#colorLiteral(red: 1, green: 0, blue: 0, alpha: 0.8470588235)) ,Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235))]), center: .center), style: StrokeStyle(lineWidth: 15.0, lineCap : .round, lineJoin: .round))
+                // 開始地点を上部に
+                    .rotationEffect(Angle(degrees: 270))
+                    .animation(.easeInOut(duration: 1), value: remainingTime)
+                }
+                
+                
                 
                 
                 //TODO: Action Button

@@ -28,9 +28,9 @@ struct TaskRow: View {
             
             HStack(alignment: .bottom){
                 Text("from")
-                Text(startDateFormatter(date: task.startDate!))
+                Text(dateTimeFormatter(date: task.startDate!))
                 Text("to")
-                Text(endDateFormatter(date: task.endDate!))
+                Text(dateTimeFormatter(date: task.endDate!))
                 Spacer()
                 Text(Image(systemName: task.isDone ?  "checkmark.circle.fill" : "circle")).font(.title).onTapGesture {
                     toggleDone(task: task)

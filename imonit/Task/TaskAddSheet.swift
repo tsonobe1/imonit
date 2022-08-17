@@ -28,102 +28,21 @@ struct TaskAddSheet: View {
     // timer
     @State var minutes = 10
     
-    //    var minutesSelection: [Int] {
-    //        get{
-    //            var minuitsArray: [Int] = []
-    //            for i in stride(from: 0, to: 62, by: 2){
-    //                minuitsArray.append(i)
-    //            }
-    //            minuitsArray.removeFirst()
-    //            return minuitsArray
-    //        }
-    //    }
-    
-    @State private var showingAlert = false
-    
-    
-    
-    
     var body: some View {
         NavigationView{
             VStack{
                 Form {
                     // MARK: Form - Task
-                    Section(header: Text("Task")){
+                    Section(header: Text("Task"),
+                            footer: Text(startDate >= endDate ? "Ends should be set to a date and time later than Starts." : "")
+                        .font(.footnote)
+                    ){
                         TextField("Task Title", text: $task)
                         TextField("Task Detail", text: $detail)
                         DatePicker("Starts", selection: $startDate)
                         DatePicker("Ends", selection: $endDate)
                     }
                     .textCase(nil)
-                    
-                    
-//                    // MARK: Form - Micro Task
-//                    Section(header: HStack{
-//                        Text("Micro Tasks")
-//                        Spacer()
-//                        // help message
-//                        Button(action: {
-//                            showingAlert.toggle()
-//                        }){
-//                            Text(Image(systemName: "questionmark.circle"))
-//
-//                        }
-//                        .alert(isPresented: $showingAlert) {
-//                            Alert(title: Text("What is Micro Task"),
-//                                  message: Text("Break tasks into smaller microtasks to make them easier to act on."))
-//                        }
-//                    },footer: HStack{
-//                        Button(action: {
-//                            addMicroTask()
-//                        }){
-//                            Spacer()
-//                            Text("Add micro tasks")
-//                                .font(.callout)
-//                                .padding(.top,5)
-//                            Spacer()
-//                        }
-//                        .disabled(microTask.isEmpty)
-//                    }){
-//                        HStack{
-//                            TextField("Micro Task Title", text: $microTask)
-//                            Picker(selection: $minutes, label:Text("Select")){
-//                                Spacer()
-//                                ForEach(1..<60, id: \.self) { i in
-//                                    Text("\(i) min").tag(i)
-//                                }
-//                            }.pickerStyle(MenuPickerStyle())
-//                        }
-//
-//                        //.multilineTextAlignment(.center)
-//                    }
-//                    .textCase(nil)
-//
-//                    // MARK: List - Micro Task
-//                    List{
-//                        Section(header:
-//                                    EditButton()
-//                            .frame(maxWidth: .infinity, alignment: .trailing)
-//                            .overlay(Text("Header"), alignment: .leading)
-//                        ){
-//                            // If microtasks are not added.
-//                            if microTaskTouple.count == 0 {
-//                                Text("No Item").foregroundColor(Color.secondary)
-//                            } else {
-//                                ForEach(0..<microTaskTouple.count, id: \.self){ index in
-//                                    HStack{
-//                                        Text("\(index+1) : ").font(.caption)
-//                                        Text(microTaskTouple[index].0)
-//                                        Spacer()
-//                                        Text("\(microTaskTouple[index].1) min").font(.caption)
-//                                    }
-//                                }
-//                                .onMove(perform: rowReplace)
-//                                .onDelete(perform: rowRemove)
-//                            }
-//                        }
-//                        .textCase(nil)
-//                    }
                 }
                 .navigationTitle("Add Task")
                 .navigationBarTitleDisplayMode(.inline)
@@ -134,9 +53,8 @@ struct TaskAddSheet: View {
                     trailing: Button("Add") {
                         addTask()
                     }
-                        .disabled(task.isEmpty)
+                    .disabled(task.isEmpty || startDate >= endDate)
                 )
-                
             }
         }
     }
@@ -178,8 +96,6 @@ struct TaskAddSheet: View {
                     newMicroTasks.task = newTask
                 }
             }
-            
-            
             do {
                 try viewContext.save()
             } catch {
@@ -194,5 +110,6 @@ struct TaskAddSheet: View {
 struct TaskAddSheet_Previews: PreviewProvider {
     static var previews: some View {
         TaskAddSheet()
+            .preferredColorScheme(.dark)
     }
 }
