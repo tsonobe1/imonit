@@ -43,6 +43,12 @@ struct TaskAddSheet: View {
                         DatePicker("Ends", selection: $endDate)
                     }
                     .textCase(nil)
+                    
+                    Section(header: Text("Other"),
+                            footer: Text("Other")
+                    ){
+                        TextEditor(text: .constant("TEST"))
+                    }
                 }
                 .navigationTitle("Add Task")
                 .navigationBarTitleDisplayMode(.inline)
@@ -83,6 +89,8 @@ struct TaskAddSheet: View {
             newTask.isDone = false
             newTask.startDate = startDate
             newTask.endDate = endDate
+            newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             
             if !microTaskTouple.isEmpty{
                 for (index, i) in microTaskTouple.enumerated() {

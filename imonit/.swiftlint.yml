@@ -1,0 +1,38 @@
+# 無効にするルール。
+disabled_rules:
+# コードの記載のない改行を許可したい
+- trailing_whitespace
+# force_cast は場合によっては使用するため
+- force_cast
+
+opt_in_rules:
+- attributes
+- closure_end
+- closure_end_indentation
+- closure_spacing
+- conditional_returns_on_newline
+- empty_count
+- explicit_init
+- explicit_type_interface
+- fatal_error_message
+- first_where
+- implicitly_unwrapped_optional
+# 大きな10進数の場合、アンダースコアは千の位取りとして使用する
+- number_separator
+- operator_usage_whitespace
+- redundant_nil_coalescing
+- switch_case_on_newline
+# filter(where:).count を 0 と比較するより contains を使うべき
+- contains_over_filter_count
+# filter(where:).isEmpty より contains を使うべき
+- contains_over_filter_is_empty
+# range(of:) != nil や range(of:) == nil より contains を使うべき
+- contains_over_range_nil_comparison
+# enumには同名のケースを複数認めない
+- duplicate_enum_cases
+# コレクションを空の配列や辞書リテラルと比較するより、 isEmpty をチェックすべき
+- empty_collection_literal
+# % より isMultiple(of:) を使うべき
+- legacy_multiple
+# メソッド名と括弧の間にスペースを入れてはいけない
+- no_space_in_method_call

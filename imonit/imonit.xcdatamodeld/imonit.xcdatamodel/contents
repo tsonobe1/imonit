@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="MicroTask" representedClassName="MicroTask" syncable="YES">
         <attribute name="actualDifficultyLevel" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="actualexpectedSatisfied" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -17,10 +17,12 @@
         <relationship name="task" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Task" inverseName="microTasks" inverseEntity="Task"/>
     </entity>
     <entity name="Task" representedClassName="Task" syncable="YES">
+        <attribute name="benefit" optional="YES" attributeType="String"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="detail" optional="YES" attributeType="String"/>
         <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="influence" optional="YES" attributeType="String"/>
         <attribute name="isDone" optional="YES" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="task" optional="YES" attributeType="String"/>
@@ -28,6 +30,6 @@
     </entity>
     <elements>
         <element name="MicroTask" positionX="-63" positionY="-18" width="128" height="239"/>
-        <element name="Task" positionX="-27" positionY="99" width="128" height="149"/>
+        <element name="Task" positionX="-27" positionY="99" width="128" height="179"/>
     </elements>
 </model>

@@ -50,18 +50,33 @@ struct TaskDetail: View {
                     DisclosureGroup("Show Detail", isExpanded: $isOpenedDisclosure){
                         VStack(alignment: .leading, spacing: 10){
                             HStack(alignment: .firstTextBaseline){
-                            Image(systemName: "doc.plaintext")
-                            Text(task.detail!)
-                        }
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                        
-                        HStack(alignment: .firstTextBaseline){
-                            Image(systemName: "figure.stand")
-                            Text(task.detail!)
-                        }
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
+                                Image(systemName: "doc.plaintext")
+                                Text(task.detail!)
+                            }
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                            
+                            HStack(alignment: .firstTextBaseline){
+                                Image(systemName: "figure.stand")
+                                Text(task.detail!)
+                            }
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                            
+                            HStack(alignment: .firstTextBaseline){
+                                Image(systemName: "figure.stand")
+                                Text(task.influence!) // TODO: optional binding
+                            }
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                            
+                            HStack(alignment: .firstTextBaseline){
+                                Image(systemName: "figure.stand")
+                                Text(task.benefit!) // TODO: optional binding
+                            }
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                            
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
