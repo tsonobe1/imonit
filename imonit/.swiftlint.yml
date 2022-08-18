@@ -5,23 +5,41 @@ disabled_rules:
 # force_cast は場合によっては使用するため
 - force_cast
 
+
 opt_in_rules:
-- attributes
-- closure_end
+# クロージャの終了は開始と同様のインデントを持つべき
 - closure_end_indentation
+# クロージャ内は各括弧の内側に1つの半角スペースがあるべき
 - closure_spacing
+# できる限りトレイリングクロージャを使うべき
+#- trailing_closure
+# クロージャ引数の定義時に括弧は不要です。
+- unneeded_parentheses_in_closure_argument
+# 条件文では次の行でリターンすべき
 - conditional_returns_on_newline
+# count を 0 と比較するより isEmpty を使うべき
 - empty_count
+# 強制アンラップ( ! )は使うべきではない
+# - force_unwrapping
 - explicit_init
-- explicit_type_interface
+# - explicit_type_interface
 - fatal_error_message
+# コレクションでは .filter {} .first より .first(where:) を使うべき
 - first_where
+# コレクションでは .filter {} .last より .last(where:) を使うべき
+- last_where
+# 暗黙的にアンラップされるオプショナル型はできる限り使うべきではない
 - implicitly_unwrapped_optional
 # 大きな10進数の場合、アンダースコアは千の位取りとして使用する
 - number_separator
+# 演算子を使うときは1つの半角スペースで囲まれるべき
 - operator_usage_whitespace
+# ?? 演算子は左辺が nil の場合のみ評価されるため、右辺に nil を記述するのは冗長
 - redundant_nil_coalescing
+# switch 文の中の case 文は常に改行すべき
 - switch_case_on_newline
+# someBool = !someBool より someBool.toggle() を使うべき
+- toggle_bool
 # filter(where:).count を 0 と比較するより contains を使うべき
 - contains_over_filter_count
 # filter(where:).isEmpty より contains を使うべき
@@ -36,3 +54,25 @@ opt_in_rules:
 - legacy_multiple
 # メソッド名と括弧の間にスペースを入れてはいけない
 - no_space_in_method_call
+# 関数でデフォルト値を持つ引数は後ろにまとめるべき
+- function_default_parameter_at_end
+# クロージャでは暗黙のリターンを優先すべき
+- implicit_return
+# 引数は同じ行に入れるか1行に1つずつ入れるべき
+#- multiline_arguments
+# 複数行の引数は、それらを括る大括弧を新しい行に持つべき
+- multiline_arguments_brackets
+# 関数を連鎖的に呼び出す場合、同じ行に入れるか1行に1つずつ入れるべき
+- multiline_function_chains
+# 関数とメソッドの引数は、同様の行にあるか1行に1つずつあるべき
+- multiline_parameters
+# 複数行の引数は、新しい行にそれを括る大括弧を入れるべき
+- multiline_parameters_brackets
+
+
+# 変数名、引数名は2文字以上ならOK
+identifier_name:
+  min_length: 1
+
+line_length : 300
+

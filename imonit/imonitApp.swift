@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct imonitApp: App {
+struct ImonitApp: App {
     let persistenceController = PersistenceController.shared
 
     var body: some Scene {

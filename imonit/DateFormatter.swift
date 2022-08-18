@@ -7,16 +7,14 @@
 
 import Foundation
 
-
-
-func dateFormatter(date: Date) -> String{
+func dateFormatter(date: Date) -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.setLocalizedDateFormatFromTemplate("yMMMMdEEEE")
     let dateString = dateFormatter.string(from: date)
     return dateString
 }
 
-func dateTimeFormatter(date: Date) -> String{
+func dateTimeFormatter(date: Date) -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.setLocalizedDateFormatFromTemplate("jm")
     let dateString = dateFormatter.string(from: date)

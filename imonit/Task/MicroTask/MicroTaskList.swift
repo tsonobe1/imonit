@@ -9,11 +9,11 @@ import SwiftUI
 
 struct MicroTaskList: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.editMode) private var editMode    
+    @Environment(\.editMode) private var editMode
     @Binding var showingAddMicroTaskTextField: Bool
-    
-    //MARK: 親Viewで選択したTaskを使い、MicroTasksをFetchする
-    @ObservedObject var task : Task
+
+    // MARK: 親Viewで選択したTaskを使い、MicroTasksをFetchする
+    @ObservedObject var task: Task
     @FetchRequest var microTasks: FetchedResults<MicroTask>
     init(withChild task: Task, showingAddMicroTaskTextField: Binding<Bool>) {
         // showingAddMicroTaskTextFieldは、Addをタップした時にTaskのDateやDetailを隠すのに使う
@@ -25,83 +25,83 @@ struct MicroTaskList: View {
             predicate: NSPredicate(format: "task == %@", task)
         )
     }
-    
+
     // MicroTaskのListの下部に表示
     private var totalTime: Int {
         var total = 0
-        for i in microTasks {
-            total += Int(i.timer/60)
+        for minute in microTasks {
+            total += Int(minute.timer / 60)
         }
         return total
     }
-    
+
     // MicroTask追加用
     @State private var newMicroTask = ""
     @State private var minutes = 10
     @State private var isStartMicroTask = false
-    
+
     // MicroTask追加時にListの最下部にScrollするためのプロパティ
     private var microTasksCount: Int { microTasks.count }
-    
+
     var body: some View {
         // 👉 MicroTaskが存在しない場合
         if microTasks.isEmpty && !showingAddMicroTaskTextField {
             MicroTaskAddButton(showingAddMicroTaskTextField: $showingAddMicroTaskTextField)
         }
         // 👉 MicroTaskが存在する場合
-        else{
-            ScrollViewReader{ scrollProxy in
-                List{
+        else {
+            ScrollViewReader { scrollProxy in
+                List {
                     Section(
                         //
                         //
                         // 📝 Header & Footer
                         //
                         //
-                        header: HStack(spacing: 20){
+                        header: HStack(spacing: 20) {
                             Text("\(microTasks.count)  Micro tasks")
                                 .font(.caption)
                             Spacer()
                             // 🔘 Add Button
                             Button(showingAddMicroTaskTextField ? "Done" : "Add") {
-                                withAnimation(.easeInOut){
+                                withAnimation(.easeInOut) {
                                     showingAddMicroTaskTextField.toggle()
-                                }}
+                                }
+                            }
                             .font(.body)
                             // 🔘 Edit Button
                             Button(editMode?.wrappedValue == .active ? "Done" : "Edit") {
-                                withAnimation() {
-                                    if editMode?.wrappedValue == .inactive{
+                                withAnimation {
+                                    if editMode?.wrappedValue == .inactive {
                                         editMode?.wrappedValue = .active
-                                    }else if editMode?.wrappedValue == .active {
+                                    } else if editMode?.wrappedValue == .active {
                                         editMode?.wrappedValue = .inactive
                                     }
                                 }
                             }
                             .font(.body)
                             .disabled(microTasks.isEmpty)
-                        }, footer: HStack{
+                        }, footer: HStack {
                             Spacer()
                             Text("Total : \(totalTime) min")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                             Spacer()
-                        })
-                    {
+                        }) {
                         //
                         //
                         // 📝 MicroTasksのリスト
                         //
                         //
-                        ForEach(microTasks){ microTask in
-                            HStack(alignment: .firstTextBaseline){
+                        ForEach(microTasks) { microTask in
+                            HStack(alignment: .firstTextBaseline) {
                                 Text("\(microTask.order) ").font(.footnote)
                                     .foregroundColor(.secondary)
                                 Text("\(microTask.microTask!)").font(.subheadline)
                                     .strikethrough(microTask.isDone)
                                     .fontWeight(.regular)
                                 Spacer()
-                                Text("\(microTask.timer/60) min").font(.caption)
+                                Text("\(microTask.timer / 60) min").font(.caption)
                             }
                             .padding(.vertical, 10)
                             .foregroundColor(microTask.isDone ? Color.secondary : Color.primary)
@@ -122,9 +122,8 @@ struct MicroTaskList: View {
                                     Image(systemName: isStartMicroTask ? "stop.circle.fill" : "timer")
                                 }.tint(isStartMicroTask ? .red : .green)
                             }
-                            .swipeActions(edge: .trailing){
-                                Button(role: .destructive) {
-                                    microTaskIsDelete(microTask: microTask)
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) { microTaskIsDelete(microTask: microTask)
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }
@@ -134,7 +133,7 @@ struct MicroTaskList: View {
                         .onMove(perform: moveMicroTasks)
                         // MicroTaskを追加したときに、リストの最下部にScrollする
                         .onChange(of: microTasks.count) { [microTasksCount] afterMicroTasksCount in
-                            withAnimation{
+                            withAnimation {
                                 // Only when adding items.
                                 if microTasksCount < afterMicroTasksCount {
                                     scrollProxy.scrollTo(microTasks.last?.id)
@@ -150,36 +149,39 @@ struct MicroTaskList: View {
                 // 📝 MicroTaskの追加フォーム
                 //
                 //
-                .safeAreaInset(edge: .bottom){
+                .safeAreaInset(edge: .bottom) {
                     if showingAddMicroTaskTextField {
-                        VStack{
-                            Section(footer: Button(action: {
-                                withAnimation{
-                                    addMicroTasks()
-                                }}){
-                                    Text("Add micro tasks")
-                                        .font(.callout)
-                                        .padding(.top)
-                                }
-                                .disabled(newMicroTask.isEmpty)
-                            ){
-                                VStack{
-                                HStack(spacing: 10){
-                                    TextField("Micro Task Title", text: $newMicroTask)
-                                    Picker(selection: $minutes, label:Text("Select")){
-                                        ForEach(1..<61, id: \.self) { i in
-                                            Text("\(i) minute").tag(i)
+                        VStack {
+                            Section(
+                                content: {
+                                    VStack {
+                                        HStack(spacing: 10) {
+                                            TextField("Micro Task Title", text: $newMicroTask)
+                                            Picker(selection: $minutes, label: Text("Select")) {
+                                                ForEach(1..<61, id: \.self) { minute in
+                                                    Text("\(minute) minute").tag(minute)
+                                                }
+                                            }.pickerStyle(MenuPickerStyle())
                                         }
-                                    }.pickerStyle(MenuPickerStyle())
+                                        .padding(.horizontal)
+                                        .padding(.vertical, 5)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color.secondary, lineWidth: 1)
+                                        )
+                                    }
+                                }, footer: {
+                                    Button(
+                                        action: { withAnimation { addMicroTasks() } },
+                                        label: {
+                                            Text("Add micro tasks")
+                                                .font(.callout)
+                                                .padding(.top)
+                                        }
+                                    )
+                                    .disabled(newMicroTask.isEmpty)
                                 }
-                                .padding(.horizontal)
-                                .padding(.vertical, 5)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.secondary, lineWidth: 1)
-                                )
-                                }
-                            }
+                            )
                         }
                         .transition(.move(edge: .bottom))
                         .padding()
@@ -189,8 +191,8 @@ struct MicroTaskList: View {
             }
         }
     }
-    
-    private func microTaskIsDone(microTask: MicroTask){
+
+    private func microTaskIsDone(microTask: MicroTask) {
         microTask.isDone.toggle()
         do {
             try viewContext.save()
@@ -199,9 +201,9 @@ struct MicroTaskList: View {
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
     }
-    
-    private func microTaskIsDelete(microTask: MicroTask){
-        withAnimation{
+
+    private func microTaskIsDelete(microTask: MicroTask) {
+        withAnimation {
             viewContext.delete(microTask)
             do {
                 try viewContext.save()
@@ -209,10 +211,13 @@ struct MicroTaskList: View {
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
-            for (index, microTask) in microTasks.enumerated() {
-                if microTask.order != index{
-                    microTask.order = Int16(index+1)
-                }
+            //            for (index, microTask) in microTasks.enumerated() {
+            //                if microTask.order != index {
+            //                    microTask.order = Int16(index + 1)
+            //                }
+            //            }
+            for (index, microTask) in microTasks.enumerated() where microTask.order != index {
+                microTask.order = Int16(index + 1)
             }
             do {
                 try viewContext.save()
@@ -222,17 +227,17 @@ struct MicroTaskList: View {
             }
         }
     }
-    
-    private func addMicroTasks(){
+
+    private func addMicroTasks() {
         let newMicroTasks = MicroTask(context: viewContext)
         newMicroTasks.microTask = newMicroTask
-        newMicroTasks.timer = Int16(minutes*60)
-        newMicroTasks.order = Int16(microTasks.count+1)
+        newMicroTasks.timer = Int16(minutes * 60)
+        newMicroTasks.order = Int16(microTasks.count + 1)
         newMicroTasks.createdAt = Date()
         newMicroTasks.id = UUID()
         newMicroTasks.isDone = false
         newMicroTasks.task = task
-        
+
         do {
             try viewContext.save()
             newMicroTask = ""
@@ -241,10 +246,8 @@ struct MicroTaskList: View {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
-        
     }
-    
-    
+
     private func deleteMicroTasks(offsets: IndexSet) {
         withAnimation {
             offsets.map { microTasks[$0] }.forEach(viewContext.delete)
@@ -254,10 +257,8 @@ struct MicroTaskList: View {
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
-            for (index, microTask) in microTasks.enumerated() {
-                if microTask.order != index{
-                    microTask.order = Int16(index+1)
-                }
+            for (index, microTask) in microTasks.enumerated() where microTask.order != index {
+                microTask.order = Int16(index + 1)
             }
             do {
                 try viewContext.save()
@@ -267,24 +268,23 @@ struct MicroTaskList: View {
             }
         }
     }
-    
+
     private func moveMicroTasks(from source: IndexSet, to destination: Int) {
         print("source first = \(source.first!)")
         print("destination = \(destination)")
         if source.first! < destination {
-            let objectsShouldChange:[Int] = Array(source.first! + 1...destination - 1)
+            let objectsShouldChange: [Int] = Array(source.first! + 1...destination - 1)
             print("objectsShouldChange \(objectsShouldChange)")
-            for i in objectsShouldChange{
-                microTasks[i].order = Int16(i)
+            for items in objectsShouldChange {
+                microTasks[items].order = Int16(items)
             }
             microTasks[source.first!].order = Int16(destination)
-        }
-        else if source.first! > destination {
-            let objectsShouldChange:[Int] = Array(destination..<source.first!)
+        } else if source.first! > destination {
+            let objectsShouldChange: [Int] = Array(destination..<source.first!)
             print("objectsShouldChange \(objectsShouldChange)")
-            
-            for i in objectsShouldChange{
-                microTasks[i].order = Int16(i + 2)
+
+            for items in objectsShouldChange {
+                microTasks[items].order = Int16(items + 2)
             }
             microTasks[source.first!].order = Int16(destination + 1)
         }
@@ -292,15 +292,12 @@ struct MicroTaskList: View {
     }
 }
 
-
-
 struct MicroTaskList_Previews: PreviewProvider {
     static var previews: some View {
-        
+
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        
-        
+
         let newTask = Task(context: viewContext)
         newTask.task = "Quis nostrud exercitation ullamco"
         newTask.isDone = false
@@ -309,7 +306,7 @@ struct MicroTaskList_Previews: PreviewProvider {
         newTask.id = UUID()
         newTask.startDate = Date()
         newTask.endDate = Date()
-        
+
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
@@ -319,12 +316,11 @@ struct MicroTaskList_Previews: PreviewProvider {
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
         newMicroTask.task = newTask
-        
+
         return NavigationView {
-            MicroTaskList(withChild: newTask, showingAddMicroTaskTextField:  .constant(false))
+            MicroTaskList(withChild: newTask, showingAddMicroTaskTextField: .constant(false))
                 .environment(\.managedObjectContext, viewContext)
         }.navigationTitle("TEST")
-            .preferredColorScheme(.dark)
+        .preferredColorScheme(.dark)
     }
 }
-

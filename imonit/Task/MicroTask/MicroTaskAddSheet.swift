@@ -10,13 +10,11 @@ import SwiftUI
 struct MicroTaskAddSheet: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) private var editMode
-    
-    
-    
+
     var body: some View {
-        VStack{
+        VStack {
             Form {
-                
+
             }
         }
     }

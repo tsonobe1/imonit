@@ -9,10 +9,10 @@ import SwiftUI
 
 struct MicroTaskAddButton: View {
     @Binding var showingAddMicroTaskTextField: Bool
-    
+
     var body: some View {
-        Button("Add Micro Tasks"){
-            withAnimation(.default){
+        Button("Add Micro Tasks") {
+            withAnimation(.default) {
                 showingAddMicroTaskTextField.toggle()
             }
         }

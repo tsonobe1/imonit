@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct TaskRow: View {
-    @ObservedObject var task : Task
+    @ObservedObject var task: Task
     @Environment(\.managedObjectContext) private var viewContext
 
     var body: some View {
-        
-        VStack(alignment: .leading){
-            VStack(alignment: .leading){
+
+        VStack(alignment: .leading) {
+            VStack(alignment: .leading) {
                 Text(task.task!)
                     .font(.headline)
                     .multilineTextAlignment(.leading)
@@ -25,8 +25,8 @@ struct TaskRow: View {
                     .multilineTextAlignment(.leading)
             }
             Spacer()
-            
-            HStack(alignment: .bottom){
+
+            HStack(alignment: .bottom) {
                 Text("from")
                 Text(dateTimeFormatter(date: task.startDate!))
                 Text("to")
@@ -42,21 +42,17 @@ struct TaskRow: View {
         }
         .foregroundColor(.primary)
         .frame(maxWidth: .infinity, alignment: .leading)
-//        .frame(height: 60)
+        //        .frame(height: 60)
         .padding()
         .background(Color(.systemGray3).opacity(0.3))
         .cornerRadius(10)
-        
-        
-        
-        
+
     }
-    func toggleDone(task: Task){
+    func toggleDone(task: Task) {
         print(task.isDone)
         task.isDone.toggle()
-        
-        
-print(task.isDone)
+
+        print(task.isDone)
         do {
             try viewContext.save()
         } catch {
@@ -64,15 +60,15 @@ print(task.isDone)
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
     }
-    
-    func startDateFormatter(date: Date) -> String{
+
+    func startDateFormatter(date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "M/d HH:mm"
         let dateString = dateFormatter.string(from: date)
         return dateString
     }
-    
-    func endDateFormatter(date: Date) -> String{
+
+    func endDateFormatter(date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "HH:mm"
         let dateString = dateFormatter.string(from: date)
@@ -80,8 +76,8 @@ print(task.isDone)
     }
 }
 
-//struct TaskRow_Previews: PreviewProvider {
+// struct TaskRow_Previews: PreviewProvider {
 //    static var previews: some View {
 //        TaskRow(task: Task())
 //    }
-//}
+// }

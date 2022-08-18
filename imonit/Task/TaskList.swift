@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-
-
 struct TaskList: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
@@ -18,17 +16,16 @@ struct TaskList: View {
     @State private var showingAddSheet = false
     @State private var taskEditMode = false
 
-    
     var body: some View {
         NavigationView {
-            ScrollView{
+            ScrollView {
                 ForEach(tasks) { task in
                     NavigationLink {
                         TaskDetail(task: task)
                     } label: {
-                        VStack{
-                            HStack{
-                                if taskEditMode == true{
+                        VStack {
+                            HStack {
+                                if taskEditMode == true {
                                     Button("Delete") {
                                         viewContext.delete(task)
                                     }
@@ -44,8 +41,8 @@ struct TaskList: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Edit") {
-                        withAnimation{
-                        taskEditMode.toggle()
+                        withAnimation {
+                            taskEditMode.toggle()
                         }
                     }
                 }
@@ -61,7 +58,7 @@ struct TaskList: View {
             .navigationTitle("Tasks")
         }
     }
-    
+
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { tasks[$0] }.forEach(viewContext.delete)

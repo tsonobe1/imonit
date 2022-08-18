@@ -12,31 +12,28 @@ struct MicroTaskDetail: View {
     @ObservedObject var microTask: MicroTask
     @State private var showingEditSheet = false
 
-    
     var body: some View {
-        VStack(alignment: .leading){
-            
+        VStack(alignment: .leading) {
+
             Text(microTask.microTask!)
                 .font(.title3)
                 .bold()
-            
-            VStack{
-                if let isDetail = microTask.detail{
+
+            VStack {
+                if let isDetail = microTask.detail {
                     Text(isDetail)
-                }else{
+                } else {
                     EmptyView()
                 }
             }
             .font(.footnote)
             .padding([.top, .bottom], 5)
             .foregroundColor(.secondary)
-            
-            //MARK: Timer
+
+            // MARK: Timer
             MicroTaskTimer(microTask: microTask)
                 .padding(10)
-            
-            
-            
+
             Spacer()
         }
         .padding(.horizontal)
@@ -47,22 +44,21 @@ struct MicroTaskDetail: View {
                 Button("Edit") {
                     self.showingEditSheet.toggle()
                 }
-                .fullScreenCover(isPresented: $showingEditSheet){
+                .fullScreenCover(isPresented: $showingEditSheet) {
                     MicroTaskEditSheet(microTask: microTask)
                 }
             }
         }
-        
+
     }
 }
 
 struct MicroTaskDetail_Previews: PreviewProvider {
     static var previews: some View {
-        
+
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        
-        
+
         let newTask = Task(context: viewContext)
         newTask.task = "Quis nostrud exercitation ullamco"
         newTask.isDone = false
@@ -71,7 +67,7 @@ struct MicroTaskDetail_Previews: PreviewProvider {
         newTask.id = UUID()
         newTask.startDate = Date()
         newTask.endDate = Date()
-        
+
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Quis nostrud exercitation ullamco"
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
@@ -81,7 +77,7 @@ struct MicroTaskDetail_Previews: PreviewProvider {
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
         newMicroTask.task = newTask
-        
+
         return NavigationView {
             MicroTaskDetail(microTask: newMicroTask)
                 .environment(\.managedObjectContext, viewContext)

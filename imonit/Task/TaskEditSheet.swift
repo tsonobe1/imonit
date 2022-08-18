@@ -10,14 +10,14 @@ import SwiftUI
 struct TaskEditSheet: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
-    @ObservedObject var task : Task
-    
+    @ObservedObject var task: Task
+
     // for text field
     @State private var taskTitle: String
     @State private var detail: String
     @State private var startDate: Date
     @State private var endDate: Date
-    
+
     // Task Entity -->> @State property
     init(task: Task) {
         self.task = task
@@ -26,14 +26,13 @@ struct TaskEditSheet: View {
         _startDate = State(initialValue: task.startDate ?? Date())
         _endDate = State(initialValue: task.endDate ?? Date())
     }
-    
-    
+
     var body: some View {
-        NavigationView{
-            VStack{
-                Form{
+        NavigationView {
+            VStack {
+                Form {
                     // MARK: Form - Task
-                    Section(header: Text("Task")){
+                    Section(header: Text("Task")) {
                         TextField("Task Title", text: $taskTitle)
                         TextEditor(text: $detail)
                         DatePicker("Starts", selection: $startDate)
@@ -44,26 +43,26 @@ struct TaskEditSheet: View {
                 .navigationTitle("Edit Task")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarItems(
-                    leading: Button("Cancel"){
+                    leading: Button("Cancel") {
                         dismiss()
                     },
                     trailing: Button("Save") {
                         updateTask()
-                        
+
                     }
-                        .disabled(taskTitle.isEmpty)
+                    .disabled(taskTitle.isEmpty)
                 )
             }
         }
     }
-    
+
     private func updateTask() {
         withAnimation {
             task.task = taskTitle
             task.detail = detail
             task.startDate = startDate
             task.endDate = endDate
-            
+
             do {
                 try viewContext.save()
             } catch {
@@ -73,16 +72,15 @@ struct TaskEditSheet: View {
         }
         dismiss()
     }
-    
+
 }
 
 struct TaskEditSheet_Previews: PreviewProvider {
     static var previews: some View {
-        
+
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        
-        
+
         let newTask = Task(context: viewContext)
         newTask.task = "Quis nostrud exercitation ullamco"
         newTask.isDone = false
@@ -91,7 +89,7 @@ struct TaskEditSheet_Previews: PreviewProvider {
         newTask.id = UUID()
         newTask.startDate = Date()
         newTask.endDate = Date()
-        
+
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
@@ -101,9 +99,9 @@ struct TaskEditSheet_Previews: PreviewProvider {
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
         newMicroTask.task = newTask
-        
+
         return NavigationView {
-            
+
             TaskEditSheet(task: newTask)
                 .environment(\.managedObjectContext, viewContext)
         }

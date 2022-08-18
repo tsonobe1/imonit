@@ -12,48 +12,48 @@ struct TaskAddSheet: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) var editMode
     @Environment(\.dismiss) var dismiss
-    
-    
+
     @State private var task = ""
     @State private var detail = ""
     @State private var id = UUID()
     @State private var startDate = Date()
     @State private var endDate = Date()
-    
-    
+
     // MicroTask
     @State private var microTask = ""
     @State private var microTaskTouple: [(String, Int16)] = []
-    
+
     // timer
     @State var minutes = 10
-    
+
     var body: some View {
-        NavigationView{
-            VStack{
+        NavigationView {
+            VStack {
                 Form {
                     // MARK: Form - Task
-                    Section(header: Text("Task"),
-                            footer: Text(startDate >= endDate ? "Ends should be set to a date and time later than Starts." : "")
-                        .font(.footnote)
-                    ){
+                    Section(
+                        header: Text("Task"),
+                        footer: Text(startDate >= endDate ? "Ends should be set to a date and time later than Starts." : "")
+                            .font(.footnote)
+                    ) {
                         TextField("Task Title", text: $task)
                         TextField("Task Detail", text: $detail)
                         DatePicker("Starts", selection: $startDate)
                         DatePicker("Ends", selection: $endDate)
                     }
                     .textCase(nil)
-                    
-                    Section(header: Text("Other"),
-                            footer: Text("Other")
-                    ){
+
+                    Section(
+                        header: Text("Other"),
+                        footer: Text("Other")
+                    ) {
                         TextEditor(text: .constant("TEST"))
                     }
                 }
                 .navigationTitle("Add Task")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarItems(
-                    leading: Button("Cancel"){
+                    leading: Button("Cancel") {
                         dismiss()
                     },
                     trailing: Button("Add") {
@@ -64,21 +64,21 @@ struct TaskAddSheet: View {
             }
         }
     }
-    
+
     private func rowRemove(offsets: IndexSet) {
         microTaskTouple.remove(atOffsets: offsets)
     }
-    
+
     private func rowReplace(_ from: IndexSet, _ to: Int) {
         microTaskTouple.move(fromOffsets: from, toOffset: to)
     }
-    
-    private func addMicroTask(){
+
+    private func addMicroTask() {
         microTaskTouple.append((microTask, Int16(minutes)))
         microTask = ""
         minutes = 10
     }
-    
+
     private func addTask() {
         withAnimation {
             let newTask = Task(context: viewContext)
@@ -91,19 +91,7 @@ struct TaskAddSheet: View {
             newTask.endDate = endDate
             newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-            
-            if !microTaskTouple.isEmpty{
-                for (index, i) in microTaskTouple.enumerated() {
-                    let newMicroTasks = MicroTask(context: viewContext)
-                    newMicroTasks.microTask = i.0
-                    newMicroTasks.timer = i.1
-                    newMicroTasks.order = Int16(index+1)
-                    newMicroTasks.createdAt = Date()
-                    newMicroTasks.id = UUID()
-                    newMicroTasks.isDone = false
-                    newMicroTasks.task = newTask
-                }
-            }
+
             do {
                 try viewContext.save()
             } catch {

@@ -9,7 +9,6 @@
 import Foundation
 import CoreData
 
-
 extension MicroTask {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<MicroTask> {
@@ -33,6 +32,6 @@ extension MicroTask {
 
 }
 
-extension MicroTask : Identifiable {
+extension MicroTask: Identifiable {
 
 }

@@ -12,11 +12,11 @@ struct MicroTaskTimer: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var microTask: MicroTask
     @State private var timerRunning = false
-    
+
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var remainingTime: CGFloat
     private let microtaskTimerMax: CGFloat
-    
+
     init(microTask: MicroTask) {
         self.microTask = microTask
         // 以下2つはCircleのtrim(カウントダウン)用のプロパティ
@@ -25,50 +25,57 @@ struct MicroTaskTimer: View {
         self.remainingTime = CGFloat(microTask.timer)
         self.microtaskTimerMax = CGFloat(microTask.timer)
     }
-    
+
     var body: some View {
-        VStack{
-            ZStack{
+        VStack {
+            ZStack {
                 // Background Circle
                 Circle()
                     .stroke(lineWidth: 30)
                     .foregroundColor(.secondary)
                     .opacity(0.25)
-                
+
                 // Foreground Circle
-                
+
                 if remainingTime >= 0 {
                     Circle()
-                    // toには正規化した値を指定する
+                        // toには正規化した値を指定する
                         .trim(from: 0, to: remainingTime / microtaskTimerMax)
-                        .stroke(AngularGradient(gradient: Gradient(colors: [Color(#colorLiteral(red: 0.2434657216, green: 0.6025889516, blue: 1, alpha: 1)), Color(#colorLiteral(red: 0, green: 1, blue: 0.849874258, alpha: 1)), Color(#colorLiteral(red: 0.924164772, green: 0.3744831383, blue: 1, alpha: 1)), Color(#colorLiteral(red: 0.2434657216, green: 0.6025889516, blue: 1, alpha: 1))]), center: .center), style: StrokeStyle(lineWidth: 15.0, lineCap: .round, lineJoin: .round))
-                    // 開始地点を上部に
+                        .stroke(
+                            AngularGradient(
+                                gradient: Gradient(colors: [Color(#colorLiteral(red: 0.2434657216, green: 0.6025889516, blue: 1, alpha: 1)), Color(#colorLiteral(red: 0, green: 1, blue: 0.849874258, alpha: 1)), Color(#colorLiteral(red: 0.924164772, green: 0.3744831383, blue: 1, alpha: 1)), Color(#colorLiteral(red: 0.2434657216, green: 0.6025889516, blue: 1, alpha: 1))]),
+                                center: .center
+                            ),
+                            style: StrokeStyle(lineWidth: 15.0, lineCap: .round, lineJoin: .round)
+                        )
+                        // 開始地点を上部に
                         .rotationEffect(Angle(degrees: 270))
                         .animation(.easeInOut(duration: 1), value: remainingTime)
                 }
                 // 設定したタイマーを過ぎた場合
-                else{
+                else {
                     Circle()
                         .trim(from: 1 + remainingTime / microtaskTimerMax, to: 1)
-                        .stroke(AngularGradient(gradient: Gradient(colors: [Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235)), Color(#colorLiteral(red: 1, green: 0.5946068037, blue: 0, alpha: 0.8470588235)),Color(#colorLiteral(red: 1, green: 0, blue: 0, alpha: 0.8470588235)) ,Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235))]), center: .center), style: StrokeStyle(lineWidth: 15.0, lineCap : .round, lineJoin: .round))
-                    // 開始地点を上部に
+                        .stroke(
+                            AngularGradient(
+                                gradient: Gradient(colors: [Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235)), Color(#colorLiteral(red: 1, green: 0.5946068037, blue: 0, alpha: 0.8470588235)), Color(#colorLiteral(red: 1, green: 0, blue: 0, alpha: 0.8470588235)), Color(#colorLiteral(red: 1, green: 0.8618306135, blue: 0, alpha: 0.8470588235))]),
+                                center: .center
+                            ),
+                            style: StrokeStyle(lineWidth: 15.0, lineCap: .round, lineJoin: .round)
+                        )
+                        // 開始地点を上部に
                         .rotationEffect(Angle(degrees: 270))
                         .animation(.easeInOut(duration: 1), value: remainingTime)
                 }
-                
-                
-                
-                
-                //TODO: Action Button
-                
-                
-                
-                VStack(spacing: 30){
+
+                // TODO: Action Button
+
+                VStack(spacing: 30) {
                     // 残り時間
-                    VStack(spacing: 10){
+                    VStack(spacing: 10) {
                         Text(remainingTime <= -1 ? "Extra Time" : "Remaining Time")
                             .opacity(0.7)
-                        HStack(alignment: .lastTextBaseline){
+                        HStack(alignment: .lastTextBaseline) {
                             /*
                              DateComponentsFormatteraのzeroFormattingBehavior=.padに
                              -1から-59の値を入れるとマイナスがつかないStringを返すが、
@@ -79,31 +86,29 @@ struct MicroTaskTimer: View {
                                 .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 50, weight: .light)))
                             Text("\\").bold()
                                 .foregroundColor(.secondary)
-                            Text(timeSeparate(timerTime:microtaskTimerMax))
+                            Text(timeSeparate(timerTime: microtaskTimerMax))
                                 .bold()
                                 .foregroundColor(.secondary)
                         }
                     }
                     if remainingTime <= -1 {
-                        VStack(spacing: 15){
+                        VStack(spacing: 15) {
                             Text("Elapsed Time")
                                 .opacity(0.7)
-                            HStack(alignment: .lastTextBaseline){
-                                Text(timeSeparate(timerTime: microtaskTimerMax-remainingTime))
+                            HStack(alignment: .lastTextBaseline) {
+                                Text(timeSeparate(timerTime: microtaskTimerMax - remainingTime))
                                     .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 20, weight: .light)))
                             }
                         }.transition(.opacity)
                     }
                 }
             }
-            
-            
-            
+
             Text("\(microTask.timer)")
                 .padding()
                 .font(.title)
-                .onReceive(timer){ _ in
-                    withAnimation() {
+                .onReceive(timer) { _ in
+                    withAnimation {
                         if timerRunning {
                             remainingTime -= 1
                         } else {
@@ -111,13 +116,13 @@ struct MicroTaskTimer: View {
                         }
                     }
                 }
-            
-            //TODO: circleをタップすると開始or一時停止　左右で異なるアクション
-            HStack(spacing:30) {
+
+            // TODO: circleをタップすると開始or一時停止　左右で異なるアクション
+            HStack(spacing: 30) {
                 Button("Start") {
                     timerRunning = true
                 }
-                
+
                 Button("Reset") {
                     remainingTime = microtaskTimerMax
                     timerRunning = false
@@ -125,9 +130,9 @@ struct MicroTaskTimer: View {
             }
         }
     }
-    
+
     // CGFloat -> String XX:XX
-    private func timeSeparate(timerTime: CGFloat) -> String{
+    private func timeSeparate(timerTime: CGFloat) -> String {
         let dateFormatter = DateComponentsFormatter()
         dateFormatter.unitsStyle = .positional
         dateFormatter.allowedUnits = [.minute, .second]
@@ -137,24 +142,12 @@ struct MicroTaskTimer: View {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
 struct MicroTaskTimer_Previews: PreviewProvider {
     static var previews: some View {
-        
-        
+
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        
-        
+
         let newTask = Task(context: viewContext)
         newTask.task = "Quis nostrud exercitation ullamco"
         newTask.isDone = false
@@ -163,7 +156,7 @@ struct MicroTaskTimer_Previews: PreviewProvider {
         newTask.id = UUID()
         newTask.startDate = Date()
         newTask.endDate = Date()
-        
+
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Quis nostrud exercitation ullamco"
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
@@ -173,12 +166,12 @@ struct MicroTaskTimer_Previews: PreviewProvider {
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
         newMicroTask.task = newTask
-        
+
         return NavigationView {
             MicroTaskTimer(microTask: newMicroTask)
                 .environment(\.managedObjectContext, viewContext)
         }
         .preferredColorScheme(.dark)
-        
+
     }
 }

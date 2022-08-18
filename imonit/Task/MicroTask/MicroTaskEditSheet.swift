@@ -16,29 +16,28 @@ struct MicroTaskEditSheet: View {
     @State private var microTaskTitle: String
     @State private var detail: String
     @State private var timer: Int16
-    
+
     init(microTask: MicroTask) {
         self.microTask = microTask
         _microTaskTitle = State(initialValue: microTask.microTask ?? "")
         _detail = State(initialValue: microTask.detail ?? "")
         _timer = State(initialValue: microTask.timer )
     }
-    
-    
+
     var body: some View {
-        NavigationView{
-            VStack{
-                Form{
+        NavigationView {
+            VStack {
+                Form {
                     // MARK: Form - Task
-                    Section(header: Text("MicroTask")){
+                    Section(header: Text("MicroTask")) {
                         TextField("Task Title", text: $microTaskTitle)
                         TextEditor(text: $detail)
-                        HStack(alignment: .lastTextBaseline){
+                        HStack(alignment: .lastTextBaseline) {
                             Text("Timer")
                             Spacer()
-                            Picker(selection: $timer, label:Text("Select")){
-                                ForEach(1..<61, id: \.self) { i in
-                                    Text("\(i) minute").tag(i)
+                            Picker(selection: $timer, label: Text("Select")) {
+                                ForEach(1..<61, id: \.self) { minute in
+                                    Text("\(minute) minute").tag(minute)
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
@@ -49,26 +48,26 @@ struct MicroTaskEditSheet: View {
                 .navigationTitle("Edit MicroTask")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarItems(
-                    leading: Button("Cancel"){
+                    leading: Button("Cancel") {
                         dismiss()
                     },
                     trailing: Button("Save") {
                         updateMicroTask()
-                        
+
                     }
-                        .disabled(microTaskTitle.isEmpty)
+                    .disabled(microTaskTitle.isEmpty)
                 )
             }
         }
-        
+
     }
-    
+
     private func updateMicroTask() {
         withAnimation {
             microTask.microTask = microTaskTitle
             microTask.detail = detail
             microTask.timer = timer
-            
+
             do {
                 try viewContext.save()
             } catch {
@@ -78,17 +77,15 @@ struct MicroTaskEditSheet: View {
         }
         dismiss()
     }
-    
-    
+
 }
 
 struct MicroTaskEditSheet_Previews: PreviewProvider {
     static var previews: some View {
-        
+
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        
-        
+
         let newTask = Task(context: viewContext)
         newTask.task = "Quis nostrud exercitation ullamco"
         newTask.isDone = false
@@ -97,7 +94,7 @@ struct MicroTaskEditSheet_Previews: PreviewProvider {
         newTask.id = UUID()
         newTask.startDate = Date()
         newTask.endDate = Date()
-        
+
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
@@ -107,9 +104,9 @@ struct MicroTaskEditSheet_Previews: PreviewProvider {
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
         newMicroTask.task = newTask
-        
+
         return NavigationView {
-            
+
             MicroTaskEditSheet(microTask: newMicroTask)
                 .environment(\.managedObjectContext, viewContext)
         }
