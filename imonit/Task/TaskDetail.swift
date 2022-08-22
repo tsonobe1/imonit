@@ -7,6 +7,16 @@
 
 import SwiftUI
 
+// HStack（sfSymbolsとText）同士を縦にAlignmentする
+extension HorizontalAlignment {
+    private enum SFSymbols: AlignmentID {
+        static func defaultValue(in d: ViewDimensions) -> CGFloat {
+            d[.trailing]
+        }
+    }
+    static let sFSymbols = HorizontalAlignment(SFSymbols.self)
+}
+
 struct TaskDetail: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) private var editMode
@@ -24,58 +34,70 @@ struct TaskDetail: View {
             //
             VStack(alignment: .leading) {
                 Text(task.task!)
-                    .font(.title2)
+                    .font(.title3)
                     .bold()
                 // MARK: 子ViewのMicroTaskListから値を貰い、TrueならTaskのDateやDetailを隠す
                 if !showingAddMicroTaskTextField {
-                    HStack(alignment: .firstTextBaseline) {
-                        Image(systemName: "calendar")
-                        VStack(alignment: .leading) {
-                            Text(dateFormatter(date: task.startDate!))
-                            HStack(spacing: 5) {
-                                Text("from")
-                                Text(dateTimeFormatter(date: task.startDate!))
-                                Text("to")
-                                Text(dateTimeFormatter(date: task.endDate!))
+                    HStack {
+                        // 📅 Calender symbol + Date
+                        HStack(alignment: .firstTextBaseline) {
+                            Image(systemName: "calendar.badge.clock")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.red, .secondary)
+
+                            VStack(alignment: .leading) {
+                                Text(dateFormatter(date: task.startDate!))
+                                HStack(spacing: 5) {
+                                    Text("from")
+                                    Text(dateTimeFormatter(date: task.startDate!))
+                                    Text("to")
+                                    Text(dateTimeFormatter(date: task.endDate!))
+                                }
                             }
                         }
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .padding([.top, .bottom], 5)
+
+                        Spacer()
+
+                        // ✅ Done
+                        
+                        BadgeCardView(title: "2020/07/11", value: "✓ Done", valueColor: Color.indigo)
                     }
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-                    .padding([.top, .bottom], 5)
+                    // Details
+                    DisclosureGroup("Show Details", isExpanded: $isOpenedDisclosure) {
+                        ScrollView {
+                            Spacer()
+                            VStack(alignment: .sFSymbols, spacing: 10) {
+                                Group {
+                                    HStack(alignment: .firstTextBaseline) {
+                                        Image(systemName: "doc.plaintext")
+                                            .foregroundColor(.secondary)
+                                        Text(task.detail!)
+                                            .alignmentGuide(.sFSymbols) { d in d[HorizontalAlignment.leading] }
+                                    }
+                                    HStack(alignment: .firstTextBaseline) {
+                                        Image(systemName: "heart")
+                                            .foregroundColor(.pink)
+                                        Text(task.influence!)
+                                            .alignmentGuide(.sFSymbols) { d in d[HorizontalAlignment.leading] }
+                                    }
+                                    HStack(alignment: .firstTextBaseline) {
+                                        Image(systemName: "chart.line.uptrend.xyaxis")
+                                            .foregroundColor(.blue)
+                                        Text(task.benefit!)
+                                            .alignmentGuide(.sFSymbols) { d in d[HorizontalAlignment.leading] }
+                                    }
+                                }
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                                .symbolVariant(.fill)
+                                .symbolRenderingMode(.hierarchical)
 
-                    DisclosureGroup("Show Detail", isExpanded: $isOpenedDisclosure) {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack(alignment: .firstTextBaseline) {
-                                Image(systemName: "doc.plaintext")
-                                Text(task.detail!)
                             }
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-
-                            HStack(alignment: .firstTextBaseline) {
-                                Image(systemName: "figure.stand")
-                                Text(task.detail!)
-                            }
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-
-                            HStack(alignment: .firstTextBaseline) {
-                                Image(systemName: "figure.stand")
-                                Text(task.influence!) //
-                            }
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-
-                            HStack(alignment: .firstTextBaseline) {
-                                Image(systemName: "figure.stand")
-                                Text(task.benefit!) //
-                            }
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .font(.subheadline)
                     .foregroundColor(isOpenedDisclosure ? .primary : .secondary)
@@ -114,13 +136,15 @@ struct TaskDetail_Previews: PreviewProvider {
         let viewContext = result.container.viewContext
 
         let newTask = Task(context: viewContext)
-        newTask.task = "Quis nostrud exercitation ullamco"
+        newTask.task = "Quis nostrud exercitation ullamco erkkk lalkk QQQqqokok dkflk fklfkldfkfk !!!"
         newTask.isDone = false
         newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
         newTask.createdAt = Date()
         newTask.id = UUID()
         newTask.startDate = Date()
         newTask.endDate = Date()
+        newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
+        newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
 
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"

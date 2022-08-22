@@ -11,6 +11,7 @@
 		0C04C7D5283CB61A00B36008 /* TaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C04C7D4283CB61A00B36008 /* TaskDetail.swift */; };
 		0C16BC3428AD2DC60098D93E /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16BC3328AD2DC60098D93E /* DateFormatter.swift */; };
 		0C16BC3728AE76850098D93E /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 0C16BC3628AE76850098D93E /* .swiftlint.yml */; };
+		0C16BC3B28B264CA0098D93E /* BadgeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */; };
 		0C7B88842846C7360035EC8A /* MicroTaskAddSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */; };
 		0C8AB3A6283FB9A80049B89D /* MicroTaskList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */; };
 		0C8AB3A82841640A0049B89D /* MicroTaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */; };
@@ -37,6 +38,7 @@
 		0C04C7D4283CB61A00B36008 /* TaskDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetail.swift; sourceTree = "<group>"; };
 		0C16BC3328AD2DC60098D93E /* DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
 		0C16BC3628AE76850098D93E /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeCardView.swift; sourceTree = "<group>"; };
 		0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddSheet.swift; sourceTree = "<group>"; };
 		0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskList.swift; sourceTree = "<group>"; };
 		0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskDetail.swift; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 				0CA2CFCE283453EF00B65F2B /* imonitApp.swift */,
 				0CA2CFD0283453EF00B65F2B /* ContentView.swift */,
 				0C16BC3328AD2DC60098D93E /* DateFormatter.swift */,
+				0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */,
 				0C757EDA28A878E80063672A /* Task */,
 				0CA2CFD2283453F000B65F2B /* Assets.xcassets */,
 				0CA2CFD7283453F000B65F2B /* Persistence.swift */,
@@ -223,7 +226,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nexport PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint autocorrect --format # 自動修正の有効化\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nexport PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  # swiftlint autocorrect --format # 自動修正の有効化\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -248,6 +251,7 @@
 				0C8AB3A6283FB9A80049B89D /* MicroTaskList.swift in Sources */,
 				0C8AB3A82841640A0049B89D /* MicroTaskDetail.swift in Sources */,
 				0CA2CFDB283453F000B65F2B /* imonit.xcdatamodeld in Sources */,
+				0C16BC3B28B264CA0098D93E /* BadgeCardView.swift in Sources */,
 				0C99AC8228AD0A3E001FA8D7 /* MicroTaskAddButton.swift in Sources */,
 				0CDA7292283E4E6800BA614B /* Task+CoreDataProperties.swift in Sources */,
 				0CDA728F283E4E6800BA614B /* MicroTask+CoreDataClass.swift in Sources */,

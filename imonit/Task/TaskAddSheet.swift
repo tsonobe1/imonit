@@ -19,9 +19,8 @@ struct TaskAddSheet: View {
     @State private var startDate = Date()
     @State private var endDate = Date()
 
-    // MicroTask
-    @State private var microTask = ""
-    @State private var microTaskTouple: [(String, Int16)] = []
+    @State private var influence = ""
+    @State private var benefit = ""
 
     // timer
     @State var minutes = 10
@@ -33,8 +32,11 @@ struct TaskAddSheet: View {
                     // MARK: Form - Task
                     Section(
                         header: Text("Task"),
-                        footer: Text(startDate >= endDate ? "Ends should be set to a date and time later than Starts." : "")
-                            .font(.footnote)
+                        footer: Text(
+                            startDate >= endDate ?
+                                "Ends should be set to a date and time later than Starts." : ""
+                        )
+                        .font(.footnote)
                     ) {
                         TextField("Task Title", text: $task)
                         TextField("Task Detail", text: $detail)
@@ -44,11 +46,14 @@ struct TaskAddSheet: View {
                     .textCase(nil)
 
                     Section(
-                        header: Text("Other"),
+                        header: Text("Motivation"),
                         footer: Text("Other")
                     ) {
-                        TextEditor(text: .constant("TEST"))
+                        // influence
+                        TextField("Influence", text: $influence)
+                        TextField("Benefit", text: $benefit)
                     }
+                    .textCase(nil)
                 }
                 .navigationTitle("Add Task")
                 .navigationBarTitleDisplayMode(.inline)
@@ -65,20 +70,6 @@ struct TaskAddSheet: View {
         }
     }
 
-    private func rowRemove(offsets: IndexSet) {
-        microTaskTouple.remove(atOffsets: offsets)
-    }
-
-    private func rowReplace(_ from: IndexSet, _ to: Int) {
-        microTaskTouple.move(fromOffsets: from, toOffset: to)
-    }
-
-    private func addMicroTask() {
-        microTaskTouple.append((microTask, Int16(minutes)))
-        microTask = ""
-        minutes = 10
-    }
-
     private func addTask() {
         withAnimation {
             let newTask = Task(context: viewContext)
@@ -89,8 +80,8 @@ struct TaskAddSheet: View {
             newTask.isDone = false
             newTask.startDate = startDate
             newTask.endDate = endDate
-            newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-            newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            newTask.influence = influence
+            newTask.benefit = benefit
 
             do {
                 try viewContext.save()
