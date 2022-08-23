@@ -60,12 +60,14 @@ struct MicroTaskList: View {
                                 .font(.caption)
                             Spacer()
                             // 🔘 Add Button
+                            if showingAddMicroTaskTextField == false {
                             Button(showingAddMicroTaskTextField ? "Done" : "Add") {
                                 withAnimation(.easeInOut) {
                                     showingAddMicroTaskTextField.toggle()
                                 }
                             }
                             .font(.body)
+                            }
                             // 🔘 Edit Button
                             Button(editMode?.wrappedValue == .active ? "Done" : "Edit") {
                                 withAnimation {
@@ -149,7 +151,7 @@ struct MicroTaskList: View {
                 .safeAreaInset(edge: .bottom) {
                     if showingAddMicroTaskTextField {
                         VStack {
-                            MicroTaskAddModal(task: task, microTasksCount: microTasksCount)
+                            MicroTaskAddModal(task: task, showingAddMicroTaskTextField: $showingAddMicroTaskTextField, microTasksCount: microTasksCount)
                         }
                         .transition(.move(edge: .bottom))
                         .padding()
