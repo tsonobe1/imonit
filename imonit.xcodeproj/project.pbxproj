@@ -12,6 +12,7 @@
 		0C16BC3428AD2DC60098D93E /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16BC3328AD2DC60098D93E /* DateFormatter.swift */; };
 		0C16BC3728AE76850098D93E /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 0C16BC3628AE76850098D93E /* .swiftlint.yml */; };
 		0C16BC3B28B264CA0098D93E /* BadgeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */; };
+		0C28F83428B46861006B66DC /* MicroTaskAddModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C28F83328B46861006B66DC /* MicroTaskAddModal.swift */; };
 		0C7B88842846C7360035EC8A /* MicroTaskAddSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */; };
 		0C8AB3A6283FB9A80049B89D /* MicroTaskList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */; };
 		0C8AB3A82841640A0049B89D /* MicroTaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */; };
@@ -39,6 +40,7 @@
 		0C16BC3328AD2DC60098D93E /* DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
 		0C16BC3628AE76850098D93E /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeCardView.swift; sourceTree = "<group>"; };
+		0C28F83328B46861006B66DC /* MicroTaskAddModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddModal.swift; sourceTree = "<group>"; };
 		0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddSheet.swift; sourceTree = "<group>"; };
 		0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskList.swift; sourceTree = "<group>"; };
 		0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskDetail.swift; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */,
+				0C28F83328B46861006B66DC /* MicroTaskAddModal.swift */,
 				0C99AC8128AD0A3E001FA8D7 /* MicroTaskAddButton.swift */,
 				0C99AC7F28AC4E46001FA8D7 /* MicroTaskEditSheet.swift */,
 				0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */,
@@ -242,6 +245,7 @@
 				0C16BC3428AD2DC60098D93E /* DateFormatter.swift in Sources */,
 				0CDA7288283CF6D900BA614B /* TaskAddSheet.swift in Sources */,
 				0CDA7290283E4E6800BA614B /* MicroTask+CoreDataProperties.swift in Sources */,
+				0C28F83428B46861006B66DC /* MicroTaskAddModal.swift in Sources */,
 				0C04C7D5283CB61A00B36008 /* TaskDetail.swift in Sources */,
 				0CA2CFD8283453F000B65F2B /* Persistence.swift in Sources */,
 				0C7B88842846C7360035EC8A /* MicroTaskAddSheet.swift in Sources */,

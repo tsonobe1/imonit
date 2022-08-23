@@ -35,9 +35,6 @@ struct MicroTaskList: View {
         return total
     }
 
-    // MicroTask追加用
-    @State private var newMicroTask = ""
-    @State private var minutes = 10
     @State private var isStartMicroTask = false
 
     // MicroTask追加時にListの最下部にScrollするためのプロパティ
@@ -152,36 +149,7 @@ struct MicroTaskList: View {
                 .safeAreaInset(edge: .bottom) {
                     if showingAddMicroTaskTextField {
                         VStack {
-                            Section(
-                                content: {
-                                    VStack {
-                                        HStack(spacing: 10) {
-                                            TextField("Micro Task Title", text: $newMicroTask)
-                                            Picker(selection: $minutes, label: Text("Select")) {
-                                                ForEach(1..<61, id: \.self) { minute in
-                                                    Text("\(minute) minute").tag(minute)
-                                                }
-                                            }.pickerStyle(MenuPickerStyle())
-                                        }
-                                        .padding(.horizontal)
-                                        .padding(.vertical, 5)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .stroke(Color.secondary, lineWidth: 1)
-                                        )
-                                    }
-                                }, footer: {
-                                    Button(
-                                        action: { withAnimation { addMicroTasks() } },
-                                        label: {
-                                            Text("Add micro tasks")
-                                                .font(.callout)
-                                                .padding(.top)
-                                        }
-                                    )
-                                    .disabled(newMicroTask.isEmpty)
-                                }
-                            )
+                            MicroTaskAddModal(task: task, microTasksCount: microTasksCount)
                         }
                         .transition(.move(edge: .bottom))
                         .padding()
@@ -225,26 +193,6 @@ struct MicroTaskList: View {
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
-        }
-    }
-
-    private func addMicroTasks() {
-        let newMicroTasks = MicroTask(context: viewContext)
-        newMicroTasks.microTask = newMicroTask
-        newMicroTasks.timer = Int16(minutes * 60)
-        newMicroTasks.order = Int16(microTasks.count + 1)
-        newMicroTasks.createdAt = Date()
-        newMicroTasks.id = UUID()
-        newMicroTasks.isDone = false
-        newMicroTasks.task = task
-
-        do {
-            try viewContext.save()
-            newMicroTask = ""
-            minutes = 10
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
     }
 
