@@ -10,13 +10,37 @@ import SwiftUI
 struct MicroTaskAddModal: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var task: Task
+    @Binding var showingAddMicroTaskTextField: Bool
     @State private var newMicroTask = ""
     @State private var minutes = 10
+    @State private var isExpand = false
     var microTasksCount: Int
     
     var body: some View {
-        Section(
-            content: {
+        VStack {
+            // 🚫 Chancel Button
+            HStack {
+                Button(
+                    action: { withAnimation { isExpand.toggle() } },
+                    label: {
+                        Image(systemName: isExpand ? "dock.arrow.down.rectangle" : "dock.arrow.up.rectangle")
+                            .font(.callout)
+                    }
+                )
+                Spacer()
+                Button(
+                    action: { withAnimation { showingAddMicroTaskTextField.toggle() } },
+                    label: {
+                        Text("Chancel")
+                            .font(.callout)
+                            .padding(.trailing)
+                    }
+                )
+            }
+            .padding(.bottom)
+            
+            if isExpand == false {
+                // ✏️ Input Form
                 VStack {
                     HStack(spacing: 10) {
                         TextField("Micro Task Title", text: $newMicroTask)
@@ -33,18 +57,40 @@ struct MicroTaskAddModal: View {
                             .stroke(Color.secondary, lineWidth: 1)
                     )
                 }
-            }, footer: {
-                Button(
-                    action: { withAnimation { addMicroTasks() } },
-                    label: {
-                        Text("Add micro tasks")
-                            .font(.callout)
-                            .padding(.top)
+                
+            } else {
+                // ✏️✏️✏️ Expand Input form
+                VStack {
+                    TextField("Micro Task Title", text: $newMicroTask)
+                    HStack {
+                        Text("Timer")
+                        Spacer()
+                        Picker(selection: $minutes, label: Text("Select")) {
+                            ForEach(1..<61, id: \.self) { minute in
+                                Text("\(minute) minute").tag(minute)
+                            }
+                        }.pickerStyle(MenuPickerStyle())
+                        
                     }
-                )
-                .disabled(newMicroTask.isEmpty)
+                    // TODO: Add Micro Task Attributes
+                    TextField("Detail", text: .constant(""))
+                    
+                    TextField("Satisfied", text: .constant(""))
+                    
+                    TextField("Difficult", text: .constant(""))
+                }
+            }
+        }
+        
+        // + Add Button
+        Button(
+            action: { withAnimation { addMicroTasks() } },
+            label: {
+                Text("Add")
             }
         )
+        .buttonStyle(.borderedProminent)
+        .disabled(newMicroTask.isEmpty)
     }
     
     private func addMicroTasks() {
@@ -56,7 +102,7 @@ struct MicroTaskAddModal: View {
         newMicroTasks.id = UUID()
         newMicroTasks.isDone = false
         newMicroTasks.task = task
-
+        
         do {
             try viewContext.save()
             newMicroTask = ""
@@ -73,7 +119,7 @@ struct MicroTaskAddModal_Previews: PreviewProvider {
         
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-
+        
         let newTask = Task(context: viewContext)
         newTask.task = "Quis nostrud exercitation ullamco"
         newTask.isDone = false
@@ -84,7 +130,7 @@ struct MicroTaskAddModal_Previews: PreviewProvider {
         newTask.endDate = Date()
         newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
         newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-
+        
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
@@ -95,6 +141,6 @@ struct MicroTaskAddModal_Previews: PreviewProvider {
         newMicroTask.order = 0
         newMicroTask.task = newTask
         
-       return MicroTaskAddModal(task: newTask, microTasksCount: 3)
+        return MicroTaskAddModal(task: newTask, showingAddMicroTaskTextField: .constant(true), microTasksCount: 3)
     }
 }
