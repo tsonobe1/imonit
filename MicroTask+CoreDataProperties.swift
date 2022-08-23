@@ -15,12 +15,12 @@ extension MicroTask {
         return NSFetchRequest<MicroTask>(entityName: "MicroTask")
     }
 
-    @NSManaged public var actualDifficultyLevel: Int16
-    @NSManaged public var actualexpectedSatisfied: Int16
+    @NSManaged public var difficultyActual: Int16
+    @NSManaged public var difficultyPredict: Int16
+    @NSManaged public var satisfactionActual: Int16
+    @NSManaged public var satisfactionPredict: Int16
     @NSManaged public var createdAt: Date?
     @NSManaged public var detail: String?
-    @NSManaged public var expectedDifficultyLevel: Int16
-    @NSManaged public var expectedSatisfied: Int16
     @NSManaged public var feedback: String?
     @NSManaged public var id: UUID?
     @NSManaged public var isDone: Bool

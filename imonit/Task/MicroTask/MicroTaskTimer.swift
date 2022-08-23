@@ -167,6 +167,8 @@ struct MicroTaskTimer_Previews: PreviewProvider {
         newMicroTask.timer = 5
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
+        newMicroTask.satisfactionPredict = 5
+        newMicroTask.satisfactionPredict = 5
         newMicroTask.task = newTask
 
         return NavigationView {

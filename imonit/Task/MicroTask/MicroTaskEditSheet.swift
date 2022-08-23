@@ -105,6 +105,8 @@ struct MicroTaskEditSheet_Previews: PreviewProvider {
         newMicroTask.timer = 10
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
+        newMicroTask.satisfactionPredict = 5
+        newMicroTask.satisfactionPredict = 5
         newMicroTask.task = newTask
 
         return NavigationView {

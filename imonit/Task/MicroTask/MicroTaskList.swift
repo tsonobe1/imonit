@@ -61,12 +61,12 @@ struct MicroTaskList: View {
                             Spacer()
                             // 🔘 Add Button
                             if showingAddMicroTaskTextField == false {
-                            Button(showingAddMicroTaskTextField ? "Done" : "Add") {
-                                withAnimation(.easeInOut) {
-                                    showingAddMicroTaskTextField.toggle()
+                                Button(showingAddMicroTaskTextField ? "Done" : "Add") {
+                                    withAnimation(.easeInOut) {
+                                        showingAddMicroTaskTextField.toggle()
+                                    }
                                 }
-                            }
-                            .font(.body)
+                                .font(.body)
                             }
                             // 🔘 Edit Button
                             Button(editMode?.wrappedValue == .active ? "Done" : "Edit") {
@@ -93,17 +93,28 @@ struct MicroTaskList: View {
                         //
                         //
                         ForEach(microTasks) { microTask in
-                            HStack(alignment: .firstTextBaseline) {
-                                Text("\(microTask.order) ").font(.footnote)
-                                    .foregroundColor(.secondary)
-                                Text("\(microTask.microTask!)").font(.subheadline)
-                                    .strikethrough(microTask.isDone)
-                                    .fontWeight(.regular)
-                                Spacer()
-                                Text("\(microTask.timer / 60) min").font(.caption)
+                            VStack(alignment: .leading) {
+                                HStack(alignment: .firstTextBaseline) {
+                                    Text("\(microTask.order) ").font(.footnote)
+                                        .foregroundColor(.secondary)
+                                    Text("\(microTask.microTask!)").font(.subheadline)
+                                        .strikethrough(microTask.isDone)
+                                        .fontWeight(.regular)
+                                    Spacer()
+                                    Text("\(microTask.timer / 60) min").font(.caption)
+                                }
+                                .padding(.vertical, 10)
+                                .foregroundColor(microTask.isDone ? Color.secondary : Color.primary)
+                                
+                                // TODO: Dysplay satisfaction & difficuly well.
+                                HStack(spacing: 20) {
+                                    Text("😊\(microTask.satisfactionPredict)")
+                                    Text("🌋\(microTask.satisfactionPredict)")
+                                }
+                                .font(.caption)
+                                .offset(x: 19.5, y: -10)
                             }
-                            .padding(.vertical, 10)
-                            .foregroundColor(microTask.isDone ? Color.secondary : Color.primary)
+                            .frame(height: 50)
                             // .backgroundにNavigationリンクを指定してopacity0にすることでNavigationLinkの矢印>を非表示にする
                             .background(
                                 NavigationLink("", destination: MicroTaskDetail(microTask: microTask))
@@ -267,6 +278,8 @@ struct MicroTaskList_Previews: PreviewProvider {
         newMicroTask.timer = 600
         newMicroTask.createdAt = Date()
         newMicroTask.order = 0
+        newMicroTask.satisfactionPredict = 5
+        newMicroTask.satisfactionPredict = 5
         newMicroTask.task = newTask
 
         return NavigationView {
