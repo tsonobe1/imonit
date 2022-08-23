@@ -94,6 +94,8 @@ struct MicroTaskEditSheet_Previews: PreviewProvider {
         newTask.id = UUID()
         newTask.startDate = Date()
         newTask.endDate = Date()
+        newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
+        newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
 
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"

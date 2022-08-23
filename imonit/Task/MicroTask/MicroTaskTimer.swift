@@ -156,6 +156,8 @@ struct MicroTaskTimer_Previews: PreviewProvider {
         newTask.id = UUID()
         newTask.startDate = Date()
         newTask.endDate = Date()
+        newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
+        newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
 
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Quis nostrud exercitation ullamco"

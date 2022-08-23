@@ -9,12 +9,12 @@ import SwiftUI
 
 // HStack（sfSymbolsとText）同士を縦にAlignmentする
 extension HorizontalAlignment {
-    private enum SFSymbols: AlignmentID {
+    private enum SFSymbolsBetweenText: AlignmentID {
         static func defaultValue(in d: ViewDimensions) -> CGFloat {
             d[.trailing]
         }
     }
-    static let sFSymbols = HorizontalAlignment(SFSymbols.self)
+    static let sFSymbolsBetweenText = HorizontalAlignment(SFSymbolsBetweenText.self)
 }
 
 struct TaskDetail: View {
@@ -36,6 +36,7 @@ struct TaskDetail: View {
                 Text(task.task!)
                     .font(.title3)
                     .bold()
+                    .minimumScaleFactor(0.8)
                 // MARK: 子ViewのMicroTaskListから値を貰い、TrueならTaskのDateやDetailを隠す
                 if !showingAddMicroTaskTextField {
                     HStack {
@@ -69,25 +70,25 @@ struct TaskDetail: View {
                     DisclosureGroup("Show Details", isExpanded: $isOpenedDisclosure) {
                         ScrollView {
                             Spacer()
-                            VStack(alignment: .sFSymbols, spacing: 10) {
+                            VStack(alignment: .sFSymbolsBetweenText, spacing: 10) {
                                 Group {
                                     HStack(alignment: .firstTextBaseline) {
                                         Image(systemName: "doc.plaintext")
                                             .foregroundColor(.secondary)
                                         Text(task.detail!)
-                                            .alignmentGuide(.sFSymbols) { d in d[HorizontalAlignment.leading] }
+                                            .alignmentGuide(.sFSymbolsBetweenText) { d in d[HorizontalAlignment.leading] }
                                     }
                                     HStack(alignment: .firstTextBaseline) {
                                         Image(systemName: "heart")
                                             .foregroundColor(.pink)
                                         Text(task.influence!)
-                                            .alignmentGuide(.sFSymbols) { d in d[HorizontalAlignment.leading] }
+                                            .alignmentGuide(.sFSymbolsBetweenText) { d in d[HorizontalAlignment.leading] }
                                     }
                                     HStack(alignment: .firstTextBaseline) {
                                         Image(systemName: "chart.line.uptrend.xyaxis")
                                             .foregroundColor(.blue)
                                         Text(task.benefit!)
-                                            .alignmentGuide(.sFSymbols) { d in d[HorizontalAlignment.leading] }
+                                            .alignmentGuide(.sFSymbolsBetweenText) { d in d[HorizontalAlignment.leading] }
                                     }
                                 }
                                 .font(.footnote)
@@ -96,6 +97,7 @@ struct TaskDetail: View {
                                 .symbolRenderingMode(.hierarchical)
 
                             }
+                            // 左に寄せる
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
@@ -136,7 +138,7 @@ struct TaskDetail_Previews: PreviewProvider {
         let viewContext = result.container.viewContext
 
         let newTask = Task(context: viewContext)
-        newTask.task = "Quis nostrud exercitation ullamco erkkk lalkk QQQqqokok dkflk fklfkldfkfk !!!"
+        newTask.task = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed"
         newTask.isDone = false
         newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
         newTask.createdAt = Date()
