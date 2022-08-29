@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct Calender: View {
+    @State var selectedDate = Date()
     var body: some View {
         NavigationView {
             VStack {
-                NavigationLink(destination: WeeklyCalender()) {
+                DatePicker(selection: $selectedDate, label: { Text("Date") })
+                NavigationLink(destination: WeeklyCalender(selectedDate: selectedDate)) {
                     Text("Weekcly")
                 }
                 NavigationLink(destination: MonthlyCalender()) {

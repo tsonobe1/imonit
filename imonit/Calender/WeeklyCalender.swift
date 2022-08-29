@@ -9,15 +9,25 @@ import SwiftUI
 
 struct WeeklyCalender: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Task.startDate, ascending: true)],
-        predicate: NSPredicate(format: "startDate >= %@ && endDate <= %@", Calendar.current.startOfDay(for: Date()) as CVarArg, Calendar.current.startOfDay(for: Date() + 86_400) as CVarArg),
-        animation: .default
-    )
-    var tasks: FetchedResults<Task>
+//    @FetchRequest(
+//        sortDescriptors: [NSSortDescriptor(keyPath: \Task.startDate, ascending: true)],
+//        predicate: NSPredicate(format: "startDate >= %@ && endDate <= %@", Calendar.current.startOfDay(for: Date()) as CVarArg, Calendar.current.startOfDay(for: Date() + 86_400) as CVarArg),
+//        animation: .default
+//    )
+//    var tasks: FetchedResults<Task>
 
-    @State private var selectedDate: Date = Date()
-    
+//    @Binding var selectedDate: Date
+    @FetchRequest var tasks: FetchedResults<Task>
+    init(selectedDate: Date) {
+        // showingAddMicroTaskTextFieldは、Addをタップした時にTaskのDateやDetailを隠すのに使う
+//        _selectedDate = selectedDate
+        _tasks = FetchRequest(
+            entity: Task.entity(),
+            sortDescriptors: [NSSortDescriptor(keyPath: \Task.startDate, ascending: true)],
+            predicate: NSPredicate(format: "startDate >= %@ && endDate <= %@", Calendar.current.startOfDay(for: selectedDate) as CVarArg, Calendar.current.startOfDay(for: selectedDate + 86_400) as CVarArg)
+        )
+    }
+
     @State private var scrollViewHeight: CGFloat = CGFloat(0)
     @State private var timelineDividerWidth: CGFloat = CGFloat(0)
 
@@ -235,6 +245,6 @@ struct WeeklyCalender_Previews: PreviewProvider {
         newTask2.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
         newTask2.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
 
-        return WeeklyCalender()
+        return WeeklyCalender(selectedDate: Date())
     }
 }
