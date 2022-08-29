@@ -32,7 +32,7 @@ struct MicroTaskDetail: View {
 
             // MARK: Timer
             MicroTaskTimer(microTask: microTask)
-                .padding(10)
+                .padding()
 
             Spacer()
         }

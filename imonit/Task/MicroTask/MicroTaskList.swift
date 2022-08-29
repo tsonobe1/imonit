@@ -103,18 +103,14 @@ struct MicroTaskList: View {
                                     Spacer()
                                     Text("\(microTask.timer / 60) min").font(.caption)
                                 }
-                                .padding(.vertical, 10)
+                                .padding(.vertical)
                                 .foregroundColor(microTask.isDone ? Color.secondary : Color.primary)
-                                
-                                // TODO: Dysplay satisfaction & difficuly well.
-                                HStack(spacing: 20) {
-                                    Text("😊\(microTask.satisfactionPredict)")
-                                    Text("🌋\(microTask.satisfactionPredict)")
-                                }
-                                .font(.caption)
-                                .offset(x: 19.5, y: -10)
+                                //                                HStack(spacing: 20) {
+                                //                                    Text("😊 ? / \(microTask.satisfactionPredict)")
+                                //                                    Text("🌋 ? / \(microTask.satisfactionPredict)")
+                                //                                }
+                                //                                .font(.caption)
                             }
-                            .frame(height: 50)
                             // .backgroundにNavigationリンクを指定してopacity0にすることでNavigationLinkの矢印>を非表示にする
                             .background(
                                 NavigationLink("", destination: MicroTaskDetail(microTask: microTask))
@@ -271,7 +267,7 @@ struct MicroTaskList_Previews: PreviewProvider {
         newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
 
         let newMicroTask = MicroTask(context: viewContext)
-        newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
+        newMicroTask.microTask = "Lorem ipsum dolor sit amet, continer add edit sed do eiusmod tempor incididunt ut"
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
         newMicroTask.id = UUID()
         newMicroTask.isDone = false

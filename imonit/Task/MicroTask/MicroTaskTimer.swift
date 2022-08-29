@@ -26,6 +26,9 @@ struct MicroTaskTimer: View {
         self.microtaskTimerMax = CGFloat(microTask.timer)
     }
 
+    // Circleサイズに対して相対的なCGFloatで文字サイズを調整する
+    @State var circleSize: CGFloat = CGFloat(0)
+
     var body: some View {
         VStack {
             ZStack {
@@ -34,6 +37,14 @@ struct MicroTaskTimer: View {
                     .stroke(lineWidth: 30)
                     .foregroundColor(.secondary)
                     .opacity(0.25)
+                    .background(
+                        GeometryReader { geometry -> Color in
+                            DispatchQueue.main.async {
+                                circleSize = geometry.size.width
+                            }
+                            return Color.clear
+                        }
+                    )
 
                 // Foreground Circle
 
@@ -83,7 +94,7 @@ struct MicroTaskTimer: View {
                              バグが仕様か不明だが、上記を考慮した上でTextにマイナス表記を付ける
                              */
                             Text(remainingTime <= -1 && remainingTime >= -59 ? "-\(timeSeparate(timerTime: remainingTime))" : timeSeparate(timerTime: remainingTime))
-                                .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 50, weight: .light)))
+                                .font(Font(UIFont.monospacedDigitSystemFont(ofSize: circleSize * 0.15, weight: .light)))
                             Text("\\").bold()
                                 .foregroundColor(.secondary)
                             Text(timeSeparate(timerTime: microtaskTimerMax))
@@ -97,7 +108,7 @@ struct MicroTaskTimer: View {
                                 .opacity(0.7)
                             HStack(alignment: .lastTextBaseline) {
                                 Text(timeSeparate(timerTime: microtaskTimerMax - remainingTime))
-                                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 20, weight: .light)))
+                                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: circleSize * 0.15, weight: .light)))
                             }
                         }.transition(.opacity)
                     }

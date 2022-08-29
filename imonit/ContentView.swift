@@ -14,7 +14,7 @@ struct ContentView: View {
     var body: some View {
 
         //        TabView{
-        TaskList() // 1枚目の子ビュー
+        WeeklyCalender() // 1枚目の子ビュー
         //                .tabItem {
         //                    Image(systemName: "1.circle.fill") //タブバーの①
         //                }

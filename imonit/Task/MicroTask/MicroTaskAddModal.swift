@@ -14,6 +14,7 @@ struct MicroTaskAddModal: View {
 
     // MicroTask Attribute
     @State private var newMicroTask = ""
+    @State private var newMicroTaskDetail = ""
     @State private var minutes = 10
     @State private var satisfactionPredict = 1
     @State private var difficultyPredict = 1
@@ -99,7 +100,7 @@ struct MicroTaskAddModal: View {
                     HStack {
                         Image(systemName: "doc.plaintext")
                             .foregroundColor(.secondary)
-                        TextField("Detail", text: .constant(""))
+                        TextField("Detail", text: $newMicroTaskDetail)
                     }
 
                     // Predict
@@ -157,6 +158,7 @@ struct MicroTaskAddModal: View {
     private func addMicroTasks() {
         let newMicroTasks = MicroTask(context: viewContext)
         newMicroTasks.microTask = newMicroTask
+        newMicroTasks.detail = newMicroTaskDetail
         newMicroTasks.timer = Int16(minutes * 60)
         newMicroTasks.order = Int16(microTasksCount + 1)
         newMicroTasks.createdAt = Date()
@@ -169,7 +171,9 @@ struct MicroTaskAddModal: View {
         do {
             try viewContext.save()
             newMicroTask = ""
-            minutes = 10
+            minutes = 5
+            difficultyPredict = 1
+            satisfactionPredict = 1
         } catch {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")

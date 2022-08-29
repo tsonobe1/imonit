@@ -26,14 +26,17 @@ struct TaskRow: View {
             }
             Spacer()
 
-            HStack(alignment: .bottom) {
-                Text("from")
-                Text(dateTimeFormatter(date: task.startDate!))
-                Text("to")
-                Text(dateTimeFormatter(date: task.endDate!))
-                Spacer()
-                Text(Image(systemName: task.isDone ?  "checkmark.circle.fill" : "circle")).font(.title).onTapGesture {
-                    toggleDone(task: task)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(dateFormatter(date: task.startDate!))
+                HStack(alignment: .bottom) {
+                    Text("from")
+                    Text(dateTimeFormatter(date: task.startDate!))
+                    Text("to")
+                    Text(dateTimeFormatter(date: task.endDate!))
+                    Spacer()
+                    Text(Image(systemName: task.isDone ?  "checkmark.circle.fill" : "circle")).font(.title).onTapGesture {
+                        toggleDone(task: task)
+                    }
                 }
             }
             .font(.caption)
@@ -65,6 +68,7 @@ struct TaskRow: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "M/d HH:mm"
         let dateString = dateFormatter.string(from: date)
+        print("😊 DateString : \(dateString)")
         return dateString
     }
 
