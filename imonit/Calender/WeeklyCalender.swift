@@ -16,6 +16,8 @@ struct WeeklyCalender: View {
     )
     var tasks: FetchedResults<Task>
 
+    @State private var selectedDate: Date = Date()
+    
     @State private var scrollViewHeight: CGFloat = CGFloat(0)
     @State private var timelineDividerWidth: CGFloat = CGFloat(0)
 
@@ -78,6 +80,35 @@ struct WeeklyCalender: View {
                 // MARK: ScrollViewの高さ取得と上乗せするコンテンツ
                 .overlay(
                     ZStack(alignment: .topTrailing) {
+
+                        // Eventの配置
+                        // Coredataからfetchしたdataをforで回して配置していく
+                        // 以下サンプル
+                        ForEach(tasks) { task in
+                            VStack(spacing: 0) {
+                                NavigationLink(destination: TaskDetail(task: task)) {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .frame(
+                                        width: timelineDividerWidth,
+                                        height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!)
+                                        
+                                    )
+                                    .foregroundColor(.mint.opacity(0.8))
+                                    .overlay(
+                                        NavigationLink(destination: TaskDetail(task: task)) {
+                                            Group {
+                                                VStack {
+                                                    Text("\(task.task!)")
+                                                }
+                                            }
+                                            .foregroundColor(.primary)
+                                            .font(.headline)
+                                        }
+                                    )
+                                }
+                            }
+                            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
+                        }
                         // ScrollViewの(コンテンツを含めた)高さをGeometryReaderで取得
                         // この高さを1440(24h)で割って標準化した値を使うことで、
                         // EventやXX:15などの時間表示を、ScrollViewの上に配置しやすくする
@@ -86,31 +117,6 @@ struct WeeklyCalender: View {
                                 scrollViewHeight = proxy.frame(in: .global).size.height
                             }
                             return Color.clear
-                        }
-
-                        // Eventの配置
-                        // Coredataからfetchしたdataをforで回して配置していく
-                        // 以下サンプル
-                        ForEach(tasks) { task in
-                            VStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .frame(
-                                        width: timelineDividerWidth,
-                                        height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!)
-                                    )
-                                    .foregroundColor(.yellow.opacity(0.8))
-                                    .overlay(
-                                        Group {
-                                            VStack {
-                                                Text("\(task.task!)")
-                                                Text("\(task.startDate!)")
-                                                Text("\(task.endDate!)")
-                                            }
-                                        }
-                                        .font(.caption)
-                                    )
-                                    .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
-                            }
                         }
                     }
                 )

@@ -13,20 +13,20 @@ struct ContentView: View {
 
     var body: some View {
 
-        //        TabView{
-        WeeklyCalender() // 1枚目の子ビュー
-        //                .tabItem {
-        //                    Image(systemName: "1.circle.fill") //タブバーの①
-        //                }
-
-        //            Text("test tab view")
-        //                .tabItem{
-        //                    Image(systemName: "circle")
-        //                }
-        //        }
-
+        TabView {
+            TaskList() // 1枚目の子ビュー
+                .tabItem {
+                    Image(systemName: "1.circle.fill") // タブバーの①
+                }
+            
+            Calender()
+                .tabItem {
+                    Image(systemName: "calendar.badge.clock")
+                }
+        }
+        
     }
-
+    
 }
 
 private let itemFormatter: DateFormatter = {
