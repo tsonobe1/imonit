@@ -26,7 +26,7 @@ struct WeeklyCalender: View {
 
     var body: some View {
 
-        ZStack(alignment: .top) {
+//        ZStack(alignment: .top) {
             // MARK: 背景の時間軸を表示するScrollView
             ScrollView(.vertical, showsIndicators: false) {
                 // ScrollViewのコンテンツ同士のスペースを0にするためだけのvStack
@@ -59,8 +59,8 @@ struct WeeklyCalender: View {
                             // ズレ修正
                             .offset(y: -7)
                             // 1h分の列幅
-                            .frame(height: 2 * 20 * magnifyBy, alignment: .top)
-                            .frame(minHeight: 40, maxHeight: 1_200)
+                            .frame(height: 1.5 * 20 * magnifyBy, alignment: .top)
+                            .frame(minHeight: 30, maxHeight: 1_200)
 
                             // 拡大率に応じてXX:30, XX:15, XX:45の表示を追加
                             switch magnifyBy {
@@ -74,6 +74,7 @@ struct WeeklyCalender: View {
                                 EmptyView()
                             }
                         }
+                        .frame(maxHeight: .infinity)
                     }
                 }
                 // MARK: ScrollViewの高さ取得と上乗せするコンテンツ
@@ -98,6 +99,7 @@ struct WeeklyCalender: View {
                                             Group {
                                                 VStack {
                                                     Text("\(task.task!)")
+//                                                    Text("\(task.microTasks[0].microTask!)")
                                                 }
                                             }
                                             .foregroundColor(.primary)
@@ -120,7 +122,7 @@ struct WeeklyCalender: View {
                     }
                 )
             }
-        }
+//        }
 
         // MARK: magnificationGestureの拡大率を利用してScrollViewをピンチイン・アウトする
         .gesture(
@@ -143,6 +145,7 @@ struct WeeklyCalender: View {
                     lastMagnificationValue = 1.0
                 }
         )
+        
     }
 
     func dateToMinute(date: Date) -> CGFloat {
