@@ -9,18 +9,8 @@ import SwiftUI
 
 struct WeeklyCalender: View {
     @Environment(\.managedObjectContext) private var viewContext
-//    @FetchRequest(
-//        sortDescriptors: [NSSortDescriptor(keyPath: \Task.startDate, ascending: true)],
-//        predicate: NSPredicate(format: "startDate >= %@ && endDate <= %@", Calendar.current.startOfDay(for: Date()) as CVarArg, Calendar.current.startOfDay(for: Date() + 86_400) as CVarArg),
-//        animation: .default
-//    )
-//    var tasks: FetchedResults<Task>
-
-//    @Binding var selectedDate: Date
     @FetchRequest var tasks: FetchedResults<Task>
     init(selectedDate: Date) {
-        // showingAddMicroTaskTextFieldは、Addをタップした時にTaskのDateやDetailを隠すのに使う
-//        _selectedDate = selectedDate
         _tasks = FetchRequest(
             entity: Task.entity(),
             sortDescriptors: [NSSortDescriptor(keyPath: \Task.startDate, ascending: true)],
@@ -37,7 +27,6 @@ struct WeeklyCalender: View {
     var body: some View {
 
         ZStack(alignment: .top) {
-
             // MARK: 背景の時間軸を表示するScrollView
             ScrollView(.vertical, showsIndicators: false) {
                 // ScrollViewのコンテンツ同士のスペースを0にするためだけのvStack
@@ -48,9 +37,9 @@ struct WeeklyCalender: View {
                             // XX:XXとDivider
                             HStack {
                                 // 一桁の数値の先頭に0を付ける
-                                //                                Text("\(timelineDividerWidth)")
                                 Text("\(String(format: "%02d", i)):00")
-                                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))                                    .opacity(0.6)
+                                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
+                                    .opacity(0.5)
 
                                 // Divider
                                 Rectangle()
@@ -182,10 +171,10 @@ private struct ColonDelimitedTimeDivider: View {
         HStack {
             Text("\(String(format: "%02d", hour)):\(time)")
                 .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                .opacity(0.6)
+                .opacity(0.4)
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(.secondary.opacity(0.5))
+                .foregroundColor(.secondary.opacity(0.4))
         }
         .offset(y: -7 + (parentScrollViewHeight / 1_440 * CGFloat(time)))
         .transition(.opacity)
