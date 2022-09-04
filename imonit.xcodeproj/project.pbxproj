@@ -14,6 +14,7 @@
 		0C16BC3428AD2DC60098D93E /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16BC3328AD2DC60098D93E /* DateFormatter.swift */; };
 		0C16BC3728AE76850098D93E /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 0C16BC3628AE76850098D93E /* .swiftlint.yml */; };
 		0C16BC3B28B264CA0098D93E /* BadgeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */; };
+		0C1FE0CB28C44369004517ED /* MicroTaskIntoWeeklyCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1FE0CA28C44369004517ED /* MicroTaskIntoWeeklyCalender.swift */; };
 		0C28F83428B46861006B66DC /* MicroTaskAddModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C28F83328B46861006B66DC /* MicroTaskAddModal.swift */; };
 		0C74994828BAD8FB00D38458 /* WeeklyCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C74994728BAD8FB00D38458 /* WeeklyCalender.swift */; };
 		0C7B88842846C7360035EC8A /* MicroTaskAddSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */; };
@@ -45,6 +46,7 @@
 		0C16BC3328AD2DC60098D93E /* DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
 		0C16BC3628AE76850098D93E /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeCardView.swift; sourceTree = "<group>"; };
+		0C1FE0CA28C44369004517ED /* MicroTaskIntoWeeklyCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskIntoWeeklyCalender.swift; sourceTree = "<group>"; };
 		0C28F83328B46861006B66DC /* MicroTaskAddModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddModal.swift; sourceTree = "<group>"; };
 		0C74994728BAD8FB00D38458 /* WeeklyCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyCalender.swift; sourceTree = "<group>"; };
 		0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddSheet.swift; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 				0C0FD78A28BD1584002653A8 /* Calender.swift */,
 				0C0FD78828BD156F002653A8 /* MonthlyCalender.swift */,
 				0C74994728BAD8FB00D38458 /* WeeklyCalender.swift */,
+				0C1FE0CA28C44369004517ED /* MicroTaskIntoWeeklyCalender.swift */,
 			);
 			path = Calender;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 				0CDA7288283CF6D900BA614B /* TaskAddSheet.swift in Sources */,
 				0CDA7290283E4E6800BA614B /* MicroTask+CoreDataProperties.swift in Sources */,
 				0C28F83428B46861006B66DC /* MicroTaskAddModal.swift in Sources */,
+				0C1FE0CB28C44369004517ED /* MicroTaskIntoWeeklyCalender.swift in Sources */,
 				0C04C7D5283CB61A00B36008 /* TaskDetail.swift in Sources */,
 				0CA2CFD8283453F000B65F2B /* Persistence.swift in Sources */,
 				0C7B88842846C7360035EC8A /* MicroTaskAddSheet.swift in Sources */,
