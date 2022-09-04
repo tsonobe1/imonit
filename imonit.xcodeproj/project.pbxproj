@@ -14,6 +14,7 @@
 		0C16BC3428AD2DC60098D93E /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16BC3328AD2DC60098D93E /* DateFormatter.swift */; };
 		0C16BC3728AE76850098D93E /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 0C16BC3628AE76850098D93E /* .swiftlint.yml */; };
 		0C16BC3B28B264CA0098D93E /* BadgeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */; };
+		0C1FE0C328C118C3004517ED /* CornerRadiusShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1FE0C228C118C3004517ED /* CornerRadiusShape.swift */; };
 		0C28F83428B46861006B66DC /* MicroTaskAddModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C28F83328B46861006B66DC /* MicroTaskAddModal.swift */; };
 		0C74994828BAD8FB00D38458 /* WeeklyCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C74994728BAD8FB00D38458 /* WeeklyCalender.swift */; };
 		0C7B88842846C7360035EC8A /* MicroTaskAddSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */; };
@@ -45,6 +46,7 @@
 		0C16BC3328AD2DC60098D93E /* DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
 		0C16BC3628AE76850098D93E /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeCardView.swift; sourceTree = "<group>"; };
+		0C1FE0C228C118C3004517ED /* CornerRadiusShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadiusShape.swift; sourceTree = "<group>"; };
 		0C28F83328B46861006B66DC /* MicroTaskAddModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddModal.swift; sourceTree = "<group>"; };
 		0C74994728BAD8FB00D38458 /* WeeklyCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyCalender.swift; sourceTree = "<group>"; };
 		0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddSheet.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 				0CA2CFD0283453EF00B65F2B /* ContentView.swift */,
 				0C16BC3328AD2DC60098D93E /* DateFormatter.swift */,
 				0C16BC3A28B264CA0098D93E /* BadgeCardView.swift */,
+				0C1FE0C228C118C3004517ED /* CornerRadiusShape.swift */,
 				0C74994928BAD90300D38458 /* Calender */,
 				0C757EDA28A878E80063672A /* Task */,
 				0CA2CFD2283453F000B65F2B /* Assets.xcassets */,
@@ -271,6 +274,7 @@
 				0CDA7291283E4E6800BA614B /* Task+CoreDataClass.swift in Sources */,
 				0C8AB3A6283FB9A80049B89D /* MicroTaskList.swift in Sources */,
 				0C8AB3A82841640A0049B89D /* MicroTaskDetail.swift in Sources */,
+				0C1FE0C328C118C3004517ED /* CornerRadiusShape.swift in Sources */,
 				0CA2CFDB283453F000B65F2B /* imonit.xcdatamodeld in Sources */,
 				0C0FD78928BD156F002653A8 /* MonthlyCalender.swift in Sources */,
 				0C16BC3B28B264CA0098D93E /* BadgeCardView.swift in Sources */,

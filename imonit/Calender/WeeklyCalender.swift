@@ -23,6 +23,10 @@ struct WeeklyCalender: View {
 
     @State private var magnifyBy: Double = 1.0
     @State private var lastMagnificationValue: Double = 1.0
+    
+    @State private var isNavigationLint: Bool = false
+    @State private var isLongPressed: Bool = false
+//    @State var position: CGFloat = CGFloat(0)
 
     var body: some View {
 
@@ -44,7 +48,7 @@ struct WeeklyCalender: View {
                                 // Divider
                                 Rectangle()
                                     .frame(height: 1)
-                                    .foregroundColor(.secondary.opacity(0.7))
+                                    .foregroundColor(.secondary.opacity(0.4))
                                     .coordinateSpace(name: "timelineDivider")
                                     // Eventのブロックの横幅とdividerの長さを一致させるために必要
                                     .overlay(
@@ -80,7 +84,6 @@ struct WeeklyCalender: View {
                 // MARK: ScrollViewの高さ取得と上乗せするコンテンツ
                 .overlay(
                     ZStack(alignment: .topTrailing) {
-
                         // Eventの配置
                         // Coredataからfetchしたdataをforで回して配置していく
                         // 以下サンプル
@@ -93,23 +96,82 @@ struct WeeklyCalender: View {
                                         height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!)
                                         
                                     )
-                                    .foregroundColor(.mint.opacity(0.8))
+                                    .foregroundColor(isLongPressed ? .purple.opacity(0.7) : .purple.opacity(0.3))
                                     .overlay(
-                                        NavigationLink(destination: TaskDetail(task: task)) {
+                                        NavigationLink(
+                                            destination: TaskDetail(task: task),
+                                        isActive: $isNavigationLint) {
                                             Group {
                                                 VStack {
                                                     Text("\(task.task!)")
-//                                                    Text("\(task.microTasks[0].microTask!)")
                                                 }
                                             }
                                             .foregroundColor(.primary)
                                             .font(.headline)
+                                            .opacity(isLongPressed ? 0.3 : 0.8)
+                                            .onTapGesture(count: 1, perform: {
+                                                isNavigationLint.toggle()
+                                                print("Tap : isNavigationLint:\(isNavigationLint)")
+                                            })
+                                            .simultaneousGesture(
+                                                LongPressGesture()
+                                                    .onEnded { _ in
+                                                        print("Loooong")
+                                                        isLongPressed.toggle()
+                                                    }
+                                            )
+                                            .highPriorityGesture(
+                                                TapGesture(count: 2)
+                                                    .onEnded { _ in
+                                                        print("Double tap")
+                                                    }
+                                            )
                                         }
                                     )
+//                                    .overlay(
+//                                        // MARK: Action point for LongPressed
+//                                        ZStack {
+//                                            if isLongPressed == true {
+//                                                VStack {
+//                                                    HStack {
+//                                                        Spacer()
+//                                                        Circle()
+//                                                            .frame(width: 50, height: 15, alignment: .topTrailing)
+//                                                            .foregroundColor(.primary)
+//                                                            .opacity(1)
+////                                                            .onTapGesture {
+////                                                                print("Apper Divider")
+////                                                            }
+//                                                            .offset(y: -5)
+//                                                    }
+//                                                    Spacer()
+//                                                    HStack {
+//                                                        Circle()
+//                                                            .frame(width: 50, height: 15, alignment: .topLeading)
+//                                                            .foregroundColor(.primary)
+//                                                            .opacity(1)
+//                                                            .offset(y: 5)
+//                                                            .gesture(
+//                                                                DragGesture()
+//                                                                        .onChanged { value in
+//                                                                            position = value.translation.height
+//                                                                            print("height: \(position)")
+//                                                                        }
+//                                                                        .onEnded { value in
+//
+//                                                                        }
+//                                                            )
+//                                                        Spacer()
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                    )
                                 }
                             }
                             .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
                         }
+                        
                         // ScrollViewの(コンテンツを含めた)高さをGeometryReaderで取得
                         // この高さを1440(24h)で割って標準化した値を使うことで、
                         // EventやXX:15などの時間表示を、ScrollViewの上に配置しやすくする
@@ -120,6 +182,7 @@ struct WeeklyCalender: View {
                             return Color.clear
                         }
                     }
+
                 )
             }
 //        }
