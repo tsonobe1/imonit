@@ -38,7 +38,6 @@ struct MicroTaskIntoWeeklyCalender: View {
         VStack(alignment: .leading, spacing: 10) {
             ForEach(microTasks) { microTask in
                 HStack(alignment: .center, spacing: 10) {
-                    
                     RoundedRectangle(cornerRadius: 10)
                         .frame(width: 3)
                         .foregroundColor(.mint)

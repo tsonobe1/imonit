@@ -19,6 +19,8 @@ struct WeeklyCalender: View {
     }
     
     @State private var scrollViewHeight: CGFloat = CGFloat(0)
+    
+    
     @State private var timelineDividerWidth: CGFloat = CGFloat(0)
     
     @State private var magnifyBy: Double = 1.0
@@ -34,12 +36,11 @@ struct WeeklyCalender: View {
     
     @State var selectedItem = Task()
     
-    func check(scrollViewHeight: CGFloat, startDate: Date, endDate: Date) -> (flag: Bool, sum :CGFloat) {
+    func isEnougEight(scrollViewHeight: CGFloat, startDate: Date, endDate: Date) -> (flag :Bool, sum :CGFloat) {
         let flag = (scrollViewHeight / 1_440 * dateToMinute(date: endDate)) - (scrollViewHeight / 1_440 * dateToMinute(date: startDate)) > 70
         let sum = scrollViewHeight / 1_440 * dateToMinute(date: endDate) - scrollViewHeight / 1_440 * dateToMinute(date: startDate)
     return (flag, sum)
                                                                                
-
     }
     
     var body: some View {
@@ -62,7 +63,7 @@ struct WeeklyCalender: View {
                             // Divider
                             Rectangle()
                                 .frame(height: 1)
-                                .foregroundColor(.secondary.opacity(0.7))
+                                .foregroundColor(.secondary.opacity(0.4))
                                 .coordinateSpace(name: "timelineDivider")
                             // Eventのブロックの横幅とdividerの長さを一致させるために必要
                                 .overlay(
@@ -78,13 +79,13 @@ struct WeeklyCalender: View {
                         .offset(y: -7)
                         // 1h分の列幅
                         .frame(height: 1.5 * 20 * magnifyBy, alignment: .top)
-                        .frame(minHeight: 30, maxHeight: 1_200)
+                        .frame(minHeight: 30, maxHeight: 1_125)
                         
                         // 拡大率に応じてXX:30, XX:15, XX:45の表示を追加
                         switch magnifyBy {
                         case 2...4:
                             ColonDelimitedTimeDivider(hour: i, time: 30, parentScrollViewHeight: scrollViewHeight)
-                        case 4...35:
+                        case 4...50:
                             ColonDelimitedTimeDivider(hour: i, time: 30, parentScrollViewHeight: scrollViewHeight)
                             ColonDelimitedTimeDivider(hour: i, time: 15, parentScrollViewHeight: scrollViewHeight)
                             ColonDelimitedTimeDivider(hour: i, time: 45, parentScrollViewHeight: scrollViewHeight)
@@ -108,15 +109,15 @@ struct WeeklyCalender: View {
                         // Task Title
                         
                         VStack(alignment: .leading) {
-                        Text(task.task!)
-                            .font(.subheadline)
-                            .foregroundColor(.primary)
+//                        Text(task.task!)
+//                            .font(.subheadline)
+//                            .foregroundColor(.primary)
                             
-                            // TODO: checkのsumの値に応じて、MicroTaskIntoWeeklyCalenderViewの下部を徐々にフェードインしていく
-                            let _ = print(check(scrollViewHeight: scrollViewHeight, startDate: task.startDate!, endDate: task.endDate!).sum)
-                            if check(scrollViewHeight: scrollViewHeight, startDate: task.startDate!, endDate: task.endDate!).flag {
-                                MicroTaskIntoWeeklyCalender(withChild: task)
-                            }
+//                            // TODO: checkのsumの値に応じて、MicroTaskIntoWeeklyCalenderViewの下部を徐々にフェードインしていく
+//                            let _ = print(isEnougEight(scrollViewHeight: scrollViewHeight, startDate: task.startDate!, endDate: task.endDate!).sum)
+//                            if isEnougEight(scrollViewHeight: scrollViewHeight, startDate: task.startDate!, endDate: task.endDate!).flag {
+//                                MicroTaskIntoWeeklyCalender(withChild: task)
+//                            }
                         
                         
         
@@ -127,7 +128,27 @@ struct WeeklyCalender: View {
                         )
                         .frame(width: timelineDividerWidth, alignment: .leading)
                         .zIndex(1)
+                        
+                        MicroTaskDetailOnWeeklyCalender(
+                            withChild: task,
+                            scrollViewHeight: $scrollViewHeight,
+                            timelineDividerWidth: $timelineDividerWidth
+                        )
 
+//                        VStack(alignment: .leading, spacing: 0) {
+//                            Text("TEST")
+//                            Text("TEST")
+//                            Text("TEST")
+//                            Text("TEST")
+//                            Text("TEST")
+//                            Text("TEST")
+//                        }
+//                        .offset(
+//                            x: 10,
+//                            y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
+//                        )
+//                        .frame(width: timelineDividerWidth, alignment: .leading)
+//                        .zIndex(2)
 
                         
                         // Task Rectangle
@@ -139,11 +160,12 @@ struct WeeklyCalender: View {
                             path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
                         }
                         .fill(.mint)
-                        .opacity(0.3)
+                        .opacity(0.35)
                         .onTapGesture {
                             selectedItem = task
                             isNavigation.toggle()
                         }
+                        // TODO: tap(指を話さなくても)した時点で、TaskのTitleをnavigationtitleに表示する（拡大率が特定の場合のみ）
                         
                         
                         
@@ -199,14 +221,11 @@ struct WeeklyCalender: View {
         .gesture(
             MagnificationGesture()
                 .onChanged { value in
-                    let maxScale: CGFloat = 20.0
-                    let minScale: CGFloat = 1.0
-                    
                     let changeRate = value / lastMagnificationValue
-                    if magnifyBy > maxScale {
-                        magnifyBy = maxScale
-                    } else if magnifyBy < minScale {
-                        magnifyBy = minScale
+                    if magnifyBy > 30.0 {
+                        magnifyBy = 30.0
+                    } else if magnifyBy < 1.0 {
+                        magnifyBy = 1.0
                     } else {
                         magnifyBy *= changeRate
                     }
@@ -245,7 +264,7 @@ private struct ColonDelimitedTimeDivider: View {
         HStack {
             Text("\(String(format: "%02d", hour)):\(time)")
                 .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                .opacity(0.4)
+                .opacity(0.5)
             Rectangle()
                 .frame(height: 1)
                 .foregroundColor(.secondary.opacity(0.4))
