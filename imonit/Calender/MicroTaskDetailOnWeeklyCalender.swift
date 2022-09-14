@@ -39,7 +39,6 @@ struct MicroTaskDetailOnWeeklyCalender: View {
         VStack(spacing: 0) {
             ForEach(microTasks) { microTask in
                 HStack(alignment: .top) {
-                    let _ = print("scrollViewHeight: \(scrollViewHeight)")
                     RoundedRectangle(cornerRadius: 40)
                         .frame(width: 8, height: scrollViewHeight / 1_440 * (CGFloat(microTask.timer / 60)), alignment: .top)
                         .foregroundColor(.mint)
@@ -52,7 +51,6 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                         .multilineTextAlignment(.leading)
                         .layoutPriority(1)
                         .opacity(0.8)
-                    
                     
                     Line()
                         .stroke(style: StrokeStyle(lineWidth: 1, dash: [3]))
@@ -67,25 +65,14 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                     }
                     
                 }
-//                .padding(.horizontal)
                 .frame(
                     width: timelineDividerWidth,
                     height: scrollViewHeight / 1_440 * (CGFloat(microTask.timer / 60)),
                     alignment: .topLeading
                 )
-                .shadow(color: Color.black.opacity(0.9), radius: 20, x: 5, y: 10)
             }
-//            .background(
-//                Rectangle()
-//                    .stroke(.primary, lineWidth: 1)
-//                    .opacity(0.3)
-//            )
-
         }
-        .offset(
-            //            x: 10,
-            y: ((scrollViewHeight / 1_440) * dateToMinute(date: task.startDate!))
-        )
+        .offset(y: ((scrollViewHeight / 1_440) * dateToMinute(date: task.startDate!)))
         .zIndex(2)
     }
     
