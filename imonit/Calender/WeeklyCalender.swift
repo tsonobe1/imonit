@@ -17,166 +17,207 @@ struct WeeklyCalender: View {
             predicate: NSPredicate(format: "startDate >= %@ && endDate <= %@", Calendar.current.startOfDay(for: selectedDate) as CVarArg, Calendar.current.startOfDay(for: selectedDate + 86_400) as CVarArg)
         )
     }
-    
+
     @State private var scrollViewHeight: CGFloat = CGFloat(0)
-    
-    
+
     @State private var timelineDividerWidth: CGFloat = CGFloat(0)
-    
+
     @State private var magnifyBy: Double = 1.0
     @State private var lastMagnificationValue: Double = 1.0
     @State private var taskBlockheight: CGFloat = 0
-    
+
     @State var lead: Int  = 0// 😜
     @State var top: Int = 0// 🎉
     @State var trail: Int = 0// 🧴
     @State var bottom: Int = 0// 💛
-    
+
     @State private var isNavigation = false
-    
+
     @State var selectedItem = Task()
-    
-    func isEnougEight(scrollViewHeight: CGFloat, startDate: Date, endDate: Date) -> (flag :Bool, sum :CGFloat) {
+
+    func isEnougEight(scrollViewHeight: CGFloat, startDate: Date, endDate: Date) -> (flag: Bool, sum: CGFloat) {
         let flag = (scrollViewHeight / 1_440 * dateToMinute(date: endDate)) - (scrollViewHeight / 1_440 * dateToMinute(date: startDate)) > 70
         let sum = scrollViewHeight / 1_440 * dateToMinute(date: endDate) - scrollViewHeight / 1_440 * dateToMinute(date: startDate)
         return (flag, sum)
-        
+
     }
 
+    @State private var scrollTarget: Int?
+    @State private var cheatFadeIn: Bool = false
     
     var body: some View {
-        
-        // MARK: 背景の時間軸を表示するScrollView
-            ScrollView(.vertical, showsIndicators: false) {
-                // ScrollViewのコンテンツ同士のスペースを0にするためだけのvStack
-                // spacing:0のVStackを置かないと、overrideするコンテンツの位置がずれる
+        // MARK: toScrollの移動先を設けるためのView
+        ScrollViewReader { (scrollviewProxy2: ScrollViewProxy) in
+            ScrollView {
                 VStack(spacing: 0) {
-                    ForEach(0..<24) { i in
-                        ZStack(alignment: .topLeading) {
-                            // XX:XXとDivider
-                            HStack {
-                                // 一桁の数値の先頭に0を付ける
-                                Text("\(String(format: "%02d", i)):00")
-                                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                                    .opacity(0.5)
-                                
-                                // Divider
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundColor(.secondary.opacity(0.4))
-                                    .coordinateSpace(name: "timelineDivider")
-                                // Eventのブロックの横幅とdividerの長さを一致させるために必要
-                                    .overlay(
-                                        GeometryReader { proxy -> Color in
-                                            DispatchQueue.main.async {
-                                                timelineDividerWidth = proxy.frame(in: .named("timelineDivider")).size.width
-                                            }
-                                            return Color.clear
-                                        }
-                                    )
-                            }
-                            // ズレ修正
-                            .offset(y: -7)
-                            // 1h分の列幅
-                            .frame(height: 1.5 * 20 * magnifyBy, alignment: .top)
-                            .frame(minHeight: 30, maxHeight: 1_125)
-                            
-                            // 拡大率に応じてXX:30, XX:15, XX:45の表示を追加
-                            switch magnifyBy {
-                            case 2...4:
-                                ColonDelimitedTimeDivider(hour: i, time: 30, parentScrollViewHeight: scrollViewHeight)
-                            case 4...50:
-                                ColonDelimitedTimeDivider(hour: i, time: 30, parentScrollViewHeight: scrollViewHeight)
-                                ColonDelimitedTimeDivider(hour: i, time: 15, parentScrollViewHeight: scrollViewHeight)
-                                ColonDelimitedTimeDivider(hour: i, time: 45, parentScrollViewHeight: scrollViewHeight)
-                            default:
-                                EmptyView()
-                            }
+                    ForEach(0..<144, id: \.self) { obj in
+                        ZStack {
+                            Rectangle()
+                                .stroke(.clear)
+                                .frame(height: 30 * magnifyBy / 6, alignment: .top)
+                                .id(obj)
                         }
-                        .frame(maxHeight: .infinity)
                     }
                 }
-                // MARK: ScrollViewの高さ取得と上乗せするコンテンツ
-                .overlay(
-                    ZStack(alignment: .topTrailing) {
-                        NavigationLink(destination: TaskDetail(task: selectedItem), isActive: self.$isNavigation) {
-                            EmptyView()
-                        }
-                        // Coredataからfetchしたdataをforで回して配置していく
-                        ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
-                            // Task Title
-                            
-                            VStack(alignment: .leading) {
-                                Text(task.task!)
-                                    .font(.footnote)
-                                    .foregroundColor(.primary)
-                                    .bold()
-                                // TODO: checkのsumの値に応じて、MicroTaskIntoWeeklyCalenderViewの下部を徐々にフェードインしていく
-                                let _ = print(isEnougEight(scrollViewHeight: scrollViewHeight, startDate: task.startDate!, endDate: task.endDate!).sum)
-                                if isEnougEight(scrollViewHeight: scrollViewHeight, startDate: task.startDate!, endDate: task.endDate!).flag {
-                                    MicroTaskIntoWeeklyCalender(withChild: task)
-                                }
-                            }
-                            // 余白を入れつつTaskのタイトルを表示する
-                            .offset(x: 10, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
-                            .frame(width: timelineDividerWidth, alignment: .leading)
-                            .zIndex(1) // Pathより上に表示
-                            
-                            //                        MicroTaskDetailOnWeeklyCalender(
-                            //                            withChild: task,
-                            //                            scrollViewHeight: $scrollViewHeight,
-                            //                            timelineDividerWidth: $timelineDividerWidth
-                            //                        )
-                            
-                            
-                            // Task Rectangle
-                            Path { path in
-                                path.move(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
-                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
-                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)))
-                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)))
-                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
-                            }
-                            .fill(.mint)
-                            .opacity(0.35)
-                            .onTapGesture {
-                                selectedItem = task
-                                isNavigation.toggle()
-                                
-                            }
-                            .simultaneousGesture(
-                                LongPressGesture()
-                                    .onEnded { _ in
-                                        print("Loooong")
-                                    }
-                            )
-                            .highPriorityGesture(
-                                TapGesture(count: 2)
-                                    .onEnded { _ in
-                                        print("Double tap")
-                                        // TODO: expand + scrollTo
-//                                        magnifyBy = 30
-                                    }
-                            )
-                            // TODO: tap(指を話さなくても)した時点で、TaskのTitleをnavigationtitleに表示する（拡大率が特定の場合のみ）
-                            
-                            
-                        }
-                        
-                        // ScrollViewの(コンテンツを含めた)高さをGeometryReaderで取得
-                        // この高さを1440(24h)で割って標準化した値を使うことで、
-                        // EventやXX:15などの時間表示を、ScrollViewの上に配置しやすくする
-                        GeometryReader { proxy -> Color in
-                            DispatchQueue.main.async {
-                                scrollViewHeight = proxy.frame(in: .global).size.height
-                            }
-                            return Color.clear
+                .onChange(of: scrollTarget) { target in
+                    if let target = target {
+                        scrollTarget = nil
+                        print("scrollTargetの変更を感知しました, target: \(target)")
+                        withAnimation {
+                            scrollviewProxy2.scrollTo(target, anchor: .top)
                         }
                     }
+                }
+                // overlay
+                .overlay(
+                    // ScrollViewのコンテンツ同士のスペースを0にするためだけのvStack
+                    // spacing:0のVStackを置かないと、overrideするコンテンツの位置がずれる
+                    VStack(spacing: 0) {
+                        ForEach(0..<24) { i in
+                            ZStack(alignment: .topLeading) {
+                                // XX:XXとDivider
+                                HStack {
+                                    // 一桁の数値の先頭に0を付ける
+                                    Text("\(String(format: "%02d", i)):00")
+                                        .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
+                                        .opacity(0.5)
+                                    
+                                    // Divider
+                                    Rectangle()
+                                        .frame(height: 1)
+                                        .foregroundColor(.secondary.opacity(0.4))
+                                        .coordinateSpace(name: "timelineDivider")
+                                    // Eventのブロックの横幅とdividerの長さを一致させるために必要
+                                        .overlay(
+                                            GeometryReader { proxy -> Color in
+                                                DispatchQueue.main.async {
+                                                    timelineDividerWidth = proxy.frame(in: .named("timelineDivider")).size.width
+                                                }
+                                                return Color.clear
+                                            }
+                                        )
+                                }
+                                // ズレ修正
+                                .offset(y: -7)
+                                // 1h分の列幅
+                                .frame(height: 30 * magnifyBy, alignment: .top)
+                                .frame(minHeight: 30, maxHeight: 1_125)
+                                
+                                // 拡大率に応じてXX:30, XX:15, XX:45の表示を追加
+                                switch magnifyBy {
+                                case 2...4:
+                                    ColonDelimitedTimeDivider(hour: i, time: 30, parentScrollViewHeight: scrollViewHeight)
+                                case 4...50:
+                                    ColonDelimitedTimeDivider(hour: i, time: 30, parentScrollViewHeight: scrollViewHeight)
+                                    ColonDelimitedTimeDivider(hour: i, time: 15, parentScrollViewHeight: scrollViewHeight)
+                                    ColonDelimitedTimeDivider(hour: i, time: 45, parentScrollViewHeight: scrollViewHeight)
+                                default:
+                                    EmptyView()
+                                }
+                            }
+                            .frame(maxHeight: .infinity)
+                        }
+                    }
+                    // MARK: ScrollViewの高さ取得と上乗せするコンテンツ
+                    .overlay(
+                        ZStack(alignment: .topTrailing) {
+                            NavigationLink(destination: TaskDetail(task: selectedItem), isActive: self.$isNavigation) {
+                                EmptyView()
+                            }
+                            // Coredataからfetchしたdataをforで回して配置していく
+                            ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
+                                // Task Title
+                                
+//                                VStack(alignment: .leading) {
+//                                    Text(task.task!)
+//                                        .font(.footnote)
+//                                        .foregroundColor(.primary)
+//                                        .bold()
+//                                    // TODO: checkのsumの値に応じて、MicroTaskIntoWeeklyCalenderViewの下部を徐々にフェードインしていく
+//                                    let _ = print(isEnougEight(scrollViewHeight: scrollViewHeight, startDate: task.startDate!, endDate: task.endDate!).sum)
+//                                    if isEnougEight(scrollViewHeight: scrollViewHeight, startDate: task.startDate!, endDate: task.endDate!).flag {
+//                                        MicroTaskIntoWeeklyCalender(withChild: task)
+//                                    }
+//                                }
+//                                // 余白を入れつつTaskのタイトルを表示する
+//                                .offset(x: 10, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
+//                                .frame(width: timelineDividerWidth, alignment: .leading)
+//                                .zIndex(1) // Pathより上に表示
+                                
+                                                        MicroTaskDetailOnWeeklyCalender(
+                                                            withChild: task,
+                                                            scrollViewHeight: $scrollViewHeight,
+                                                            timelineDividerWidth: $timelineDividerWidth
+                                                        )
+                                
+                                // Task Rectangle
+                                Path { path in
+                                    path.move(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
+                                    path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
+                                    path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)))
+                                    path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)))
+                                    path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
+                                }
+                                .fill(.mint)
+                                .opacity(0.35)
+                                .onTapGesture {
+                                    selectedItem = task
+                                    isNavigation.toggle()
+                                    
+                                }
+                                .simultaneousGesture(
+                                    LongPressGesture()
+                                        .onEnded { _ in
+                                            print("Loooong")
+                                        }
+                                )
+                                .highPriorityGesture(
+                                    TapGesture(count: 2)
+                                        .onEnded { _ in
+                                            print("Double tap")
+                                            // TODO: magnifyByを30にするとスクロールViewの拡大スピードが遅くてスクロールがうまく行かないので、遅延させている
+//                                            cheatFadeIn = true
+                                            magnifyBy = 30
+
+                                            // magnifyByによる拡大でScrollViewのTopに戻り、そこからtoScrollで移動するのでアニメーションがぐちゃぐちゃになる
+                                            // TODO: そのため、スクロールの間、opacityを0にして隠しているが、もっとうまくやりたい
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                let taskBlockHeight = scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
+                                                let banme = taskBlockHeight / (30 * magnifyBy / 6)
+                                                let intBanme = Int(floor(banme))
+                                                scrollTarget = intBanme
+//                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+//                                                    cheatFadeIn = false
+//                                                }
+                                            }
+
+                                            
+                                            
+                                        }
+                                )
+                                // TODO: tap(指を話さなくても)した時点で、TaskのTitleをnavigationtitleに表示する（拡大率が特定の場合のみ）
+                            }
+                            
+                            // ScrollViewの(コンテンツを含めた)高さをGeometryReaderで取得
+                            // この高さを1440(24h)で割って標準化した値を使うことで、
+                            // EventやXX:15などの時間表示を、ScrollViewの上に配置しやすくする
+                            GeometryReader { proxy -> Color in
+                                DispatchQueue.main.async {
+                                    scrollViewHeight = proxy.frame(in: .global).size.height
+                                }
+                                return Color.clear
+                            }
+                        }
+                    )
                 )
             }
+            .coordinateSpace(name: "scroll")
+            .transaction { transaction in
+                transaction.animation = nil
+            }
+            .opacity(cheatFadeIn ? 0 : 1)
+        }
 
-        
         // MARK: magnificationGestureの拡大率を利用してScrollViewをピンチイン・アウトする
         .gesture(
             MagnificationGesture()
@@ -249,7 +290,7 @@ struct WeeklyCalender_Previews: PreviewProvider {
         newTask.endDate = Calendar.current.date(bySettingHour: 11, minute: 00, second: 0, of: Date())!
         newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
         newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-        
+
         // micro task
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
@@ -262,7 +303,7 @@ struct WeeklyCalender_Previews: PreviewProvider {
         newMicroTask.satisfactionPredict = 5
         newMicroTask.satisfactionPredict = 5
         newMicroTask.task = newTask
-        
+
         let newMicroTask2 = MicroTask(context: viewContext)
         newMicroTask2.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
         newMicroTask2.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
@@ -274,7 +315,7 @@ struct WeeklyCalender_Previews: PreviewProvider {
         newMicroTask2.satisfactionPredict = 5
         newMicroTask2.satisfactionPredict = 5
         newMicroTask2.task = newTask
-        
+
         // task2
         let newTask2 = Task(context: viewContext)
         newTask2.task = "Quis2 nostrud exercitation ullamco"
@@ -286,9 +327,7 @@ struct WeeklyCalender_Previews: PreviewProvider {
         newTask2.endDate = Calendar.current.date(bySettingHour: 15, minute: 30, second: 0, of: Date())!
         newTask2.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
         newTask2.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-        
+
         return WeeklyCalender(selectedDate: Date())
     }
 }
-
-

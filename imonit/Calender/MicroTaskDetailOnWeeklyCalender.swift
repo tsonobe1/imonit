@@ -11,7 +11,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
     @Environment(\.editMode) private var editMode
     @Binding var scrollViewHeight: CGFloat
     @Binding var timelineDividerWidth: CGFloat
-    
+
     // MARK: 親Viewで選択したTaskを使い、MicroTasksをFetchする
     @ObservedObject var task: Task
     @FetchRequest var microTasks: FetchedResults<MicroTask>
@@ -26,7 +26,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
             predicate: NSPredicate(format: "task == %@", task)
         )
     }
-    
+
     // MicroTaskのListの下部に表示
     private var totalTime: Int {
         var total = 0
@@ -46,24 +46,24 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                         .fixedSize()
 
                     HStack(alignment: .center, spacing: 5) {
-                    Text(microTask.microTask!)
-                        .font(.caption)
-                        .multilineTextAlignment(.leading)
-                        .layoutPriority(1)
-                        .opacity(0.8)
-                    
-                    Line()
-                        .stroke(style: StrokeStyle(lineWidth: 1, dash: [3]))
-                        .frame(height: 1)
-                        .opacity(0.5)
-                    
-                    Text("\(microTask.timer / 60) m")
-                        .opacity(0.8)
-                        .font(.caption)
-                        .fixedSize()
-                        .padding(.trailing)
+                        Text(microTask.microTask!)
+                            .font(.caption)
+                            .multilineTextAlignment(.leading)
+                            .layoutPriority(1)
+                            .opacity(0.8)
+
+                        Line()
+                            .stroke(style: StrokeStyle(lineWidth: 1, dash: [3]))
+                            .frame(height: 1)
+                            .opacity(0.5)
+
+                        Text("\(microTask.timer / 60) m")
+                            .opacity(0.8)
+                            .font(.caption)
+                            .fixedSize()
+                            .padding(.trailing)
                     }
-                    
+
                 }
                 .frame(
                     width: timelineDividerWidth,
@@ -75,13 +75,13 @@ struct MicroTaskDetailOnWeeklyCalender: View {
         .offset(y: ((scrollViewHeight / 1_440) * dateToMinute(date: task.startDate!)))
         .zIndex(2)
     }
-    
+
     func caluculateTimeInterval(startDate: Date, endDate: Date) -> CGFloat {
         let timeInterval = endDate.timeIntervalSince(startDate)
         //        print("👉 TimeInterval : \(timeInterval / 60)")
         return CGFloat(timeInterval / 60)
     }
-    
+
     func dateToMinute(date: Date) -> CGFloat {
         //        print("dateToMinuteが何度も実行されてしまう問題を解決したい")
         let calendar = Calendar.current
@@ -91,4 +91,3 @@ struct MicroTaskDetailOnWeeklyCalender: View {
         return CGFloat((hour * 60) + minute)
     }
 }
-

@@ -31,9 +31,9 @@ struct MicroTaskIntoWeeklyCalender: View {
         }
         return total
     }
-    
+
     @State private var textHeight: CGFloat = 0
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             ForEach(microTasks) { microTask in
@@ -43,19 +43,19 @@ struct MicroTaskIntoWeeklyCalender: View {
                         .foregroundColor(.mint)
                         .opacity(0.7)
                         .fixedSize()
-                    
+
                     Text(microTask.microTask!)
                         .font(.caption)
                         .foregroundColor(.primary)
                         .opacity(0.9)
                         .multilineTextAlignment(.leading)
                         .layoutPriority(1)
-                    
+
                     Line()
                         .stroke(style: StrokeStyle(lineWidth: 1, dash: [3]))
                         .frame(height: 1)
                         .opacity(0.6)
-                    
+
                     Text("\(microTask.timer / 60) m")
                         .opacity(0.9)
                         .font(.caption)
@@ -79,7 +79,7 @@ struct Line: Shape {
 
 struct MicroTaskIntoWeeklyCalender_Previews: PreviewProvider {
     static var previews: some View {
-        
+
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
 
@@ -105,7 +105,7 @@ struct MicroTaskIntoWeeklyCalender_Previews: PreviewProvider {
         newMicroTask.satisfactionPredict = 5
         newMicroTask.satisfactionPredict = 5
         newMicroTask.task = newTask
-        
+
         return MicroTaskIntoWeeklyCalender(withChild: newTask)
     }
 }
