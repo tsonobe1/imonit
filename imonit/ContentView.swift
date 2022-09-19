@@ -18,15 +18,15 @@ struct ContentView: View {
                 .tabItem {
                     Image(systemName: "1.circle.fill") // タブバーの①
                 }
-            
+
             Calender()
                 .tabItem {
                     Image(systemName: "calendar.badge.clock")
                 }
         }
-        
+
     }
-    
+
 }
 
 private let itemFormatter: DateFormatter = {
