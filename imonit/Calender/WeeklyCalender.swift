@@ -22,7 +22,7 @@ struct WeeklyCalender: View {
     @State private var timelineDividerWidth: CGFloat = CGFloat(0)
     
     // For ScrollView Magnify Rate
-    @State private var magnifyBy: Double = 1.0
+    @State private var magnifyBy: Double = 10.0
     @State private var lastMagnificationValue: Double = 1.0
     
     // For Navigation When Tapped Task Block
@@ -52,9 +52,9 @@ struct WeeklyCalender: View {
     // 🖕 Pinch in When Double Tap Gesture
     fileprivate func findOrderOfTaskBlockUpperSide(_ task: FetchedResults<Task>.Element) {
         let taskBlockHeight = scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
-        let CompartmentalizedOrder = taskBlockHeight / (30 * magnifyBy / 6)
-        let RoundDown  = Int(floor(CompartmentalizedOrder))
-        scrollTarget = RoundDown
+        let compartmentalizedOrder = taskBlockHeight / (30 * magnifyBy / 6)
+        let roundDown = Int(floor(compartmentalizedOrder))
+        scrollTarget = roundDown
     }
     fileprivate func pinchInAndToSctrollDoubleTap(_ task: FetchedResults<Task>.Element) -> _EndedGesture<TapGesture> {
         TapGesture(count: 2)
@@ -93,12 +93,17 @@ struct WeeklyCalender: View {
             }
     }
     
+    // Long pressed
+    @State private var isLongpressed = false
+    @State private var changedHeight = CGFloat.zero
+    @State private var changedStartDate = Int.zero
+    
     var body: some View {
         ZStack {
-            // MARK: Compartmentalization of ScrollView to programmatically scrollable
-            // ScrollViewに透明のRectを敷き詰めることで、Tapした位置のRectの順番を割り出し、プログラム的にtoScrollできるようにする
             ScrollViewReader { (scrollviewProxy2: ScrollViewProxy) in
                 ScrollView {
+                    // MARK: Compartmentalization of ScrollView to programmatically scrollable
+                    // ScrollViewに透明のRectを敷き詰めることで、Tapした位置のRectの順番を割り出し、プログラム的にtoScrollできるようにする
                     VStack(spacing: 0) {
                         ForEach(0..<144, id: \.self) { obj in
                             ZStack {
@@ -132,12 +137,12 @@ struct WeeklyCalender: View {
                                         Text("\(String(format: "%02d", i)):00")
                                         // 数字のweightを固定化してcomputed propertyが無限ループに陥らないようにする
                                             .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                                            .opacity(0.5)
+                                            .opacity(0.4)
                                         
                                         // Divider
                                         Rectangle()
                                             .frame(height: 1)
-                                            .foregroundColor(.secondary.opacity(0.4))
+                                            .foregroundColor(.secondary.opacity(0.3))
                                             .coordinateSpace(name: "timelineDivider")
                                         // Eventのブロックの横幅とdividerの長さを一致させるために取得しておく
                                             .overlay(
@@ -201,18 +206,103 @@ struct WeeklyCalender: View {
                                         .onTapGesture {
                                             selectedItem = task
                                             isNavigation.toggle()
-                                            
                                         }
                                         .simultaneousGesture(
                                             LongPressGesture()
                                                 .onEnded { _ in
-                                                    print("Loooong")
+                                                    selectedItem = task
+                                                    isLongpressed.toggle()
                                                 }
                                         )
                                         .highPriorityGesture(
                                             pinchInAndToSctrollDoubleTap(task)
                                         )
+                                        
                                     }
+                                    
+                                    // MARK: Long pressed Task Block
+                                    if isLongpressed {
+                                        // Longpress後の値変更用TaskBlock
+                                        ZStack(alignment: .top) {
+                                            Path { path in
+                                                path.move(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedHeight))
+                                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedHeight))
+                                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!)))
+                                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!)))
+                                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!)))
+                                            }
+                                            .fill(.mint)
+                                            .opacity(0.8)
+                                            .gesture(
+                                                LongPressGesture()
+                                                    .onEnded { _ in
+                                                        isLongpressed.toggle()
+                                                    }
+                                            )
+                                            
+                                            //
+                                            //
+                                            // ☝ Upper side = startDateの変更
+                                            //
+                                            //
+                                            // 変更時の時間軸
+                                            HStack(alignment: .center) {
+                                                Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedStartDate, to: selectedItem.startDate!)!))
+                                                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
+                                                    .opacity(1)
+                                                    .background(
+                                                        Rectangle()
+                                                            .fill(.ultraThinMaterial)
+                                                            .opacity(0.6)
+                                                    )
+
+                                                Rectangle()
+                                                    .fill(.red)
+                                                    .frame(height: 1)
+                                                    .foregroundColor(.secondary.opacity(0.9))
+                                            }
+                                            .foregroundColor(.red)
+                                            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedHeight - 7)
+                                            
+                                            // StartDateの移動バー
+                                            Rectangle()
+                                                .frame(width: 40, height: 8)
+                                                .offset(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedHeight)
+                                                .gesture(
+                                                    DragGesture()
+                                                        .onChanged { value in
+//                                                             ドラッグ中の処理
+                                                            // やり直しポイント~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                            // TODO: 5刻みの移動をしたい　むずい
+                                                            if magnifyBy <= 1.0 {
+                                                                changedHeight = (ceil(value.translation.height / 5 * 5))
+//                                                                print("changedHeight: \(changedHeight)")
+                                                                changedStartDate = Int(ceil(value.translation.height / 5 * 5) / magnifyBy * 2)
+                                                            } else {
+                                                                changedHeight = (floor(value.translation.height) / 10) * 10
+                                                                changedStartDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
+                                                            }
+                                                            print("translation: \(value.translation.height)")
+                                                            print("changedHeight: \(changedHeight)")
+                                                            print("changedStartDate: \(changedStartDate)")
+                                                        }
+                                                        .onEnded { _ in
+                                                            do {
+                                                                print("startDate: \(selectedItem.startDate!)")
+                                                                let modifiedDate = Calendar.current.date(byAdding: .minute, value: changedStartDate, to: selectedItem.startDate!)!
+                                                                selectedItem.startDate = modifiedDate
+                                                                try viewContext.save()
+                                                                changedHeight = CGFloat.zero
+                                                                changedStartDate = Int.zero
+                                                                isLongpressed.toggle()
+                                                            } catch let error as NSError {
+                                                                print("\(error), \(error.userInfo)")
+                                                            }
+                                                        }
+                                                )
+                                        }
+                                    }
+                                    
                                     // ScrollViewの(コンテンツを含めた)高さをGeometryReaderで取得
                                     // この高さを1440(24h)で割って標準化した値を使うことで、
                                     // EventやXX:15などの時間表示を、ScrollViewの上に配置しやすくする
@@ -245,13 +335,14 @@ struct WeeklyCalender: View {
                             magnifyBy *= changeRate
                         }
                         lastMagnificationValue = value
+                        print(magnifyBy)
                     }
                     .onEnded { _ in
                         lastMagnificationValue = 1.0
                     }
             )
             .toolbar {
-                // TODO: 拡大率が30じゃなくなった & scrollTarget(int)がtaskの範囲から外れたら、Text("")にする
+                // MARK: 拡大率が30じゃなくなった & scrollTarget(int)がtaskの範囲から外れたら、Text("")にする
                 ToolbarItem(placement: .principal) {
                     if fadeState == .second {
                         Text(selectedText!)
@@ -303,10 +394,10 @@ private struct ColonDelimitedTimeDivider: View {
         HStack {
             Text("\(String(format: "%02d", hour)):\(time)")
                 .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                .opacity(0.5)
+                .opacity(0.4)
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(.secondary.opacity(0.4))
+                .foregroundColor(.secondary.opacity(0.3))
         }
         .offset(y: -7 + (parentScrollViewHeight / 1_440 * CGFloat(time)))
         .transition(.opacity)

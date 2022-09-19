@@ -12,14 +12,15 @@ func dateFormatter(date: Date) -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.setLocalizedDateFormatFromTemplate("yMMMMdEEEE")
     let dateString = dateFormatter.string(from: date)
-    print("😊 DateString : \(dateString)")
+//    print("😊 DateString : \(dateString)")
     return dateString
 }
 
 func dateTimeFormatter(date: Date) -> String {
     let dateFormatter = DateFormatter()
-    dateFormatter.setLocalizedDateFormatFromTemplate("jm")
+    dateFormatter.setLocalizedDateFormatFromTemplate("Hm")
+//    dateFormatter.timeStyle = .short
     let dateTimeString = dateFormatter.string(from: date)
-    print("😡 DateTimeString : \(dateTimeString)")
+//    print("😡 DateTimeString : \(dateTimeString)")
     return dateTimeString
 }
