@@ -48,18 +48,55 @@ struct WeeklyCalender: View {
     @State var top: Int = 0
     @State var trail: Int = 0
     @State var bottom: Int = 0
-    
-    func isEnougEight(scrollViewHeight: CGFloat, startDate: Date, endDate: Date) -> (flag: Bool, sum: CGFloat) {
-        let flag = (scrollViewHeight / 1_440 * dateToMinute(date: endDate)) - (scrollViewHeight / 1_440 * dateToMinute(date: startDate)) > 70
-        let sum = scrollViewHeight / 1_440 * dateToMinute(date: endDate) - scrollViewHeight / 1_440 * dateToMinute(date: startDate)
-        return (flag, sum)
-        
+
+    // 🖕 Pinch in When Double Tap Gesture
+    fileprivate func findOrderOfTaskBlockUpperSide(_ task: FetchedResults<Task>.Element) {
+        let taskBlockHeight = scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
+        let CompartmentalizedOrder = taskBlockHeight / (30 * magnifyBy / 6)
+        let RoundDown  = Int(floor(CompartmentalizedOrder))
+        scrollTarget = RoundDown
     }
-    
+    fileprivate func pinchInAndToSctrollDoubleTap(_ task: FetchedResults<Task>.Element) -> _EndedGesture<TapGesture> {
+        TapGesture(count: 2)
+            .onEnded { _ in
+                if magnifyBy != 30 {
+                    // ScrollViewの拡大率を30にして拡大 -> Scrollが上辺に戻る
+                    magnifyBy = 30
+                    cheatFadeInOut = true // Scrollのopacity操作をしておかしな挙動を隠す(誤魔化し用フェードイン・アウト)
+                    // View中央にTask名を表示
+                    withAnimation(Animation.easeInOut(duration: 0.1)) {
+                        fadeState = .first
+                        selectedText = task.task
+                    }
+                    // 0.1秒後にダブルタップしたTaskBlockまでスクロール
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation {
+                            findOrderOfTaskBlockUpperSide(task)
+                        }
+                        // 0.1秒後の更に0.3秒後にScrollのopacityを戻す
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation {
+                                cheatFadeInOut = false
+                            }
+                        }
+                    }
+                    // 0.8秒後にView中央にTask名を消す
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        withAnimation(Animation.easeInOut) {
+                            fadeState = .second
+                        }
+                    }
+                } else {
+                    // ダブルタップ時にmagnifByが30だった場合
+                    findOrderOfTaskBlockUpperSide(task)
+                }
+            }
+    }
     
     var body: some View {
         ZStack {
-            // MARK: toScrollの移動先を設けるためのView
+            // MARK: Compartmentalization of ScrollView to programmatically scrollable
+            // ScrollViewに透明のRectを敷き詰めることで、Tapした位置のRectの順番を割り出し、プログラム的にtoScrollできるようにする
             ScrollViewReader { (scrollviewProxy2: ScrollViewProxy) in
                 ScrollView {
                     VStack(spacing: 0) {
@@ -72,6 +109,7 @@ struct WeeklyCalender: View {
                             }
                         }
                     }
+                    // scrollTargetが更新された時 = TackBlockがDouble tapされた時の処理
                     .onChange(of: scrollTarget) { target in
                         if let target = target {
                             scrollTarget = nil
@@ -81,8 +119,8 @@ struct WeeklyCalender: View {
                             }
                         }
                     }
-                    // overlay
                     .overlay(
+                        // MARK: Timeline 00:00~23:00
                         // ScrollViewのコンテンツ同士のスペースを0にするためだけのvStack
                         // spacing:0のVStackを置かないと、overrideするコンテンツの位置がずれる
                         VStack(spacing: 0) {
@@ -92,6 +130,7 @@ struct WeeklyCalender: View {
                                     HStack {
                                         // 一桁の数値の先頭に0を付ける
                                         Text("\(String(format: "%02d", i)):00")
+                                        // 数字のweightを固定化してcomputed propertyが無限ループに陥らないようにする
                                             .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
                                             .opacity(0.5)
                                         
@@ -100,7 +139,7 @@ struct WeeklyCalender: View {
                                             .frame(height: 1)
                                             .foregroundColor(.secondary.opacity(0.4))
                                             .coordinateSpace(name: "timelineDivider")
-                                        // Eventのブロックの横幅とdividerの長さを一致させるために必要
+                                        // Eventのブロックの横幅とdividerの長さを一致させるために取得しておく
                                             .overlay(
                                                 GeometryReader { proxy -> Color in
                                                     DispatchQueue.main.async {
@@ -131,58 +170,25 @@ struct WeeklyCalender: View {
                                 .frame(maxHeight: .infinity)
                             }
                         }
-                        // MARK: ScrollViewの高さ取得と上乗せするコンテンツ
                             .overlay(
+                                // MARK: TaskBlock to be added on top of ScrollView
+                                // ScrollViewの高さ取得 + 上乗せするTask Blocks
                                 ZStack(alignment: .topTrailing) {
                                     NavigationLink(destination: TaskDetail(task: selectedItem), isActive: self.$isNavigation) {
                                         EmptyView()
                                     }
-                                    // Coredataからfetchしたdataをforで回して配置していく
+                                    // Coredataからfetchしたtasksをforで回して配置していく
                                     ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
-                                        // 🐦 Task Title
-                                        if magnifyBy == 30 {
-                                            MicroTaskDetailOnWeeklyCalender(
-                                                withChild: task,
-                                                scrollViewHeight: $scrollViewHeight,
-                                                timelineDividerWidth: $timelineDividerWidth
-                                            )
-                                        } else {
-                                            VStack(alignment: .leading) {
-                                                HStack(alignment: .top) {
-                                                    RoundedRectangle(cornerRadius: 40)
-                                                        .frame(
-                                                            width: 4,
-                                                            height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                                                            alignment: .topLeading
-                                                        )
-                                                        .foregroundColor(.mint)
-                                                        .opacity(0.6)
-                                                        .fixedSize()
-                                                    
-                                                    HStack(alignment: .top) {
-                                                        Text(task.task!)
-                                                            .font(.subheadline)
-                                                            .minimumScaleFactor(0.5)
-                                                            .foregroundColor(.primary)
-                                                        
-                                                        Spacer()
-                                                        Text("\(task.microTasks!.count) micro tasks")
-                                                            .font(.subheadline)
-                                                            .minimumScaleFactor(0.5)
-                                                            .padding(.trailing, 5)
-                                                    }
-                                                }
-                                            }
-                                            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
-                                            .frame(
-                                                width: timelineDividerWidth,
-                                                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                                                alignment: .topLeading
-                                            )
-                                            .zIndex(1) // Pathより上に表示
-                                        }
+                                        // 🐦 Task Title & Detail
+                                        MicroTaskDetailOnWeeklyCalender(
+                                            withChild: task,
+                                            scrollViewHeight: $scrollViewHeight,
+                                            timelineDividerWidth: $timelineDividerWidth,
+                                            magnifyBy: $magnifyBy
+                                        )
+                                        .zIndex(1) // Pathより上に表示
                                         
-                                        // ⬜️ Tack BLocks
+                                        // 🧱 Tack BLock
                                         Path { path in
                                             path.move(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
                                             path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
@@ -204,60 +210,8 @@ struct WeeklyCalender: View {
                                                 }
                                         )
                                         .highPriorityGesture(
-                                            // MARK: 🖕 Pinch in When Double Tap Gesture
-                                            TapGesture(count: 2)
-                                                .onEnded { _ in
-                                                    print("Double tap")
-                                                    
-                                                    if magnifyBy != 30 {
-                                                        magnifyBy = 30
-                                                        // tap時にmagnifyが30じゃなかった場合、スクロールのバグを隠すための誤魔化し用フェードアウト・イン
-                                                        cheatFadeInOut = true
-                                                        
-                                                        //
-                                                        //
-                                                        // 💬 スクロールを隠している間にView前景にタスク名を表示するためのFlag (enum)
-                                                        //
-                                                        //
-                                                        withAnimation(Animation.easeInOut(duration: 0.1)) {
-                                                            fadeState = .first
-                                                            selectedText = task.task // fadeState = .second時にnavigationにタイトルを表示する用
-                                                        }
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                                            withAnimation(Animation.easeInOut) {
-                                                                fadeState = .second // 前景のタスク名をフェードアウトしてnavigationにタイトルを表示
-                                                            }
-                                                        }
-                                                        
-                                                        //
-                                                        //
-                                                        // 🫥 magnifyByによる拡大でScrollViewがTopに戻ってからtoScrollで移動するのでアニメーションが狂う
-                                                        // 🫥 そのため、スクロールの間(asyncAfter)、opacityを0にして隠している
-                                                        //
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                            let taskBlockHeight = scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
-                                                            let banme = taskBlockHeight / (30 * magnifyBy / 6)
-                                                            let intBanme = Int(floor(banme))
-                                                            withAnimation {
-                                                                scrollTarget = intBanme
-                                                            }
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                                                withAnimation {
-                                                                    cheatFadeInOut = false
-                                                                }
-                                                            }
-                                                        }
-                                                        // magnifyByが30だった場合、ScrollViewのフェードイン・アウトはしない
-                                                    } else {
-                                                        let taskBlockHeight = scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
-                                                        let banme = taskBlockHeight / (30 * magnifyBy / 6)
-                                                        let intBanme = Int(floor(banme))
-                                                        scrollTarget = intBanme
-                                                    }
-                                                }
+                                            pinchInAndToSctrollDoubleTap(task)
                                         )
-                                        
-                                        
                                     }
                                     // ScrollViewの(コンテンツを含めた)高さをGeometryReaderで取得
                                     // この高さを1440(24h)で割って標準化した値を使うことで、
@@ -310,6 +264,7 @@ struct WeeklyCalender: View {
                     }
                 }
             }
+            //
             if fadeState == .first {
                 if let wrappedText = selectedText {
                     Text(String(wrappedText))
