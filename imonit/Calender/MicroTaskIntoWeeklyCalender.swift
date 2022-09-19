@@ -42,7 +42,7 @@ struct MicroTaskIntoWeeklyCalender: View {
                 HStack(alignment: .center, spacing: 10) {
                     RoundedRectangle(cornerRadius: 10)
                         .frame(width: 3)
-                        .foregroundColor(.mint)
+                        .foregroundColor(.orange)
                         .opacity(0.7)
                         .fixedSize()
 

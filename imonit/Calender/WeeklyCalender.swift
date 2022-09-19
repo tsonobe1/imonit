@@ -22,7 +22,7 @@ struct WeeklyCalender: View {
     @State private var timelineDividerWidth: CGFloat = CGFloat(0)
     
     // For ScrollView Magnify Rate
-    @State private var magnifyBy: Double = 10.0
+    @State private var magnifyBy: Double = 1.50
     @State private var lastMagnificationValue: Double = 1.0
     
     // For Navigation When Tapped Task Block
@@ -48,7 +48,7 @@ struct WeeklyCalender: View {
     @State var top: Int = 0
     @State var trail: Int = 0
     @State var bottom: Int = 0
-
+    
     // 🖕 Pinch in When Double Tap Gesture
     fileprivate func findOrderOfTaskBlockUpperSide(_ task: FetchedResults<Task>.Element) {
         let taskBlockHeight = scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
@@ -95,9 +95,13 @@ struct WeeklyCalender: View {
     
     // Long pressed
     @State private var isLongpressed = false
-    @State private var changedHeight = CGFloat.zero
+    @State private var changedUpperSidePosition = CGFloat.zero
     @State private var changedStartDate = Int.zero
-    
+    @State private var changedLowerSidePosition = CGFloat.zero
+    @State private var changedEndDate = Int.zero
+    @State private var changedPosition = CGFloat.zero
+    @State private var changedDate = Int.zero
+        
     var body: some View {
         ZStack {
             ScrollViewReader { (scrollviewProxy2: ScrollViewProxy) in
@@ -195,13 +199,28 @@ struct WeeklyCalender: View {
                                         
                                         // 🧱 Tack BLock
                                         Path { path in
-                                            path.move(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
-                                            path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
-                                            path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)))
-                                            path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)))
-                                            path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)))
+                                            path.move(to: CGPoint(
+                                                x: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
+                                            ))
+                                            path.addLine(to: CGPoint(
+                                                x: UIScreen.main.bounds.maxX,
+                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
+                                            ))
+                                            path.addLine(to: CGPoint(
+                                                x: UIScreen.main.bounds.maxX,
+                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)
+                                            ))
+                                            path.addLine(to: CGPoint(
+                                                x: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)
+                                            ))
+                                            path.addLine(to: CGPoint(
+                                                x: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
+                                            ))
                                         }
-                                        .fill(.mint)
+                                        .fill(.orange)
                                         .opacity(0.35)
                                         .onTapGesture {
                                             selectedItem = task
@@ -211,7 +230,9 @@ struct WeeklyCalender: View {
                                             LongPressGesture()
                                                 .onEnded { _ in
                                                     selectedItem = task
-                                                    isLongpressed.toggle()
+                                                    withAnimation {
+                                                        isLongpressed.toggle()
+                                                    }
                                                 }
                                         )
                                         .highPriorityGesture(
@@ -225,29 +246,73 @@ struct WeeklyCalender: View {
                                         // Longpress後の値変更用TaskBlock
                                         ZStack(alignment: .top) {
                                             Path { path in
-                                                path.move(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedHeight))
-                                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedHeight))
-                                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!)))
-                                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!)))
-                                                path.addLine(to: CGPoint(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!)))
+                                                // 👆Upper
+                                                path.move(to: CGPoint(
+                                                    x: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
+                                                ))
+                                                // 👆Upper
+                                                path.addLine(to: CGPoint(
+                                                        x: UIScreen.main.bounds.maxX,
+                                                        y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
+                                                    ))
+                                                // 👇Lower
+                                                path.addLine(to: CGPoint(
+                                                        x: UIScreen.main.bounds.maxX,
+                                                        y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition
+                                                    ))
+                                                // 👇Lower
+                                                path.addLine(to: CGPoint(
+                                                        x: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                                        y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition
+                                                ))
+                                                // 👆Upper
+                                                path.addLine(to: CGPoint(
+                                                        x: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                                        y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
+                                                ))
                                             }
-                                            .fill(.mint)
-                                            .opacity(0.8)
+                                            .fill(.orange)
+                                            .opacity(0.5)
                                             .gesture(
                                                 LongPressGesture()
                                                     .onEnded { _ in
-                                                        isLongpressed.toggle()
+                                                        withAnimation {
+                                                            isLongpressed.toggle()
+                                                        }
                                                     }
                                             )
-                                            
-                                            //
-                                            //
-                                            // ☝ Upper side = startDateの変更
-                                            //
-                                            //
-                                            // 変更時の時間軸
+                                            .gesture(
+                                                // Position
+                                                DragGesture()
+                                                    .onChanged { value in
+                                                        // ドラッグ中の処理
+                                                        // やり直しポイント~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                        // TODO: 5刻みの移動をしたい　むずい
+                                                        changedPosition = (floor(value.translation.height) / 10) * 10
+                                                        print("changedPosition: \(changedPosition)")
+                                                        changedDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
+                                                    }
+                                                    .onEnded { _ in
+                                                        do {
+                                                            let modifiedStartDate = Calendar.current.date(byAdding: .minute, value: changedDate, to: selectedItem.startDate!)!
+                                                            let modifiedEndDate = Calendar.current.date(byAdding: .minute, value: changedDate, to: selectedItem.endDate!)!
+                                                            selectedItem.startDate = modifiedStartDate
+                                                            selectedItem.endDate = modifiedEndDate
+                                                            try viewContext.save()
+                                                            changedPosition = CGFloat.zero
+                                                            changedDate = Int.zero
+                                                            withAnimation {
+                                                                isLongpressed.toggle()
+                                                            }
+                                                        } catch let error as NSError {
+                                                            print("\(error), \(error.userInfo)")
+                                                        }
+                                                    }
+                                            )
+                                            // 🕛 StartDateの時間軸
                                             HStack(alignment: .center) {
-                                                Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedStartDate, to: selectedItem.startDate!)!))
+                                                Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedStartDate + changedDate, to: selectedItem.startDate!)!))
                                                     .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
                                                     .opacity(1)
                                                     .background(
@@ -255,51 +320,122 @@ struct WeeklyCalender: View {
                                                             .fill(.ultraThinMaterial)
                                                             .opacity(0.6)
                                                     )
-
-                                                Rectangle()
+                                                
+                                                Line()
+                                                    .stroke(style: StrokeStyle(lineWidth: 3, dash: [5]))
                                                     .fill(.red)
                                                     .frame(height: 1)
-                                                    .foregroundColor(.secondary.opacity(0.9))
+                                                    .opacity(0.6)
                                             }
                                             .foregroundColor(.red)
-                                            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedHeight - 7)
+                                            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 6 + changedPosition)
                                             
-                                            // StartDateの移動バー
-                                            Rectangle()
-                                                .frame(width: 40, height: 8)
-                                                .offset(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedHeight)
-                                                .gesture(
-                                                    DragGesture()
-                                                        .onChanged { value in
-//                                                             ドラッグ中の処理
-                                                            // やり直しポイント~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                                            // TODO: 5刻みの移動をしたい　むずい
-                                                            if magnifyBy <= 1.0 {
-                                                                changedHeight = (ceil(value.translation.height / 5 * 5))
-//                                                                print("changedHeight: \(changedHeight)")
-                                                                changedStartDate = Int(ceil(value.translation.height / 5 * 5) / magnifyBy * 2)
-                                                            } else {
-                                                                changedHeight = (floor(value.translation.height) / 10) * 10
-                                                                changedStartDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
+                                            // 🕛 EndDateの時間軸
+                                            HStack(alignment: .center) {
+                                                Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedEndDate + changedDate, to: selectedItem.endDate!)!))
+                                                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
+                                                    .opacity(1)
+                                                    .background(
+                                                        Rectangle()
+                                                            .fill(.ultraThinMaterial)
+                                                            .opacity(0.6)
+                                                    )
+                                                
+                                                Line()
+                                                    .stroke(style: StrokeStyle(lineWidth: 3, dash: [5]))
+                                                    .fill(.red)
+                                                    .frame(height: 1)
+                                                    .opacity(0.6)
+                                            }
+                                            .foregroundColor(.red)
+                                            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition - 7 + changedPosition)
+                                            
+                                            // 🤐 StartDateの移動バー
+                                            HStack {
+                                                Spacer()
+                                                Rectangle()
+                                                    .fill(.red)
+                                                    .opacity(0.6)
+                                                    .frame(width: 70, height: 10)
+                                                    .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 10)
+                                                    .gesture(
+                                                        DragGesture()
+                                                            .onChanged { value in
+                                                                // ドラッグ中の処理
+                                                                // やり直しポイント~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                                // TODO: 5刻みの移動をしたい　むずい
+                                                                if magnifyBy <= 1.0 {
+                                                                    changedUpperSidePosition = (ceil(value.translation.height / 5 * 5))
+                                                                    //                                                                print("changedUpperSidePosition: \(changedUpperSidePosition)")
+                                                                    changedStartDate = Int(ceil(value.translation.height / 5 * 5) / magnifyBy * 2)
+                                                                } else {
+                                                                    changedUpperSidePosition = (floor(value.translation.height) / 10) * 10
+                                                                    changedStartDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
+                                                                }
+                                                                print("translation: \(value.translation.height)")
+                                                                print("changedUpperSidePosition: \(changedUpperSidePosition)")
+                                                                print("changedStartDate: \(changedStartDate)")
                                                             }
-                                                            print("translation: \(value.translation.height)")
-                                                            print("changedHeight: \(changedHeight)")
-                                                            print("changedStartDate: \(changedStartDate)")
-                                                        }
-                                                        .onEnded { _ in
-                                                            do {
-                                                                print("startDate: \(selectedItem.startDate!)")
-                                                                let modifiedDate = Calendar.current.date(byAdding: .minute, value: changedStartDate, to: selectedItem.startDate!)!
-                                                                selectedItem.startDate = modifiedDate
-                                                                try viewContext.save()
-                                                                changedHeight = CGFloat.zero
-                                                                changedStartDate = Int.zero
-                                                                isLongpressed.toggle()
-                                                            } catch let error as NSError {
-                                                                print("\(error), \(error.userInfo)")
+                                                            .onEnded { _ in
+                                                                do {
+                                                                    print("startDate: \(selectedItem.startDate!)")
+                                                                    let modifiedDate = Calendar.current.date(byAdding: .minute, value: changedStartDate, to: selectedItem.startDate!)!
+                                                                    selectedItem.startDate = modifiedDate
+                                                                    try viewContext.save()
+                                                                    changedUpperSidePosition = CGFloat.zero
+                                                                    changedStartDate = Int.zero
+                                                                    withAnimation {
+                                                                        isLongpressed.toggle()
+                                                                    }
+                                                                } catch let error as NSError {
+                                                                    print("\(error), \(error.userInfo)")
+                                                                }
                                                             }
-                                                        }
-                                                )
+                                                    )
+                                            }
+                                            // 🤐 EndDateの移動バー
+                                            HStack {
+                                                Rectangle()
+                                                    .fill(.red)
+                                                    .opacity(0.6)
+                                                    .frame(width: 70, height: 10)
+                                                    .offset(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition)
+                                                    .gesture(
+                                                        DragGesture()
+                                                            .onChanged { value in
+                                                                //                                                             ドラッグ中の処理
+                                                                // やり直しポイント~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                                // TODO: 5刻みの移動をしたい　むずい
+                                                                if magnifyBy <= 1.0 {
+                                                                    changedLowerSidePosition = (ceil(value.translation.height / 5 * 5))
+                                                                    //                                                                print("changedLowerSidePosition: \(changedLowerSidePosition)")
+                                                                    changedStartDate = Int(ceil(value.translation.height / 5 * 5) / magnifyBy * 2)
+                                                                } else {
+                                                                    changedLowerSidePosition = (floor(value.translation.height) / 10) * 10
+                                                                    changedEndDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
+                                                                }
+                                                                print("translation: \(value.translation.height)")
+                                                                print("changedLowerSidePosition: \(changedLowerSidePosition)")
+                                                                print("changedEndDate: \(changedEndDate)")
+                                                            }
+                                                            .onEnded { _ in
+                                                                do {
+                                                                    print("startDate: \(selectedItem.endDate!)")
+                                                                    let modifiedDate = Calendar.current.date(byAdding: .minute, value: changedEndDate, to: selectedItem.endDate!)!
+                                                                    selectedItem.endDate = modifiedDate
+                                                                    try viewContext.save()
+                                                                    changedLowerSidePosition = CGFloat.zero
+                                                                    changedEndDate = Int.zero
+                                                                    withAnimation {
+                                                                        isLongpressed.toggle()
+                                                                    }
+                                                                } catch let error as NSError {
+                                                                    print("\(error), \(error.userInfo)")
+                                                                }
+                                                            }
+                                                    )
+                                                Spacer()
+                                            }
                                         }
                                     }
                                     

@@ -45,7 +45,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                     HStack(alignment: .top) {
                         RoundedRectangle(cornerRadius: 40)
                             .frame(width: 8, height: scrollViewHeight / 1_440 * (CGFloat(microTask.timer / 60)), alignment: .top)
-                            .foregroundColor(.mint)
+                            .foregroundColor(.orange)
                             .opacity(0.6)
                             .fixedSize()
                         
@@ -89,7 +89,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                             height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
                             alignment: .topLeading
                         )
-                        .foregroundColor(.mint)
+                        .foregroundColor(.orange)
                         .opacity(0.6)
                         .fixedSize()
                     
