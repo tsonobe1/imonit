@@ -50,20 +50,21 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                             .font(.caption)
                             .multilineTextAlignment(.leading)
                             .layoutPriority(1)
-                            .opacity(0.8)
+                            .opacity(1)
 
+                        Group {
                         Line()
                             .stroke(style: StrokeStyle(lineWidth: 1, dash: [3]))
                             .frame(height: 1)
                             .opacity(0.5)
 
                         Text("\(microTask.timer / 60) m")
-                            .opacity(0.8)
+                            .opacity(1)
                             .font(.caption)
                             .fixedSize()
                             .padding(.trailing)
+                        }                        
                     }
-
                 }
                 .frame(
                     width: timelineDividerWidth,
