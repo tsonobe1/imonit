@@ -22,7 +22,7 @@ struct WeeklyCalender: View {
     @State private var timelineDividerWidth: CGFloat = CGFloat(0)
     
     // For ScrollView Magnify Rate
-    @State private var magnifyBy: Double = 1.50
+    @State private var magnifyBy: Double = 1.0
     @State private var lastMagnificationValue: Double = 1.0
     
     // For Navigation When Tapped Task Block
@@ -101,7 +101,7 @@ struct WeeklyCalender: View {
     @State private var changedEndDate = Int.zero
     @State private var changedPosition = CGFloat.zero
     @State private var changedDate = Int.zero
-        
+            
     var body: some View {
         ZStack {
             ScrollViewReader { (scrollviewProxy2: ScrollViewProxy) in
@@ -196,6 +196,10 @@ struct WeeklyCalender: View {
                                             magnifyBy: $magnifyBy
                                         )
                                         .zIndex(1) // Pathより上に表示
+                                        .onTapGesture {
+                                            selectedItem = task
+                                            isNavigation.toggle()
+                                        }
                                         
                                         // 🧱 Tack BLock
                                         Path { path in
@@ -232,6 +236,8 @@ struct WeeklyCalender: View {
                                                     selectedItem = task
                                                     withAnimation {
                                                         isLongpressed.toggle()
+                                                        let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                                                            impactHeavy.impactOccurred()
                                                     }
                                                 }
                                         )
@@ -287,11 +293,16 @@ struct WeeklyCalender: View {
                                                 DragGesture()
                                                     .onChanged { value in
                                                         // ドラッグ中の処理
-                                                        // やり直しポイント~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                                        // TODO: 5刻みの移動をしたい　むずい
-                                                        changedPosition = (floor(value.translation.height) / 10) * 10
-                                                        print("changedPosition: \(changedPosition)")
-                                                        changedDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
+                                                        if magnifyBy <= 3.0 {
+                                                            changedPosition = (ceil(value.translation.height * 2 / 10) * 5)
+                                                            changedDate = Int(ceil(value.translation.height * 2 / 10) * 10 / magnifyBy)
+                                                        } else if magnifyBy <= 5 {
+                                                            changedPosition = (ceil(value.translation.height / 5) * 5 * 2.5)
+                                                            changedDate = Int(ceil(value.translation.height / 5) * 5 / magnifyBy * 5)
+                                                        } else {
+                                                            changedPosition = (floor(value.translation.height) / 10) * 10
+                                                            changedDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
+                                                        }
                                                     }
                                                     .onEnded { _ in
                                                         do {
@@ -330,6 +341,7 @@ struct WeeklyCalender: View {
                                             .foregroundColor(.red)
                                             .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 6 + changedPosition)
                                             
+                                            
                                             // 🕛 EndDateの時間軸
                                             HStack(alignment: .center) {
                                                 Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedEndDate + changedDate, to: selectedItem.endDate!)!))
@@ -362,19 +374,16 @@ struct WeeklyCalender: View {
                                                         DragGesture()
                                                             .onChanged { value in
                                                                 // ドラッグ中の処理
-                                                                // やり直しポイント~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                                                // TODO: 5刻みの移動をしたい　むずい
-                                                                if magnifyBy <= 1.0 {
-                                                                    changedUpperSidePosition = (ceil(value.translation.height / 5 * 5))
-                                                                    //                                                                print("changedUpperSidePosition: \(changedUpperSidePosition)")
-                                                                    changedStartDate = Int(ceil(value.translation.height / 5 * 5) / magnifyBy * 2)
+                                                                if magnifyBy <= 3.0 {
+                                                                    changedUpperSidePosition = (ceil(value.translation.height * 2 / 10) * 5)
+                                                                    changedStartDate = Int(ceil(value.translation.height * 2 / 10) * 10 / magnifyBy)
+                                                                } else if magnifyBy <= 5 {
+                                                                    changedUpperSidePosition = (ceil(value.translation.height / 5) * 5 * 2.5)
+                                                                    changedStartDate = Int(ceil(value.translation.height / 5) * 5 / magnifyBy * 5)
                                                                 } else {
                                                                     changedUpperSidePosition = (floor(value.translation.height) / 10) * 10
                                                                     changedStartDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
                                                                 }
-                                                                print("translation: \(value.translation.height)")
-                                                                print("changedUpperSidePosition: \(changedUpperSidePosition)")
-                                                                print("changedStartDate: \(changedStartDate)")
                                                             }
                                                             .onEnded { _ in
                                                                 do {
@@ -403,20 +412,16 @@ struct WeeklyCalender: View {
                                                     .gesture(
                                                         DragGesture()
                                                             .onChanged { value in
-                                                                //                                                             ドラッグ中の処理
-                                                                // やり直しポイント~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                                                // TODO: 5刻みの移動をしたい　むずい
-                                                                if magnifyBy <= 1.0 {
-                                                                    changedLowerSidePosition = (ceil(value.translation.height / 5 * 5))
-                                                                    //                                                                print("changedLowerSidePosition: \(changedLowerSidePosition)")
-                                                                    changedStartDate = Int(ceil(value.translation.height / 5 * 5) / magnifyBy * 2)
+                                                                if magnifyBy <= 3.0 {
+                                                                    changedLowerSidePosition = (ceil(value.translation.height * 2 / 10) * 5)
+                                                                    changedEndDate = Int(ceil(value.translation.height * 2 / 10) * 10 / magnifyBy)
+                                                                } else if magnifyBy <= 5 {
+                                                                    changedLowerSidePosition = (ceil(value.translation.height / 5) * 5 * 2.5)
+                                                                    changedEndDate = Int(ceil(value.translation.height / 5) * 5 / magnifyBy * 5)
                                                                 } else {
                                                                     changedLowerSidePosition = (floor(value.translation.height) / 10) * 10
                                                                     changedEndDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
                                                                 }
-                                                                print("translation: \(value.translation.height)")
-                                                                print("changedLowerSidePosition: \(changedLowerSidePosition)")
-                                                                print("changedEndDate: \(changedEndDate)")
                                                             }
                                                             .onEnded { _ in
                                                                 do {
@@ -501,22 +506,42 @@ struct WeeklyCalender: View {
                         .padding()
                 }
             }
+            
+            VStack {
+                // 1, 2, 5, 10, 15. 30
+                withAnimation{
+                    Stepper(value: $magnifyBy, in: 1...30) {
+                        Text("magnifyBy: \(magnifyBy)")
+                    }
+                }
+            }
+            
+            VStack {  // --- 1
+                Spacer()
+                HStack { // --- 2
+                    Spacer()
+                    Button(action: {
+                        let mag = [1, 2, 5, 10, 20, 30]
+                        
+                        print("Tapped!!") // --- 3
+                    }, label: {
+                        Image(systemName: "plus.magnifyingglass")
+                            .foregroundColor(.primary)
+                            .font(.system(size: 18)) // --- 4
+                    })
+                    .frame(width: 54, height: 54)
+                    .background(
+                        Circle()
+                            .fill(Color.secondary)
+                            .opacity(0.5)
+                    )
+                    .cornerRadius(30.0)
+//                    .shadow(color: .gray, radius: 3, x: 3, y: 3)
+                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 16.0, trailing: 16.0)) // --- 5
+                    
+                }
+            }
         }
-    }
-    
-    func dateToMinute(date: Date) -> CGFloat {
-        //        print("dateToMinuteが何度も実行されてしまう問題を解決したい")
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: date)
-        let minute = calendar.component(.minute, from: date)
-        //        print("🫲 Convert Minute : \((hour * 60) + minute)")
-        return CGFloat((hour * 60) + minute)
-    }
-    
-    func caluculateTimeInterval(startDate: Date, endDate: Date) -> CGFloat {
-        let timeInterval = endDate.timeIntervalSince(startDate)
-        //        print("👉 TimeInterval : \(timeInterval / 60)")
-        return CGFloat(timeInterval / 60)
     }
 }
 

@@ -24,3 +24,15 @@ func dateTimeFormatter(date: Date) -> String {
 //    print("😡 DateTimeString : \(dateTimeString)")
     return dateTimeString
 }
+
+func dateToMinute(date: Date) -> CGFloat {
+    let calendar = Calendar.current
+    let hour = calendar.component(.hour, from: date)
+    let minute = calendar.component(.minute, from: date)
+    return CGFloat((hour * 60) + minute)
+}
+
+func caluculateTimeInterval(startDate: Date, endDate: Date) -> CGFloat {
+    let timeInterval = endDate.timeIntervalSince(startDate)
+    return CGFloat(timeInterval / 60)
+}
