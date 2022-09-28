@@ -7,6 +7,15 @@
 
 import SwiftUI
 
+struct Line: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: rect.width, y: 0))
+        return path
+    }
+}
+
 struct MicroTaskDetailOnWeeklyCalender: View {
     @Environment(\.editMode) private var editMode
     @Binding var scrollViewHeight: CGFloat
@@ -43,7 +52,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
     
     var body: some View {
         // MARK: pinch in時
-        if magnifyBy == 30 {
+        if magnifyBy >= 30 {
             VStack(spacing: 0) {
                 ForEach(microTasks) { microTask in
                     VStack {
@@ -57,152 +66,166 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                                 .fixedSize()
                             
                             // MicroTaskTitle ...... min
-                            HStack(alignment: .center, spacing: 5) {
-                                Text(microTask.microTask!)
-                                    .font(.caption)
-                                    .multilineTextAlignment(.leading)
-                                    .layoutPriority(1)
-                                    .opacity(1)
+                            GeometryReader { metrics in
                                 
-                                Line()
-                                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [3]))
-                                    .frame(height: 1)
-                                    .opacity(0.5)
+                                HStack(alignment: .center, spacing: 0) {
+                                    Text(microTask.microTask!)
+                                        .font(.caption)
+                                        .multilineTextAlignment(.leading)
+                                        .minimumScaleFactor(0.6)
+                                        .frame(width: metrics.size.width * 0.75, alignment: .leading)
+                                        .opacity(1)
+                                    
+                                    Spacer()
+                                    
+                                    Text("\(microTask.timer / 60) m")
+                                        .font(.caption)
+                                        .minimumScaleFactor(0.6)
+                                        .frame(width: metrics.size.width * 0.20, alignment: .trailing)
+                                        .opacity(1)
+                                    
+                                    Spacer()
+                                }
+                                .overlay(
+                                    Rectangle()
+                                        .offset(y: 0)
+                                        .frame(width: timelineDividerWidth, height: 1)
+                                        .foregroundColor(.orange)
+                                        .opacity(0.3),
+                                    alignment: .topTrailing
+                                )
+                                .frame(width: timelineDividerWidth - 8)
                                 
-                                Text("\(microTask.timer / 60) m")
-                                    .opacity(1)
-                                    .font(.caption)
-                                    .fixedSize()
-                                    .padding(.trailing)
                             }
+                            .padding(.trailing, 10)
                         }
                         .frame(
-                            width: timelineDividerWidth,
                             height: scrollViewHeight / 1_440 * (CGFloat(microTask.timer / 60)),
                             alignment: .topLeading
                         )
                     }
                     // Divider
-                    Rectangle()
-                        .frame(width: timelineDividerWidth, height: 1)
-                        .foregroundColor(.primary).opacity(0.2)
+                    
+                    //                    Rectangle()
+                    //                        .frame(width: timelineDividerWidth, height: 1)
+                    //                        .foregroundColor(.orange).opacity(0.2)
                 }
                 
             }
             // TaskBlockの位置までズラす
             .offset(y: ((scrollViewHeight / 1_440) * dateToMinute(date: task.startDate!)))
-            .zIndex(2)
+            .frame(
+                width: timelineDividerWidth,
+                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
+                alignment: .topLeading
+            )
         } else {
             // MARK: pinch out時
-                HStack(alignment: .top) {
-                    // Left Color Border
-                    RoundedRectangle(cornerRadius: 40)
-                        .frame(
-                            width: 8,
-                            height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                            alignment: .topLeading
-                        )
-                        .foregroundColor(.orange)
-                        .opacity(0.5)
-                        .fixedSize()
-                    
-                    VStack {
-                        ZStack(alignment: .top) {
-                            // TaskTitle
-                            HStack(alignment: .top) {
-                                Text(task.task!)
-                                    .font(.subheadline)
-                                    .minimumScaleFactor(0.5)
-                                    .foregroundColor(.primary)
-                                
-                                Spacer()
-                                Text("\(task.microTasks!.count) micro tasks")
-                                    .font(.subheadline)
-                                    .minimumScaleFactor(0.5)
-                                    .padding(.trailing, 5)
-                            }
-                            .padding(.vertical, 3)
-                            // TaskTitleの高さ。ZStackで配置したMicroTasksがかぶらないようにズラすのに使う
-                            .background(
-                                GeometryReader { proxy -> Color in
-                                    DispatchQueue.main.async {
-                                        taskTitleHeight = proxy.frame(in: .local).size.height
-                                    }
-                                    return Color.clear
+            HStack(alignment: .top) {
+                // Left Color Border
+                RoundedRectangle(cornerRadius: 40)
+                    .frame(
+                        width: 8,
+                        height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
+                        alignment: .topLeading
+                    )
+                    .foregroundColor(.orange)
+                    .opacity(0.5)
+                    .fixedSize()
+                
+                VStack {
+                    ZStack(alignment: .top) {
+                        // TaskTitle
+                        HStack(alignment: .top) {
+                            Text(task.task!)
+                                .font(.subheadline)
+                                .minimumScaleFactor(0.5)
+                                .foregroundColor(.primary)
+                            
+                            Spacer()
+                        }
+                        .padding(.vertical, 2)
+                        // TaskTitleの高さ。ZStackで配置したMicroTasksがかぶらないようにズラすのに使う
+                        .background(
+                            GeometryReader { proxy -> Color in
+                                DispatchQueue.main.async {
+                                    taskTitleHeight = proxy.frame(in: .local).size.height
                                 }
-                            )
-  
-                            // MicroTasks
-                            ScrollView {
-                                VStack {
-                                    // MicroTasks
-                                    ForEach(microTasks) { microTask in
-                                        HStack(alignment: .center) {
-                                            RoundedRectangle(cornerRadius: 40)
-                                                .frame(width: 4, alignment: .top)
-                                                .foregroundColor(.orange)
-                                                .opacity(0.6)
-                                                .fixedSize()
+                                return Color.clear
+                            }
+                        )
+                        
+                        // MicroTasks
+                        ScrollView {
+                            VStack {
+                                // MicroTasks
+                                ForEach(microTasks) { microTask in
+                                    HStack(alignment: .center) {
+                                        RoundedRectangle(cornerRadius: 40)
+                                            .frame(width: 4, alignment: .top)
+                                            .foregroundColor(.orange)
+                                            .opacity(0.6)
+                                            .fixedSize()
+                                        
+                                        HStack(alignment: .center, spacing: 5) {
+                                            Text(microTask.microTask!)
+                                                .font(.caption)
+                                                .multilineTextAlignment(.leading)
+                                                .layoutPriority(1)
+                                                .opacity(1)
                                             
-                                            HStack(alignment: .center, spacing: 5) {
-                                                Text(microTask.microTask!)
-                                                    .font(.caption)
-                                                    .multilineTextAlignment(.leading)
-                                                    .layoutPriority(1)
-                                                    .opacity(1)
-                                                
-                                                Line()
-                                                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [3]))
-                                                    .frame(height: 1)
-                                                    .opacity(0.5)
-                                                
-                                                Text("\(microTask.timer / 60) m")
-                                                    .opacity(1)
-                                                    .font(.caption)
-                                                    .fixedSize()
-                                                    .padding(.trailing)
-                                            }
+                                            Line()
+                                                .stroke(style: StrokeStyle(lineWidth: 1, dash: [3]))
+                                                .frame(height: 1)
+                                                .opacity(0.5)
+                                            
+                                            Text("\(microTask.timer / 60) m")
+                                                .opacity(1)
+                                                .font(.caption)
+                                                .fixedSize()
+                                                .padding(.trailing)
                                         }
                                     }
-                                    // maskを避けるためのスペース
-                                    Rectangle()
-                                        .fill(.clear)
-                                        .frame(height: 5)
                                 }
+                                // mask避けるためのスペース
+                                Rectangle()
+                                    .fill(.clear)
+                                    .frame(height: 5)
                             }
-                            // 上から順にMicroTasksを表示をするにあたり、TaskBlockから見切れそうな部分をフェードアウトする
-                            .mask(
-                                LinearGradient(
-                                    gradient: Gradient(colors:
-                                                        [Color.black,
-                                                         Color.black,
-                                                         Color.black,
-                                                         Color.black,
-                                                         Color.black,
-                                                         Color.black,
-                                                         Color.black.opacity(0)]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            // frameのheightを超えた部分のmictoTask名が見切れるように.cornerRadiusを指定
-//                            .cornerRadius(8)
-                            // MicroTaskのScrollViewとTaskTitleをZStackで置いているため、Tasktitleとかぶらないようにズラす
-                            // ZStackを使っている理由　→　TaskTitleの".minimumScaleFactor(0.5)"を使いたいため
-                            .padding(.vertical, 3)
-//                            .border(.blue)
-                            .offset(y: taskTitleHeight)
-                            // .offSetでTaskTitle分をy方向にずらしているため、何もしないとTaskBlockからMicroTasksがTaskTitle分はみ出してしまう
-                            // はみ出さないように、frameを指定している。 TaskBlock - TaskTitleHeight
-                            // MicroTaskがない場合は、「 - TaskTitleHeight 」でRuntime issueが起きてしまう
-                            // MagnifyByが小さい場合、TaskTitleHeightがTaskBlockを上回ってしまうため。
-                            // なので、microtaskがなければ、「 - TaskTitleHeight 」をしないように三項演算子で条件分岐してる
-                            // absにしないとInvalid frame dimension (negative or non-finite).になる
-                            .frame(height: task.microTasks!.count == 0 ? scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!) : abs(scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!) - taskTitleHeight), alignment: .top)
-
                         }
+                        
+                        // 上から順にMicroTasksを表示をするにあたり、TaskBlockから見切れそうな部分をフェードアウトする
+                        .mask(
+                            LinearGradient(
+                                gradient: Gradient(colors:
+                                                    [Color.black,
+                                                     Color.black,
+                                                     Color.black,
+                                                     Color.black,
+                                                     Color.black,
+                                                     Color.black,
+                                                     Color.black.opacity(0)]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        // frameのheightを超えた部分のmictoTask名が見切れるように.cornerRadiusを指定
+                        //                            .cornerRadius(8)
+                        // MicroTaskのScrollViewとTaskTitleをZStackで置いているため、Tasktitleとかぶらないようにズラす
+                        // ZStackを使っている理由　→　TaskTitleの".minimumScaleFactor(0.5)"を使いたいため
+                        .padding(.vertical, 5)
+                        .offset(y: taskTitleHeight)
+                        // .offSetでTaskTitle分をy方向にずらしているため、何もしないとTaskBlockからMicroTasksがTaskTitle分はみ出してしまう
+                        // はみ出さないように、frameを指定している。 TaskBlock - TaskTitleHeight
+                        // MicroTaskがない場合は、「 - TaskTitleHeight 」でRuntime issueが起きてしまう
+                        // MagnifyByが小さい場合、TaskTitleHeightがTaskBlockを上回ってしまうため。
+                        // なので、microtaskがなければ、「 - TaskTitleHeight 」をしないように三項演算子で条件分岐してる
+                        // absにしないとInvalid frame dimension (negative or non-finite).になる
+                        .frame(height: task.microTasks!.count == 0 ? scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!) : abs(scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!) - taskTitleHeight), alignment: .top)
+                        
                     }
                 }
+            }
             .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
             .frame(
                 width: timelineDividerWidth,

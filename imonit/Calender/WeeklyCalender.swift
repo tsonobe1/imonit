@@ -43,7 +43,7 @@ struct WeeklyCalender: View {
     @State private var fadeState = FadeInOutState.empty
     @State private var selectedText: String?
     
-    //
+    // Task Block Path
     @State var lead: Int  = 0
     @State var top: Int = 0
     @State var trail: Int = 0
@@ -68,8 +68,8 @@ struct WeeklyCalender: View {
                         fadeState = .first
                         selectedText = task.task
                     }
-                    // 0.1秒後にダブルタップしたTaskBlockまでスクロール
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // 0.2秒後にダブルタップしたTaskBlockまでスクロール
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         withAnimation {
                             findOrderOfTaskBlockUpperSide(task)
                         }
@@ -93,7 +93,7 @@ struct WeeklyCalender: View {
             }
     }
     
-    // Long pressed
+    // 🖕Long pressed
     @State private var isLongpressed = false
     @State private var changedUpperSidePosition = CGFloat.zero
     @State private var changedStartDate = Int.zero
@@ -101,7 +101,19 @@ struct WeeklyCalender: View {
     @State private var changedEndDate = Int.zero
     @State private var changedPosition = CGFloat.zero
     @State private var changedDate = Int.zero
-            
+    fileprivate func enableVirtualTaskBlock(_ task: FetchedResults<Task>.Element) -> _EndedGesture<LongPressGesture> {
+        return LongPressGesture()
+            .onEnded { _ in
+                selectedItem = task
+                withAnimation {
+                    isLongpressed.toggle()
+                    // 触覚フィードバック
+                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                    impactHeavy.impactOccurred()
+                }
+            }
+    }
+    
     var body: some View {
         ZStack {
             ScrollViewReader { (scrollviewProxy2: ScrollViewProxy) in
@@ -146,7 +158,7 @@ struct WeeklyCalender: View {
                                         // Divider
                                         Rectangle()
                                             .frame(height: 1)
-                                            .foregroundColor(.secondary.opacity(0.3))
+                                            .foregroundColor(.secondary.opacity(0.2))
                                             .coordinateSpace(name: "timelineDivider")
                                         // Eventのブロックの横幅とdividerの長さを一致させるために取得しておく
                                             .overlay(
@@ -189,62 +201,36 @@ struct WeeklyCalender: View {
                                     // Coredataからfetchしたtasksをforで回して配置していく
                                     ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
                                         // 🐦 Task Title & Detail
-                                        MicroTaskDetailOnWeeklyCalender(
-                                            withChild: task,
-                                            scrollViewHeight: $scrollViewHeight,
-                                            timelineDividerWidth: $timelineDividerWidth,
-                                            magnifyBy: $magnifyBy
-                                        )
-                                        .zIndex(1) // Pathより上に表示
-                                        .onTapGesture {
-                                            selectedItem = task
-                                            isNavigation.toggle()
+                                        Group {
+                                            // 🧱 Tack BLock
+                                            TaskBlockPath(
+                                                radius: 5,
+                                                top: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!),
+                                                bottom: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!),
+                                                leading: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                                traling: UIScreen.main.bounds.maxX
+                                            )
+                                            .fill(Color.orange)
+                                            .opacity(0.35)
+                                            
+                                            // 📛 Task, MicroTask
+                                            MicroTaskDetailOnWeeklyCalender(
+                                                withChild: task,
+                                                scrollViewHeight: $scrollViewHeight,
+                                                timelineDividerWidth: $timelineDividerWidth,
+                                                magnifyBy: $magnifyBy
+                                            )
                                         }
-                                        
-                                        // 🧱 Tack BLock
-                                        Path { path in
-                                            path.move(to: CGPoint(
-                                                x: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
-                                            ))
-                                            path.addLine(to: CGPoint(
-                                                x: UIScreen.main.bounds.maxX,
-                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
-                                            ))
-                                            path.addLine(to: CGPoint(
-                                                x: UIScreen.main.bounds.maxX,
-                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)
-                                            ))
-                                            path.addLine(to: CGPoint(
-                                                x: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!)
-                                            ))
-                                            path.addLine(to: CGPoint(
-                                                x: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                                                y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
-                                            ))
-                                        }
-                                        .fill(.orange)
-                                        .opacity(0.35)
                                         .onTapGesture {
                                             selectedItem = task
                                             isNavigation.toggle()
                                         }
                                         .simultaneousGesture(
-                                            LongPressGesture()
-                                                .onEnded { _ in
-                                                    selectedItem = task
-                                                    withAnimation {
-                                                        isLongpressed.toggle()
-                                                        let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                                                            impactHeavy.impactOccurred()
-                                                    }
-                                                }
+                                            enableVirtualTaskBlock(task)
                                         )
                                         .highPriorityGesture(
                                             pinchInAndToSctrollDoubleTap(task)
                                         )
-                                        
                                     }
                                     
                                     // MARK: Long pressed Task Block
@@ -259,35 +245,27 @@ struct WeeklyCalender: View {
                                                 ))
                                                 // 👆Upper
                                                 path.addLine(to: CGPoint(
-                                                        x: UIScreen.main.bounds.maxX,
-                                                        y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
-                                                    ))
+                                                    x: UIScreen.main.bounds.maxX,
+                                                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
+                                                ))
                                                 // 👇Lower
                                                 path.addLine(to: CGPoint(
-                                                        x: UIScreen.main.bounds.maxX,
-                                                        y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition
-                                                    ))
+                                                    x: UIScreen.main.bounds.maxX,
+                                                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition
+                                                ))
                                                 // 👇Lower
                                                 path.addLine(to: CGPoint(
-                                                        x: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                                                        y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition
+                                                    x: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition
                                                 ))
                                                 // 👆Upper
                                                 path.addLine(to: CGPoint(
-                                                        x: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                                                        y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
+                                                    x: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
                                                 ))
                                             }
                                             .fill(.orange)
                                             .opacity(0.5)
-                                            .gesture(
-                                                LongPressGesture()
-                                                    .onEnded { _ in
-                                                        withAnimation {
-                                                            isLongpressed.toggle()
-                                                        }
-                                                    }
-                                            )
                                             .gesture(
                                                 // Position
                                                 DragGesture()
@@ -321,6 +299,14 @@ struct WeeklyCalender: View {
                                                         }
                                                     }
                                             )
+                                            .gesture(
+                                                LongPressGesture()
+                                                    .onEnded { _ in
+                                                        withAnimation {
+                                                            isLongpressed.toggle()
+                                                        }
+                                                    }
+                                            )
                                             // 🕛 StartDateの時間軸
                                             HStack(alignment: .center) {
                                                 Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedStartDate + changedDate, to: selectedItem.startDate!)!))
@@ -340,7 +326,6 @@ struct WeeklyCalender: View {
                                             }
                                             .foregroundColor(.red)
                                             .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 6 + changedPosition)
-                                            
                                             
                                             // 🕛 EndDateの時間軸
                                             HStack(alignment: .center) {
@@ -442,6 +427,7 @@ struct WeeklyCalender: View {
                                                 Spacer()
                                             }
                                         }
+                                        .zIndex(5)
                                     }
                                     
                                     // ScrollViewの(コンテンツを含めた)高さをGeometryReaderで取得
@@ -464,28 +450,28 @@ struct WeeklyCalender: View {
                 .opacity(cheatFadeInOut ? 0 : 1)
             }
             // MARK: magnificationGestureの拡大率を利用してScrollViewをピンチイン・アウトする
-            .gesture(
-                MagnificationGesture()
-                    .onChanged { value in
-                        let changeRate = value / lastMagnificationValue
-                        if magnifyBy > 30.0 {
-                            magnifyBy = 30.0
-                        } else if magnifyBy < 1.0 {
-                            magnifyBy = 1.0
-                        } else {
-                            magnifyBy *= changeRate
-                        }
-                        lastMagnificationValue = value
-                        print(magnifyBy)
-                    }
-                    .onEnded { _ in
-                        lastMagnificationValue = 1.0
-                    }
-            )
+            //            .gesture(
+            //                MagnificationGesture()
+            //                    .onChanged { value in
+            //                        let changeRate = value / lastMagnificationValue
+            //                        if magnifyBy > 30.0 {
+            //                            magnifyBy = 30.0
+            //                        } else if magnifyBy < 1.0 {
+            //                            magnifyBy = 1.0
+            //                        } else {
+            //                            magnifyBy *= changeRate
+            //                        }
+            //                        lastMagnificationValue = value
+            //                        print(magnifyBy)
+            //                    }
+            //                    .onEnded { _ in
+            //                        lastMagnificationValue = 1.0
+            //                    }
+            //            )
             .toolbar {
                 // MARK: 拡大率が30じゃなくなった & scrollTarget(int)がtaskの範囲から外れたら、Text("")にする
                 ToolbarItem(placement: .principal) {
-                    if fadeState == .second {
+                    if fadeState == .second  && magnifyBy == 30{
                         Text(selectedText!)
                             .font(.footnote)
                             .bold()
@@ -496,7 +482,7 @@ struct WeeklyCalender: View {
                     }
                 }
             }
-            //
+            // 一時的に画面中央にTask名を表示する
             if fadeState == .first {
                 if let wrappedText = selectedText {
                     Text(String(wrappedText))
@@ -506,39 +492,37 @@ struct WeeklyCalender: View {
                         .padding()
                 }
             }
-            
-            VStack {
-                // 1, 2, 5, 10, 15. 30
-                withAnimation{
-                    Stepper(value: $magnifyBy, in: 1...30) {
-                        Text("magnifyBy: \(magnifyBy)")
-                    }
-                }
-            }
-            
+            // Floating button
             VStack {  // --- 1
                 Spacer()
                 HStack { // --- 2
                     Spacer()
                     Button(action: {
-                        let mag = [1, 2, 5, 10, 20, 30]
-                        
-                        print("Tapped!!") // --- 3
+                        withAnimation(.linear){
+                            switch magnifyBy {
+                            case 1:
+                                magnifyBy = 2
+                            case 2:
+                                magnifyBy = 5
+                            case 5:
+                                magnifyBy = 10
+                            default:
+                                magnifyBy = 1
+                            }
+                        }
                     }, label: {
-                        Image(systemName: "plus.magnifyingglass")
+                        Text("× \(Int(magnifyBy))")
                             .foregroundColor(.primary)
-                            .font(.system(size: 18)) // --- 4
+                            .font(.system(size: 16)) // --- 4
+                            .frame(width: 54, height: 54)
+                            .background(
+                                Circle()
+                                    .fill(Color.secondary)
+                                    .opacity(0.5)
+                            )
+                            .cornerRadius(30.0)
+                            .padding(EdgeInsets(top: 0, leading: 0, bottom: 16.0, trailing: 16.0)) // --- 5
                     })
-                    .frame(width: 54, height: 54)
-                    .background(
-                        Circle()
-                            .fill(Color.secondary)
-                            .opacity(0.5)
-                    )
-                    .cornerRadius(30.0)
-//                    .shadow(color: .gray, radius: 3, x: 3, y: 3)
-                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 16.0, trailing: 16.0)) // --- 5
-                    
                 }
             }
         }
@@ -558,7 +542,7 @@ private struct ColonDelimitedTimeDivider: View {
                 .opacity(0.4)
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(.secondary.opacity(0.3))
+                .foregroundColor(.secondary.opacity(0.2))
         }
         .offset(y: -7 + (parentScrollViewHeight / 1_440 * CGFloat(time)))
         .transition(.opacity)

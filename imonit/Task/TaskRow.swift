@@ -79,9 +79,3 @@ struct TaskRow: View {
         return dateString
     }
 }
-
-// struct TaskRow_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TaskRow(task: Task())
-//    }
-// }
