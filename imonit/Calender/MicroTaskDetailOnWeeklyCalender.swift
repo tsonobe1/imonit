@@ -89,7 +89,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                                 .overlay(
                                     Rectangle()
                                         .offset(y: 0)
-                                        .frame(width: timelineDividerWidth, height: 1)
+                                        .frame(width: timelineDividerWidth, height: 2)
                                         .foregroundColor(.orange)
                                         .opacity(0.3),
                                     alignment: .topTrailing
@@ -104,13 +104,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                             alignment: .topLeading
                         )
                     }
-                    // Divider
-                    
-                    //                    Rectangle()
-                    //                        .frame(width: timelineDividerWidth, height: 1)
-                    //                        .foregroundColor(.orange).opacity(0.2)
                 }
-                
             }
             // TaskBlockの位置までズラす
             .offset(y: ((scrollViewHeight / 1_440) * dateToMinute(date: task.startDate!)))

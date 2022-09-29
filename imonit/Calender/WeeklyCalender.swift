@@ -153,7 +153,7 @@ struct WeeklyCalender: View {
                                         Text("\(String(format: "%02d", i)):00")
                                         // 数字のweightを固定化してcomputed propertyが無限ループに陥らないようにする
                                             .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                                            .opacity(0.4)
+                                            .opacity(0.8)
                                         
                                         // Divider
                                         Rectangle()
@@ -237,6 +237,16 @@ struct WeeklyCalender: View {
                                     if isLongpressed {
                                         // Longpress後の値変更用TaskBlock
                                         ZStack(alignment: .top) {
+                                            // 🧱 Tack BLock
+//                                            TaskBlockPath(
+//                                                radius: 5,
+//                                                top: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition,
+//                                                bottom: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedUpperSidePosition + changedPosition,
+//                                                leading: UIScreen.main.bounds.maxX - timelineDividerWidth,
+//                                                traling: UIScreen.main.bounds.maxX
+//                                            )
+                                            
+                                            
                                             Path { path in
                                                 // 👆Upper
                                                 path.move(to: CGPoint(

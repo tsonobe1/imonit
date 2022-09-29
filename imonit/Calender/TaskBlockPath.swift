@@ -41,6 +41,7 @@ struct TaskBlockPath: Shape {
         path.addLine(to: h)
         path.addRelativeArc(center: i, radius: radius,
           startAngle: Angle.degrees(180), delta: Angle.degrees(270))
+        path.closeSubpath()
         
         return path
     }
