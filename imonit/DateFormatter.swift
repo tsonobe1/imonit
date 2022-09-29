@@ -25,6 +25,19 @@ func dateTimeFormatter(date: Date) -> String {
     return dateTimeString
 }
 
+func dateTimeFormatterColon() -> DateFormatter {
+    let dateFormatter = DateFormatter()
+    dateFormatter.setLocalizedDateFormatFromTemplate("Hm")
+    return dateFormatter
+}
+
+func convertToMinutes(date: Date) -> Int {
+    let calendar = Calendar(identifier: .gregorian)
+    let hour = calendar.component(.hour, from: date)
+    let minute = calendar.component(.minute, from: date)
+    return hour * 60 + minute
+}
+
 func dateToMinute(date: Date) -> CGFloat {
     let calendar = Calendar.current
     let hour = calendar.component(.hour, from: date)

@@ -52,7 +52,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
     
     var body: some View {
         // MARK: pinch in時
-        if magnifyBy >= 30 {
+        if magnifyBy >= 10 {
             VStack(spacing: 0) {
                 ForEach(microTasks) { microTask in
                     VStack {
