@@ -25,13 +25,13 @@ struct WeeklyCalender: View {
     @State private var magnifyBy: Double = 1.0
     @State private var lastMagnificationValue: Double = 1.0
     
-    // For Navigation When Tapped Task Block
+    // For Navigation When Tapped Task Box
     @State private var isNavigation = false
     @State var selectedItem = Task()
     
     // For "toSctroll" When Double Tap Gesture
     @State private var scrollTarget: Int?
-    @State private var taskBlockheight: CGFloat = 0
+    @State private var taskBoxheight: CGFloat = 0
     
     // For FadeIn-Out Which ScrollView And Task Title
     @State private var cheatFadeInOut: Bool = false
@@ -45,9 +45,9 @@ struct WeeklyCalender: View {
 
     
     // 🖕 Pinch in When Double Tap Gesture
-    fileprivate func findOrderOfTaskBlockUpperSide(_ task: FetchedResults<Task>.Element) {
-        let taskBlockHeight = scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
-        let compartmentalizedOrder = taskBlockHeight / (30 * magnifyBy / 6)
+    fileprivate func findOrderOfTaskBoxUpperSide(_ task: FetchedResults<Task>.Element) {
+        let taskBoxHeight = scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
+        let compartmentalizedOrder = taskBoxHeight / (30 * magnifyBy / 12)
         let roundDown = Int(floor(compartmentalizedOrder))
         scrollTarget = roundDown
     }
@@ -63,10 +63,10 @@ struct WeeklyCalender: View {
                         fadeState = .first
                         selectedText = task.task
                     }
-                    // 0.2秒後にダブルタップしたTaskBlockまでスクロール
+                    // 0.2秒後にダブルタップしたtaskBoxまでスクロール
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         withAnimation {
-                            findOrderOfTaskBlockUpperSide(task)
+                            findOrderOfTaskBoxUpperSide(task)
                         }
                         // 0.1秒後の更に0.3秒後にScrollのopacityを戻す
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -83,14 +83,14 @@ struct WeeklyCalender: View {
                     }
                 } else {
                     // ダブルタップ時にmagnifByが30だった場合
-                    findOrderOfTaskBlockUpperSide(task)
+                    findOrderOfTaskBoxUpperSide(task)
                 }
             }
     }
     
     // 🖕Long pressed
     @State private var isActiveVirtualTaskBox = false
-    fileprivate func enableVirtualTaskBlock(_ task: FetchedResults<Task>.Element) -> _EndedGesture<LongPressGesture> {
+    fileprivate func enableVirtualTaskBox(_ task: FetchedResults<Task>.Element) -> _EndedGesture<LongPressGesture> {
         return LongPressGesture()
             .onEnded { _ in
                 selectedItem = task
@@ -111,16 +111,16 @@ struct WeeklyCalender: View {
                     // MARK: Compartmentalization of ScrollView to programmatically scrollable
                     // ScrollViewに透明のRectを敷き詰めることで、Tapした位置のRectの順番を割り出し、プログラム的にtoScrollできるようにする
                     VStack(spacing: 0) {
-                        ForEach(0..<144, id: \.self) { obj in
+                        ForEach(0..<288, id: \.self) { obj in
                             ZStack {
                                 Rectangle()
-                                    .stroke(.clear)
-                                    .frame(height: 30 * magnifyBy / 6, alignment: .top)
+                                    .stroke(.blue)
+                                    .frame(height: 30 * magnifyBy / 12, alignment: .top)
                                     .id(obj)
                             }
                         }
                     }
-                    // scrollTargetが更新された時 = TackBlockがDouble tapされた時の処理
+                    // scrollTargetが更新された時 = TackBoxがDouble tapされた時の処理
                     .onChange(of: scrollTarget) { target in
                         if let target = target {
                             scrollTarget = nil
@@ -148,7 +148,7 @@ struct WeeklyCalender: View {
                                         // Divider
                                         Rectangle()
                                             .frame(height: 1)
-                                            .foregroundColor(.secondary.opacity(0.2))
+                                            .foregroundColor(.secondary.opacity(0.3))
                                             .coordinateSpace(name: "timelineDivider")
                                         // Eventのブロックの横幅とdividerの長さを一致させるために取得しておく
                                             .overlay(
@@ -182,8 +182,8 @@ struct WeeklyCalender: View {
                             }
                         }
                             .overlay(
-                                // MARK: TaskBlock to be added on top of ScrollView
-                                // ScrollViewの高さ取得 + 上乗せするTask Blocks
+                                // MARK: TaskBox to be added on top of ScrollView
+                                // ScrollViewの高さ取得 + 上乗せするTask Boxs
                                 ZStack(alignment: .topTrailing) {
                                     NavigationLink(destination: TaskDetail(task: selectedItem), isActive: self.$isNavigation) {
                                         EmptyView()
@@ -192,8 +192,8 @@ struct WeeklyCalender: View {
                                     ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
                                         // 🐦 Task Title & Detail
                                         Group {
-                                            // 🧱 Tack BLock
-                                            TaskBlockPath(
+                                            // 🧱 Tack Box
+                                            TaskBoxPath(
                                                 radius: 5,
                                                 top: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!),
                                                 bottom: scrollViewHeight / 1_440 * dateToMinute(date: task.endDate!),
@@ -204,7 +204,7 @@ struct WeeklyCalender: View {
                                             .opacity(0.35)
                                             
                                             // 📛 Task, MicroTask
-                                            MicroTaskDetailOnWeeklyCalender(
+                                            TaskOnBox(
                                                 withChild: task,
                                                 scrollViewHeight: $scrollViewHeight,
                                                 timelineDividerWidth: $timelineDividerWidth,
@@ -216,16 +216,16 @@ struct WeeklyCalender: View {
                                             isNavigation.toggle()
                                         }
                                         .simultaneousGesture(
-                                            enableVirtualTaskBlock(task)
+                                            enableVirtualTaskBox(task)
                                         )
                                         .highPriorityGesture(
                                             pinchInAndToSctrollDoubleTap(task)
                                         )
                                     }
                                     
-                                    // MARK: Long pressed Task Block
+                                    // MARK: Long pressed Task Box
                                     if isActiveVirtualTaskBox {
-                                        // Longpress後の値変更用TaskBlock
+                                        // Longpress後の値変更用TaskBox
                                         VirtualTaskBox(
                                             scrollViewHeight: scrollViewHeight,
                                             timelineDividerWidth: timelineDividerWidth,

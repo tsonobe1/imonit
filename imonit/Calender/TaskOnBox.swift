@@ -16,7 +16,7 @@ struct Line: Shape {
     }
 }
 
-struct MicroTaskDetailOnWeeklyCalender: View {
+struct TaskOnBox: View {
     @Environment(\.editMode) private var editMode
     @Binding var scrollViewHeight: CGFloat
     @Binding var timelineDividerWidth: CGFloat
@@ -106,7 +106,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                     }
                 }
             }
-            // TaskBlockの位置までズラす
+            // TaskBoxの位置までズラす
             .offset(y: ((scrollViewHeight / 1_440) * dateToMinute(date: task.startDate!)))
             .frame(
                 width: timelineDividerWidth,
@@ -188,7 +188,7 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                             }
                         }
                         
-                        // 上から順にMicroTasksを表示をするにあたり、TaskBlockから見切れそうな部分をフェードアウトする
+                        // 上から順にMicroTasksを表示をするにあたり、TaskBoxから見切れそうな部分をフェードアウトする
                         .mask(
                             LinearGradient(
                                 gradient: Gradient(colors:
@@ -209,10 +209,10 @@ struct MicroTaskDetailOnWeeklyCalender: View {
                         // ZStackを使っている理由　→　TaskTitleの".minimumScaleFactor(0.5)"を使いたいため
                         .padding(.vertical, 5)
                         .offset(y: taskTitleHeight)
-                        // .offSetでTaskTitle分をy方向にずらしているため、何もしないとTaskBlockからMicroTasksがTaskTitle分はみ出してしまう
-                        // はみ出さないように、frameを指定している。 TaskBlock - TaskTitleHeight
+                        // .offSetでTaskTitle分をy方向にずらしているため、何もしないとTaskBoxからMicroTasksがTaskTitle分はみ出してしまう
+                        // はみ出さないように、frameを指定している。 TaskBox - TaskTitleHeight
                         // MicroTaskがない場合は、「 - TaskTitleHeight 」でRuntime issueが起きてしまう
-                        // MagnifyByが小さい場合、TaskTitleHeightがTaskBlockを上回ってしまうため。
+                        // MagnifyByが小さい場合、TaskTitleHeightがTaskBoxを上回ってしまうため。
                         // なので、microtaskがなければ、「 - TaskTitleHeight 」をしないように三項演算子で条件分岐してる
                         // absにしないとInvalid frame dimension (negative or non-finite).になる
                         .frame(height: task.microTasks!.count == 0 ? scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!) : abs(scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!) - taskTitleHeight), alignment: .top)

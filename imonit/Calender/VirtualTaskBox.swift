@@ -25,34 +25,13 @@ struct VirtualTaskBox: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            
-            Path { path in
-                // 👆Upper
-                path.move(to: CGPoint(
-                    x: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
-                ))
-                // 👆Upper
-                path.addLine(to: CGPoint(
-                    x: UIScreen.main.bounds.maxX,
-                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
-                ))
-                // 👇Lower
-                path.addLine(to: CGPoint(
-                    x: UIScreen.main.bounds.maxX,
-                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition
-                ))
-                // 👇Lower
-                path.addLine(to: CGPoint(
-                    x: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition
-                ))
-                // 👆Upper
-                path.addLine(to: CGPoint(
-                    x: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition
-                ))
-            }
+            TaskBoxPath(
+                radius: 5,
+                top: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition,
+                bottom: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition,
+                leading: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                traling: UIScreen.main.bounds.maxX
+            )
             .fill(.orange)
             .opacity(0.5)
             .gesture(
@@ -88,7 +67,7 @@ struct VirtualTaskBox: View {
                         }
                     }
             )
-            .gesture(
+            .simultaneousGesture(
                 LongPressGesture()
                     .onEnded { _ in
                         withAnimation {
@@ -97,55 +76,55 @@ struct VirtualTaskBox: View {
                     }
             )
             Group {
-            // 🕛 StartDateの時間軸
-            HStack(alignment: .center) {
-                Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedStartDate + changedDate, to: selectedItem.startDate!)!))
-                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                    .opacity(1)
-                    .background(
-                        Rectangle()
-                            .fill(.ultraThinMaterial)
-                            .opacity(0.6)
-                    )
+                // 🕛 StartDateの時間軸
+                HStack(alignment: .center) {
+                    Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedStartDate + changedDate, to: selectedItem.startDate!)!))
+                        .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
+                        .opacity(1)
+                        .background(
+                            Rectangle()
+                                .fill(.ultraThinMaterial)
+                                .opacity(0.6)
+                        )
+                    
+                    Line()
+                        .stroke(style: StrokeStyle(lineWidth: 3, dash: [5]))
+                        .fill(.red)
+                        .frame(height: 1)
+                        .opacity(0.6)
+                }
+                .foregroundColor(.red)
+                .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 6 + changedPosition)
                 
-                Line()
-                    .stroke(style: StrokeStyle(lineWidth: 3, dash: [5]))
-                    .fill(.red)
-                    .frame(height: 1)
-                    .opacity(0.6)
-            }
-            .foregroundColor(.red)
-            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 6 + changedPosition)
-            
-            // 🕛 EndDateの時間軸
-            HStack(alignment: .center) {
-                Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedEndDate + changedDate, to: selectedItem.endDate!)!))
-                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                    .opacity(1)
-                    .background(
-                        Rectangle()
-                            .fill(.ultraThinMaterial)
-                            .opacity(0.6)
-                    )
-                
-                Line()
-                    .stroke(style: StrokeStyle(lineWidth: 3, dash: [5]))
-                    .fill(.red)
-                    .frame(height: 1)
-                    .opacity(0.6)
-            }
-            .foregroundColor(.red)
-            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition - 7 + changedPosition)
+                // 🕛 EndDateの時間軸
+                HStack(alignment: .center) {
+                    Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedEndDate + changedDate, to: selectedItem.endDate!)!))
+                        .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
+                        .opacity(1)
+                        .background(
+                            Rectangle()
+                                .fill(.ultraThinMaterial)
+                                .opacity(0.6)
+                        )
+                    
+                    Line()
+                        .stroke(style: StrokeStyle(lineWidth: 3, dash: [5]))
+                        .fill(.red)
+                        .frame(height: 1)
+                        .opacity(0.6)
+                }
+                .foregroundColor(.red)
+                .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition - 7 + changedPosition)
             }
             
             // 🤐 StartDateの移動バー
             HStack {
                 Spacer()
-                Rectangle()
-                    .fill(.red)
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.secondary)
                     .opacity(0.6)
-                    .frame(width: 70, height: 10)
-                    .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 10)
+                    .frame(width: 120, height: 20)
+                    .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 20)
                     .gesture(
                         DragGesture()
                             .onChanged { value in
@@ -180,10 +159,10 @@ struct VirtualTaskBox: View {
             }
             // 🤐 EndDateの移動バー
             HStack {
-                Rectangle()
-                    .fill(.red)
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.secondary)
                     .opacity(0.6)
-                    .frame(width: 70, height: 10)
+                    .frame(width: 120, height: 20)
                     .offset(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition)
                     .gesture(
                         DragGesture()

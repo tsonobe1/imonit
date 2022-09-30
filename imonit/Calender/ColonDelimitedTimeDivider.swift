@@ -19,7 +19,7 @@ struct ColonDelimitedTimeDivider: View {
                 .opacity(0.4)
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(.secondary.opacity(0.2))
+                .foregroundColor(.secondary.opacity(0.3))
         }
         .offset(y: -7 + (scrollViewHeight / 1_440 * CGFloat(time)))
         .transition(.opacity)
