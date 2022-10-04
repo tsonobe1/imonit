@@ -10,7 +10,10 @@ import SwiftUI
 struct WeeklyCalender: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest var tasks: FetchedResults<Task>
+    var selectedDate: Date
+    
     init(selectedDate: Date) {
+        self.selectedDate = selectedDate
         _tasks = FetchRequest(
             entity: Task.entity(),
             sortDescriptors: [NSSortDescriptor(keyPath: \Task.startDate, ascending: true)],
@@ -88,7 +91,7 @@ struct WeeklyCalender: View {
             }
     }
     
-    // 🖕Long pressed
+    // 🖕Long pressed at TaskBox
     @State private var isActiveVirtualTaskBox = false
     fileprivate func enableVirtualTaskBox(_ task: FetchedResults<Task>.Element) -> _EndedGesture<LongPressGesture> {
         return LongPressGesture()
@@ -103,23 +106,160 @@ struct WeeklyCalender: View {
             }
     }
     
+    // 🖕Long pressed at WeeklyCalender ScrollView
+    @State private var isActiveNewTaskBox = false
+    @State var selectedCompartmentalizedArea = Double.zero
+    @State var newTaskBoxTop = CGFloat.zero
+    @State var newTaskBoxBottom = CGFloat.zero
     
+    var calendar = Calendar(identifier: .gregorian)
+    @State var newTaskStartdate = Date()
+    @State var newTaskEnddate = Date()
+    @State var newTaskMinute = Int.zero
+    @State var plusXMinute = Int.zero
+
     var body: some View {
         ZStack {
             ScrollViewReader { (scrollviewProxy: ScrollViewProxy) in
                 ScrollView {
-                    // MARK: Compartmentalization of ScrollView to programmatically scrollable
+                    // MARK: Compartmentalize ScrollView to allow programmatic scrolling
                     // ScrollViewに透明のRectを敷き詰めることで、Tapした位置のRectの順番を割り出し、プログラム的にtoScrollできるようにする
                     VStack(spacing: 0) {
                         ForEach(0..<288, id: \.self) { obj in
-                            ZStack {
                                 Rectangle()
-                                    .stroke(.blue)
+                                    .stroke(.clear)
                                     .frame(height: 30 * magnifyBy / 12, alignment: .top)
                                     .id(obj)
-                            }
+                                    .contentShape(Rectangle())
+                                    .onTapGesture() {
+                                        withAnimation {
+                                            isActiveNewTaskBox.toggle()
+                                        }
+                                        selectedCompartmentalizedArea = Double(obj)
+                                        
+                                        if magnifyBy == 1 {
+                                            // 選択したAreaを12で割ることで、hour(0h~23h)に変換する。小数点以下は切り捨て = hourのみ取得
+                                            selectedCompartmentalizedArea =  floor(selectedCompartmentalizedArea / 12)
+                                            // hourに変換した後に、*60をして分単位に
+                                            newTaskBoxTop = scrollViewHeight / 1440 * CGFloat((selectedCompartmentalizedArea) * 60)
+                                            // + 60で　1h分のboxにする
+                                            newTaskBoxBottom = scrollViewHeight / 1440 * CGFloat((selectedCompartmentalizedArea) * 60) + 30
+                                            newTaskMinute = 0
+                                            plusXMinute = 60
+                                        } else if magnifyBy == 2 {
+                                            selectedCompartmentalizedArea =  selectedCompartmentalizedArea / 12
+                                            // 10倍にして、1の位が5未満だったら0に、5以上だったら5を代入する
+                                            // その値に6をかけて分単位にする
+                                            newTaskMinute = Int((selectedCompartmentalizedArea * Double(10)).truncatingRemainder(dividingBy: 10.0))
+                                            if newTaskMinute >=  5 {
+                                                newTaskMinute = 5
+                                            }else {
+                                                newTaskMinute = 0
+                                            }
+                                            newTaskMinute *= 6
+                                            newTaskBoxTop = scrollViewHeight / 1440 * CGFloat(Int(selectedCompartmentalizedArea) * 60 + newTaskMinute)
+                                            newTaskBoxBottom = scrollViewHeight / 1440 * CGFloat(Int(selectedCompartmentalizedArea) * 60 + newTaskMinute) + 30
+                                            plusXMinute = 30
+                                        } else if magnifyBy == 5 {
+                                            selectedCompartmentalizedArea =  selectedCompartmentalizedArea / 12
+                                            newTaskMinute = Int((selectedCompartmentalizedArea * Double(100)).truncatingRemainder(dividingBy: 100.0))
+                                            if 25..<50 ~= newTaskMinute {
+                                                newTaskMinute = 25
+                                            }else if 50..<75 ~= newTaskMinute {
+                                                newTaskMinute = 50
+                                            }else if 75..<100 ~= newTaskMinute {
+                                                newTaskMinute = 75
+                                            }else{
+                                                newTaskMinute = 0
+                                            }
+                                            newTaskMinute = newTaskMinute * 6 / 10
+                                            newTaskBoxTop = scrollViewHeight / 1440 * CGFloat(Int(selectedCompartmentalizedArea) * 60 + newTaskMinute)
+                                            newTaskBoxBottom = scrollViewHeight / 1440 * CGFloat(Int(selectedCompartmentalizedArea) * 60 + newTaskMinute) + 75
+                                            plusXMinute = 30
+                                        }  else if magnifyBy == 10 {
+                                            selectedCompartmentalizedArea =  selectedCompartmentalizedArea / 12
+                                            newTaskMinute = Int((selectedCompartmentalizedArea * Double(100)).truncatingRemainder(dividingBy: 100.0))
+                                            if 25..<50 ~= newTaskMinute {
+                                                newTaskMinute = 25
+                                            }else if 50..<75 ~= newTaskMinute {
+                                                newTaskMinute = 50
+                                            }else if 75..<100 ~= newTaskMinute {
+                                                newTaskMinute = 75
+                                            }else{
+                                                newTaskMinute = 0
+                                            }
+                                            newTaskMinute = newTaskMinute * 6 / 10
+                                            newTaskBoxTop = scrollViewHeight / 1440 * CGFloat(Int(selectedCompartmentalizedArea) * 60 + newTaskMinute)
+                                            newTaskBoxBottom = scrollViewHeight / 1440 * CGFloat(Int(selectedCompartmentalizedArea) * 60 + newTaskMinute) + 75
+                                            plusXMinute = 15
+                                        }
+                                        else if magnifyBy == 30 {
+                                            selectedCompartmentalizedArea =  selectedCompartmentalizedArea / 12
+                                            newTaskMinute = Int((selectedCompartmentalizedArea * Double(100)).truncatingRemainder(dividingBy: 100.0))
+                                            if 25..<50 ~= newTaskMinute {
+                                                newTaskMinute = 25
+                                            }else if 50..<75 ~= newTaskMinute {
+                                                newTaskMinute = 50
+                                            }else if 75..<100 ~= newTaskMinute {
+                                                newTaskMinute = 75
+                                            }else{
+                                                newTaskMinute = 0
+                                            }
+                                            newTaskMinute = newTaskMinute * 6 / 10
+                                            newTaskBoxTop = scrollViewHeight / 1440 * CGFloat(Int(selectedCompartmentalizedArea) * 60 + newTaskMinute)
+                                            newTaskBoxBottom = scrollViewHeight / 1440 * CGFloat(Int(selectedCompartmentalizedArea) * 60 + newTaskMinute) + 225
+                                            plusXMinute = 15
+                                        }
+                                        
+                                        newTaskStartdate = calendar.date(
+                                            from: DateComponents(
+                                                year: calendar.component(.year, from: selectedDate),
+                                                month:  calendar.component(.month, from: selectedDate),
+                                                day: calendar.component(.day, from: selectedDate),
+                                                hour: Int(selectedCompartmentalizedArea),
+                                                minute: newTaskMinute
+                                            )
+                                        ) ?? Date()
+                                        
+                                        newTaskEnddate = calendar.date(
+                                            from: DateComponents(
+                                                year: calendar.component(.year, from: selectedDate),
+                                                month:  calendar.component(.month, from: selectedDate),
+                                                day: calendar.component(.day, from: selectedDate),
+                                                hour: Int(selectedCompartmentalizedArea),
+                                                minute: newTaskMinute + plusXMinute
+                                            )
+                                        ) ?? Date()
+                                    }
                         }
                     }
+                    .overlay(
+                        ZStack(alignment: .topLeading) {
+                            if isActiveNewTaskBox {
+                                
+                                Group {
+                                    TaskBoxPath(
+                                        radius: 5,
+                                        top: newTaskBoxTop,
+                                        bottom: newTaskBoxBottom,
+                                        leading: UIScreen.main.bounds.maxX - timelineDividerWidth,
+                                        traling: UIScreen.main.bounds.maxX
+                                    )
+                                    .fill(.green)
+                                    .opacity(0.5)
+                                    
+                                    Text("New Task")
+                                        .offset(x: UIScreen.main.bounds.maxX - timelineDividerWidth + 5, y: newTaskBoxTop + 5)
+                                }
+
+                            }
+                        }
+                            .fullScreenCover(isPresented: $isActiveNewTaskBox) {
+                                TaskAddSheet(startDate: $newTaskStartdate, endDate: $newTaskEnddate)
+                            }
+                        ,
+                        alignment: .topLeading
+                    )
                     // scrollTargetが更新された時 = TackBoxがDouble tapされた時の処理
                     .onChange(of: scrollTarget) { target in
                         if let target = target {
@@ -340,59 +480,59 @@ struct WeeklyCalender: View {
 }
 
 
-struct WeeklyCalender_Previews: PreviewProvider {
-    static var previews: some View {
-        let result: PersistenceController = PersistenceController(inMemory: true)
-        let viewContext = result.container.viewContext
-        // task
-        let newTask = Task(context: viewContext)
-        newTask.task = "Quis nostrud exercitation ullamco"
-        newTask.isDone = false
-        newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-        newTask.createdAt = Date()
-        newTask.id = UUID()
-        newTask.startDate = Calendar.current.date(bySettingHour: 9, minute: 30, second: 0, of: Date())!
-        newTask.endDate = Calendar.current.date(bySettingHour: 11, minute: 00, second: 0, of: Date())!
-        newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
-        newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-        
-        // micro task
-        let newMicroTask = MicroTask(context: viewContext)
-        newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
-        newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-        newMicroTask.id = UUID()
-        newMicroTask.isDone = false
-        newMicroTask.timer = 10
-        newMicroTask.createdAt = Date()
-        newMicroTask.order = 0
-        newMicroTask.satisfactionPredict = 5
-        newMicroTask.satisfactionPredict = 5
-        newMicroTask.task = newTask
-        
-        let newMicroTask2 = MicroTask(context: viewContext)
-        newMicroTask2.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
-        newMicroTask2.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-        newMicroTask2.id = UUID()
-        newMicroTask2.isDone = false
-        newMicroTask2.timer = 10
-        newMicroTask2.createdAt = Date()
-        newMicroTask2.order = 0
-        newMicroTask2.satisfactionPredict = 5
-        newMicroTask2.satisfactionPredict = 5
-        newMicroTask2.task = newTask
-        
-        // task2
-        let newTask2 = Task(context: viewContext)
-        newTask2.task = "Quis2 nostrud exercitation ullamco"
-        newTask2.isDone = false
-        newTask2.detail = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-        newTask2.createdAt = Date()
-        newTask2.id = UUID()
-        newTask2.startDate = Calendar.current.date(bySettingHour: 14, minute: 45, second: 0, of: Date())!
-        newTask2.endDate = Calendar.current.date(bySettingHour: 15, minute: 30, second: 0, of: Date())!
-        newTask2.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
-        newTask2.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-        
-        return WeeklyCalender(selectedDate: Date())
-    }
-}
+//struct WeeklyCalender_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let result: PersistenceController = PersistenceController(inMemory: true)
+//        let viewContext = result.container.viewContext
+//        // task
+//        let newTask = Task(context: viewContext)
+//        newTask.task = "Quis nostrud exercitation ullamco"
+//        newTask.isDone = false
+//        newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+//        newTask.createdAt = Date()
+//        newTask.id = UUID()
+//        newTask.startDate = Calendar.current.date(bySettingHour: 9, minute: 30, second: 0, of: Date())!
+//        newTask.endDate = Calendar.current.date(bySettingHour: 11, minute: 00, second: 0, of: Date())!
+//        newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
+//        newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
+//
+//        // micro task
+//        let newMicroTask = MicroTask(context: viewContext)
+//        newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
+//        newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+//        newMicroTask.id = UUID()
+//        newMicroTask.isDone = false
+//        newMicroTask.timer = 10
+//        newMicroTask.createdAt = Date()
+//        newMicroTask.order = 0
+//        newMicroTask.satisfactionPredict = 5
+//        newMicroTask.satisfactionPredict = 5
+//        newMicroTask.task = newTask
+//
+//        let newMicroTask2 = MicroTask(context: viewContext)
+//        newMicroTask2.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
+//        newMicroTask2.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+//        newMicroTask2.id = UUID()
+//        newMicroTask2.isDone = false
+//        newMicroTask2.timer = 10
+//        newMicroTask2.createdAt = Date()
+//        newMicroTask2.order = 0
+//        newMicroTask2.satisfactionPredict = 5
+//        newMicroTask2.satisfactionPredict = 5
+//        newMicroTask2.task = newTask
+//
+//        // task2
+//        let newTask2 = Task(context: viewContext)
+//        newTask2.task = "Quis2 nostrud exercitation ullamco"
+//        newTask2.isDone = false
+//        newTask2.detail = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+//        newTask2.createdAt = Date()
+//        newTask2.id = UUID()
+//        newTask2.startDate = Calendar.current.date(bySettingHour: 14, minute: 45, second: 0, of: Date())!
+//        newTask2.endDate = Calendar.current.date(bySettingHour: 15, minute: 30, second: 0, of: Date())!
+//        newTask2.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
+//        newTask2.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
+//
+//        return WeeklyCalender(selectedDate: Date())
+//    }
+//}
