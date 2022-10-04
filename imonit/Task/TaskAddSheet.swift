@@ -12,19 +12,30 @@ struct TaskAddSheet: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) var editMode
     @Environment(\.dismiss) var dismiss
-
+    
+    init(
+        startDate: Binding<Date> = .constant(Date()),
+        endDate: Binding<Date> = .constant(Calendar.current.date(byAdding: .hour, value: 1, to: Date())!)
+    ) {
+        _startDate = startDate
+        _endDate = endDate
+    }
+    
     @State private var task = ""
     @State private var detail = ""
     @State private var id = UUID()
-    @State private var startDate = Date()
-    @State private var endDate = Date()
-
+    @Binding private var startDate: Date
+    @Binding private var endDate: Date
+    
     @State private var influence = ""
     @State private var benefit = ""
-
+    
     // timer
     @State var minutes = 10
-
+    
+    
+    
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -34,7 +45,7 @@ struct TaskAddSheet: View {
                         header: Text("Task"),
                         footer: Text(
                             startDate >= endDate ?
-                                "Ends should be set to a date and time later than Starts." : ""
+                            "Ends should be set to a date and time later than Starts." : ""
                         )
                         .font(.footnote)
                     ) {
@@ -44,7 +55,7 @@ struct TaskAddSheet: View {
                         DatePicker("Ends", selection: $endDate)
                     }
                     .textCase(nil)
-
+                    
                     Section(
                         header: Text("Motivation"),
                         footer: Text("Other")
@@ -64,12 +75,12 @@ struct TaskAddSheet: View {
                     trailing: Button("Add") {
                         addTask()
                     }
-                    .disabled(task.isEmpty || startDate >= endDate)
+                        .disabled(task.isEmpty || startDate >= endDate)
                 )
             }
         }
     }
-
+    
     private func addTask() {
         withAnimation {
             let newTask = Task(context: viewContext)
@@ -82,7 +93,7 @@ struct TaskAddSheet: View {
             newTask.endDate = endDate
             newTask.influence = influence
             newTask.benefit = benefit
-
+            
             do {
                 try viewContext.save()
             } catch {
