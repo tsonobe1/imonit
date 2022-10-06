@@ -16,7 +16,7 @@ struct Line: Shape {
     }
 }
 
-struct TaskOnBox: View {
+struct TaskDetailOnBox: View {
     @Environment(\.editMode) private var editMode
     @Binding var scrollViewHeight: CGFloat
     @Binding var timelineDividerWidth: CGFloat

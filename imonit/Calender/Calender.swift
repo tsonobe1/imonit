@@ -14,7 +14,7 @@ struct Calender: View {
         NavigationView {
             VStack {
                 DatePicker(selection: $selectedDate, label: { Text("Date") })
-                NavigationLink(destination: WeeklyCalender(selectedDate: selectedDate)) {
+                NavigationLink(destination: DailyCalender(selectedDate: selectedDate)) {
                     Text("Weekcly")
                 }
                 NavigationLink(destination: MonthlyCalender()) {

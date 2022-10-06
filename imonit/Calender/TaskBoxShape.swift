@@ -1,5 +1,5 @@
 //
-//  TaskBoxPath.swift
+//  TaskBoxShape.swift
 //  imonit
 //
 //  Created by 薗部拓人 on 2022/09/28.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TaskBoxPath: Shape {
+struct TaskBoxShape: Shape {
     
     let radius: CGFloat
     var top: CGFloat

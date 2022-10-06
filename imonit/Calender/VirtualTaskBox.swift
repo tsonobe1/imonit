@@ -25,7 +25,7 @@ struct VirtualTaskBox: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            TaskBoxPath(
+            TaskBoxShape(
                 radius: 5,
                 top: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition,
                 bottom: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition,
