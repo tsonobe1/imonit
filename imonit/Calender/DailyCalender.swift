@@ -22,18 +22,19 @@ class NewTaskBoxData: ObservableObject {
     @Published var forXMinutes = Int.zero
 }
 
-class DailyCalenderBasicGeometry: ObservableObject {
-    @Published var scrollViewHeight = CGFloat.zero
-    @Published var timelineDividerWidth = CGFloat.zero
-    @Published var magnifyBy = Double.zero
-    var aMinuteHeight: CGFloat {
-        scrollViewHeight / 1_440
-    }
-}
+// TODO: DispatchQueue.main.asyncを解決しないとCPUが100%になる
+//class DailyCalenderBasicGeometry: ObservableObject {
+//    @Published var scrollViewHeight = CGFloat.zero
+//    @Published var timelineDividerWidth = CGFloat.zero
+//    @Published var magnifyBy = Double.zero
+//    var aMinuteHeight: CGFloat {
+//        scrollViewHeight / 1_440
+//    }
+//}
 
 class WhenScrollingToTaskBox: ObservableObject {
     // For "toSctroll" When Double Tap Gesture
-    @Published var scrollTarget: Int = Int.zero
+    @Published var scrollTarget: Int?
     // Fade in and out of ScrollView and task title
     @Published  var cheatFadeInOut: Bool = false
     enum FadeInOutState {
@@ -59,6 +60,11 @@ struct DailyCalender: View {
         )
     }
     
+    // Observable Objects
+    @StateObject private var newTaskBox = NewTaskBoxData()
+    @StateObject private var toSctollBox = WhenScrollingToTaskBox()
+    
+    // DailyCalenderBasicGeometry
     @State private var magnifyBy: Double = 1.0 //
     @State private var scrollViewHeight: CGFloat = CGFloat(0) //
     @State private var timelineDividerWidth: CGFloat = CGFloat(0) // Get at Vertical24hTimeline //
@@ -66,39 +72,17 @@ struct DailyCalender: View {
         scrollViewHeight / 1_440
     }
     
-    
     // For Navigation When Tapped Task Box
-    @State private var isNavigation = false
-    @State var selectedItem = Task()
-    
-    // For "toSctroll" When Double Tap Gesture
-    @State private var scrollTarget = Int.zero //
-    
-    // Fade in and out of ScrollView and task title
-    @State private var cheatFadeInOut: Bool = false //
-    enum FadeInOutState {
-        case empty
-        case first
-        case second
-    }
-    @State private var fadeState = FadeInOutState.empty //
-    @State private var selectedText: String? //
-    
-    
-
+    @State private var isNavigation = false // Navigation
+    @State var selectedItem = Task() // Navigation
     
     // 🖕Long pressed at TaskBox
     @State private var isActiveVirtualTaskBox = false
     
-    
-    // 🖕Long pressed at DailyCalender ScrollView
-    @StateObject private var newTaskBox = NewTaskBoxData()
-    @StateObject private var calenderGeo = DailyCalenderBasicGeometry()
-    
-    // 📜 => Scroll Contents
-    // 🎁 => Task Box
-    
+
     var body: some View {
+        // 📜 => Scroll Contents
+        // 🎁 => Task Box
         ZStack {
             ScrollViewReader { (scrollviewProxy: ScrollViewProxy) in
                 ScrollView {
@@ -111,20 +95,21 @@ struct DailyCalender: View {
                     )
                     .overlay(
                         // 🎁 MARK: Add a TaskBox for new tasks when we tap the daily calender
-                        TaskAddBoxAndAddSheet(
+                        NewTaskBoxOnCalender(
                             newTaskBox: newTaskBox,
                             timelineDividerWidth: timelineDividerWidth
-                        ), alignment: .topLeading
+                        ),
+                        alignment: .topLeading
                     )
                     // scrollTargetが更新された時 = 既存のTackBoxがDouble tapされた時の処理
-                    .onChange(of: scrollTarget) { target in
-//                        if let target = target {
-//                            scrollTarget = nil
-//                            print("scrollTargetの変更を感知しました, target: \(target)")
+                    .onChange(of: toSctollBox.scrollTarget) { target in
+                        if let target = target {
+                            toSctollBox.scrollTarget = nil
+                            print("scrollTargetの変更を感知しました, target: \(target)")
                             withAnimation {
                                 scrollviewProxy.scrollTo(target, anchor: .top)
                             }
-//                        }
+                        }
                     }
                     .overlay(
                         // 📜 MARK: Timeline 00:00~23:00
@@ -143,18 +128,15 @@ struct DailyCalender: View {
                                 // Coredataからfetchしたtasksをforで回して配置していく
                                 ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
                                     // 🎁 MARK: Task Box
-                                    TaskBox(
+                                    TaskBoxOnCalender(
                                         task: task,
-                                        selectedItem: $selectedItem, // Nav
-                                        isActiveVirtualTaskBox: $isActiveVirtualTaskBox,
-                                        magnifyBy: $magnifyBy, // GEO
-                                        scrollTarget: $scrollTarget, // Fade
-                                        cheatFadeInOut: $cheatFadeInOut, // Fade
-                                        selectedText: $selectedText, // Fade
-                                        fadeState: $fadeState, // Fade
+                                        toSctollBox: toSctollBox,
                                         scrollViewHeight: $scrollViewHeight, // GEO
                                         timelineDividerWidth: $timelineDividerWidth, // GEO
-                                        isNavigation: $isNavigation // Nav
+                                        magnifyBy: $magnifyBy, // GEO
+                                        selectedItem: $selectedItem, // Nav
+                                        isNavigation: $isNavigation, // Nav
+                                        isActiveVirtualTaskBox: $isActiveVirtualTaskBox
                                     )
                                 }
                                 
@@ -192,13 +174,13 @@ struct DailyCalender: View {
                 .transaction { transaction in
                     transaction.animation = nil
                 }
-                .opacity(cheatFadeInOut ? 0 : 1)
+                .opacity(toSctollBox.cheatFadeInOut ? 0 : 1)
             }
             .toolbar {
                 // MARK: 拡大率が30じゃなくなった & scrollTarget(int)がtaskの範囲から外れたら、Text("")にする
                 ToolbarItem(placement: .principal) {
-                    if fadeState == .second  && magnifyBy == 30{
-                        Text(selectedText!)
+                    if toSctollBox.fadeState == .second  && magnifyBy == 30{
+                        Text(toSctollBox.selectedText!)
                             .font(.footnote)
                             .bold()
                             .lineLimit(1)
@@ -209,8 +191,8 @@ struct DailyCalender: View {
                 }
             }
             // 一時的に画面中央にTask名を表示する
-            if fadeState == .first {
-                if let wrappedText = selectedText {
+            if toSctollBox.fadeState == .first {
+                if let wrappedText = toSctollBox.selectedText {
                     Text(String(wrappedText))
                         .font(.title2)
                         .bold()
@@ -313,139 +295,3 @@ struct DailyCalender: View {
 //        return DailyCalender(selectedDate: Date())
 //    }
 //}
-
-struct TaskAddBoxAndAddSheet: View {
-    @ObservedObject var newTaskBox: NewTaskBoxData
-    var timelineDividerWidth: CGFloat
-    
-    var body: some View {
-        ZStack(alignment: .topLeading) {
-            if newTaskBox.isActive {
-                TaskBoxShape(
-                    radius: 5,
-                    top: newTaskBox.top,
-                    bottom: newTaskBox.bottom,
-                    leading: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                    traling: UIScreen.main.bounds.maxX
-                )
-                .fill(.green)
-                .opacity(0.5)
-                
-                Text("New Task")
-                    .offset(x: UIScreen.main.bounds.maxX - timelineDividerWidth + 5, y: newTaskBox.top + 5)
-                
-            }
-        }
-        .fullScreenCover(isPresented: $newTaskBox.isActive) {
-            TaskAddSheet(startDate: $newTaskBox.startDate, endDate: $newTaskBox.endDate)
-        }
-        
-    }
-}
-
-
-struct TaskBox: View {
-    var task: Task
-    @Binding var selectedItem: Task
-    @Binding var isActiveVirtualTaskBox: Bool
-    @Binding var magnifyBy: Double
-    @Binding var scrollTarget: Int
-    @Binding var cheatFadeInOut: Bool
-    @Binding var selectedText: String?
-    @Binding var fadeState: DailyCalender.FadeInOutState
-    @Binding var scrollViewHeight: CGFloat
-    @Binding var timelineDividerWidth: CGFloat
-    @Binding var isNavigation: Bool
-    var aMinuteHeight: CGFloat {
-        scrollViewHeight / 1_440
-    }
-    
-    fileprivate func enableVirtualTaskBox(_ task: FetchedResults<Task>.Element) -> _EndedGesture<LongPressGesture> {
-        return LongPressGesture()
-            .onEnded { _ in
-                selectedItem = task
-                withAnimation {
-                    isActiveVirtualTaskBox.toggle()
-                    // 触覚フィードバック
-                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                    impactHeavy.impactOccurred()
-                }
-            }
-    }
-    // 🖕 Pinch in When Double Tap Gesture
-    fileprivate func findOrderOfTaskBoxUpperSide(_ task: FetchedResults<Task>.Element) {
-        let taskBoxHeight = aMinuteHeight * dateToMinute(date: task.startDate!)
-        let compartmentalizedOrder = taskBoxHeight / (30 * magnifyBy / 12)
-        let roundDown = Int(floor(compartmentalizedOrder))
-        scrollTarget = roundDown
-    }
-    fileprivate func pinchInAndToSctrollDoubleTap(_ task: FetchedResults<Task>.Element) -> _EndedGesture<TapGesture> {
-        TapGesture(count: 2)
-            .onEnded { _ in
-                if magnifyBy != 30 {
-                    // ScrollViewの拡大率を30にして拡大 -> Scrollが上辺に戻る
-                    magnifyBy = 30
-                    cheatFadeInOut = true // Scrollのopacity操作をしておかしな挙動を隠す(誤魔化し用フェードイン・アウト)
-                    // View中央にTask名を表示
-                    withAnimation(Animation.easeInOut(duration: 0.1)) {
-                        fadeState = .first
-                        selectedText = task.task
-                    }
-                    // 0.2秒後にダブルタップしたtaskBoxまでスクロール
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        withAnimation {
-                            findOrderOfTaskBoxUpperSide(task)
-                        }
-                        // 0.1秒後の更に0.3秒後にScrollのopacityを戻す
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            withAnimation {
-                                cheatFadeInOut = false
-                            }
-                        }
-                    }
-                    // 0.8秒後にView中央にTask名を消す
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        withAnimation(Animation.easeInOut) {
-                            fadeState = .second
-                        }
-                    }
-                } else {
-                    // ダブルタップ時にmagnifByが30だった場合
-                    findOrderOfTaskBoxUpperSide(task)
-                }
-            }
-    }
-
-    var body: some View {
-        Group {
-            // 🧱 Tack Box Shape
-            TaskBoxShape(
-                radius: 5,
-                top: aMinuteHeight * dateToMinute(date: task.startDate!),
-                bottom: aMinuteHeight * dateToMinute(date: task.endDate!),
-                leading: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                traling: UIScreen.main.bounds.maxX
-            )
-            .fill(Color.orange)
-            .opacity(0.35)
-            
-            // 📛 Task, MicroTask Details
-            TaskDetailOnBox(
-                withChild: task,
-                scrollViewHeight: $scrollViewHeight,
-                timelineDividerWidth: $timelineDividerWidth,
-                magnifyBy: $magnifyBy
-            )
-        }
-        .onTapGesture {
-            selectedItem = task
-            isNavigation.toggle()
-        }
-        .simultaneousGesture(
-            enableVirtualTaskBox(task)
-        )
-        .highPriorityGesture(
-            pinchInAndToSctrollDoubleTap(task)
-        )
-    }
-}

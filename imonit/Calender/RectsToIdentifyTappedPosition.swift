@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RectsToIdentifyTappedPosition: View {
     @ObservedObject var newTaskBox: NewTaskBoxData
+    
     var scrollViewHeight: CGFloat
     var aMinuteHeight: CGFloat {
         scrollViewHeight / 1_440

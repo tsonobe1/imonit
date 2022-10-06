@@ -26,6 +26,8 @@
 		0C8AB3A82841640A0049B89D /* MicroTaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */; };
 		0C981A6428EDD00A00B0BD5E /* RectsToIdentifyTappedPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C981A6328EDD00A00B0BD5E /* RectsToIdentifyTappedPosition.swift */; };
 		0C981A6828EDE52F00B0BD5E /* Vertical24hTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C981A6728EDE52F00B0BD5E /* Vertical24hTimeline.swift */; };
+		0C981A6A28EF42B500B0BD5E /* TaskBoxOnCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C981A6928EF42B500B0BD5E /* TaskBoxOnCalender.swift */; };
+		0C981A6C28EF436D00B0BD5E /* NewTaskBoxOnCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C981A6B28EF436D00B0BD5E /* NewTaskBoxOnCalender.swift */; };
 		0C99AC8028AC4E46001FA8D7 /* MicroTaskEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C99AC7F28AC4E46001FA8D7 /* MicroTaskEditSheet.swift */; };
 		0C99AC8228AD0A3E001FA8D7 /* MicroTaskAddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C99AC8128AD0A3E001FA8D7 /* MicroTaskAddButton.swift */; };
 		0CA2CFCF283453EF00B65F2B /* imonitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2CFCE283453EF00B65F2B /* imonitApp.swift */; };
@@ -64,6 +66,8 @@
 		0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskDetail.swift; sourceTree = "<group>"; };
 		0C981A6328EDD00A00B0BD5E /* RectsToIdentifyTappedPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectsToIdentifyTappedPosition.swift; sourceTree = "<group>"; };
 		0C981A6728EDE52F00B0BD5E /* Vertical24hTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vertical24hTimeline.swift; sourceTree = "<group>"; };
+		0C981A6928EF42B500B0BD5E /* TaskBoxOnCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBoxOnCalender.swift; sourceTree = "<group>"; };
+		0C981A6B28EF436D00B0BD5E /* NewTaskBoxOnCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTaskBoxOnCalender.swift; sourceTree = "<group>"; };
 		0C99AC7F28AC4E46001FA8D7 /* MicroTaskEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskEditSheet.swift; sourceTree = "<group>"; };
 		0C99AC8128AD0A3E001FA8D7 /* MicroTaskAddButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddButton.swift; sourceTree = "<group>"; };
 		0CA2CFCB283453EF00B65F2B /* imonit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = imonit.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +104,8 @@
 				0C0FD78A28BD1584002653A8 /* Calender.swift */,
 				0C0FD78828BD156F002653A8 /* MonthlyCalender.swift */,
 				0C74994728BAD8FB00D38458 /* DailyCalender.swift */,
+				0C981A6B28EF436D00B0BD5E /* NewTaskBoxOnCalender.swift */,
+				0C981A6928EF42B500B0BD5E /* TaskBoxOnCalender.swift */,
 				0C981A6328EDD00A00B0BD5E /* RectsToIdentifyTappedPosition.swift */,
 				0C981A6728EDE52F00B0BD5E /* Vertical24hTimeline.swift */,
 				0C43412628E5CDF900E2CFDE /* ColonDelimitedTimeDivider.swift */,
@@ -288,11 +294,13 @@
 				0CDA7290283E4E6800BA614B /* MicroTask+CoreDataProperties.swift in Sources */,
 				0C28F83428B46861006B66DC /* MicroTaskAddModal.swift in Sources */,
 				0C04C7D5283CB61A00B36008 /* TaskDetail.swift in Sources */,
+				0C981A6A28EF42B500B0BD5E /* TaskBoxOnCalender.swift in Sources */,
 				0CA2CFD8283453F000B65F2B /* Persistence.swift in Sources */,
 				0C7B88842846C7360035EC8A /* MicroTaskAddSheet.swift in Sources */,
 				0CA2CFD1283453EF00B65F2B /* ContentView.swift in Sources */,
 				0CA2CFCF283453EF00B65F2B /* imonitApp.swift in Sources */,
 				0CDA7291283E4E6800BA614B /* Task+CoreDataClass.swift in Sources */,
+				0C981A6C28EF436D00B0BD5E /* NewTaskBoxOnCalender.swift in Sources */,
 				0C8AB3A6283FB9A80049B89D /* MicroTaskList.swift in Sources */,
 				0C43412928E5E04C00E2CFDE /* VirtualTaskBox.swift in Sources */,
 				0C981A6828EDE52F00B0BD5E /* Vertical24hTimeline.swift in Sources */,
