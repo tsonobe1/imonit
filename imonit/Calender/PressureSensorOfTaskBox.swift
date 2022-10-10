@@ -1,5 +1,5 @@
 //
-//  ToIdentifyTapPositionRect.swift
+//  PressureSensorOfTaskBox.swift
 //  imonit
 //
 //  Created by 薗部拓人 on 2022/10/05.
@@ -7,9 +7,10 @@
 
 import SwiftUI
 
-struct RectsToIdentifyTappedPosition: View {
+struct PressureSensorOfTaskBox: View {
     @ObservedObject var newTaskBox: NewTaskBoxData
     
+    var obj: Int
     var scrollViewHeight: CGFloat
     var aMinuteHeight: CGFloat {
         scrollViewHeight / 1_440
@@ -105,8 +106,7 @@ struct RectsToIdentifyTappedPosition: View {
     
     var body: some View {
         // ScrollViewに透明のRectを敷き詰めることで、Tapした位置のRectの順番を割り出し、プログラム的にtoScrollできるようにする
-        VStack(spacing: 0) {
-            ForEach(0..<288, id: \.self) { obj in
+
                 Rectangle()
                     .stroke(.clear)
                     .frame(height: 30 * magnifyBy / 12, alignment: .top)
@@ -145,6 +145,6 @@ struct RectsToIdentifyTappedPosition: View {
                     )
             }
         }
-    }
-}
+    
+
 

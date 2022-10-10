@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TaskBoxOnCalender: View {
     var task: Task
-    @ObservedObject var toSctollBox: WhenScrollingToTaskBox
+    @ObservedObject var programScroll: ForProgrammaticScrolling
     
     @Binding var scrollViewHeight: CGFloat
     @Binding var timelineDividerWidth: CGFloat
@@ -39,7 +39,7 @@ struct TaskBoxOnCalender: View {
         let taskBoxHeight = aMinuteHeight * dateToMinute(date: task.startDate!)
         let compartmentalizedOrder = taskBoxHeight / (30 * magnifyBy / 12)
         let roundDown = Int(floor(compartmentalizedOrder))
-        toSctollBox.scrollTarget = roundDown
+        programScroll.scrollTarget = roundDown
     }
     fileprivate func pinchInAndToSctrollDoubleTap(_ task: FetchedResults<Task>.Element) -> _EndedGesture<TapGesture> {
         TapGesture(count: 2)
@@ -47,11 +47,11 @@ struct TaskBoxOnCalender: View {
                 if magnifyBy != 30 {
                     // ScrollViewの拡大率を30にして拡大 -> Scrollが上辺に戻る
                     magnifyBy = 30
-                    toSctollBox.cheatFadeInOut = true // Scrollのopacity操作をしておかしな挙動を隠す(誤魔化し用フェードイン・アウト)
+                    programScroll.cheatFadeInOut = true // Scrollのopacity操作をしておかしな挙動を隠す(誤魔化し用フェードイン・アウト)
                     // View中央にTask名を表示
                     withAnimation(Animation.easeInOut(duration: 0.1)) {
-                        toSctollBox.fadeState = .first
-                        toSctollBox.selectedText = task.task
+                        programScroll.fadeState = .first
+                        programScroll.selectedText = task.task
                     }
                     // 0.2秒後にダブルタップしたtaskBoxまでスクロール
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -61,14 +61,14 @@ struct TaskBoxOnCalender: View {
                         // 0.1秒後の更に0.3秒後にScrollのopacityを戻す
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             withAnimation {
-                                toSctollBox.cheatFadeInOut = false
+                                programScroll.cheatFadeInOut = false
                             }
                         }
                     }
                     // 0.8秒後にView中央にTask名を消す
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                         withAnimation(Animation.easeInOut) {
-                            toSctollBox.fadeState = .second
+                            programScroll.fadeState = .second
                         }
                     }
                 } else {

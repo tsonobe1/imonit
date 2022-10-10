@@ -24,7 +24,7 @@
 		0C7B88842846C7360035EC8A /* MicroTaskAddSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */; };
 		0C8AB3A6283FB9A80049B89D /* MicroTaskList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */; };
 		0C8AB3A82841640A0049B89D /* MicroTaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */; };
-		0C981A6428EDD00A00B0BD5E /* RectsToIdentifyTappedPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C981A6328EDD00A00B0BD5E /* RectsToIdentifyTappedPosition.swift */; };
+		0C981A6428EDD00A00B0BD5E /* PressureSensorOfTaskBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C981A6328EDD00A00B0BD5E /* PressureSensorOfTaskBox.swift */; };
 		0C981A6828EDE52F00B0BD5E /* Vertical24hTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C981A6728EDE52F00B0BD5E /* Vertical24hTimeline.swift */; };
 		0C981A6A28EF42B500B0BD5E /* TaskBoxOnCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C981A6928EF42B500B0BD5E /* TaskBoxOnCalender.swift */; };
 		0C981A6C28EF436D00B0BD5E /* NewTaskBoxOnCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C981A6B28EF436D00B0BD5E /* NewTaskBoxOnCalender.swift */; };
@@ -64,7 +64,7 @@
 		0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddSheet.swift; sourceTree = "<group>"; };
 		0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskList.swift; sourceTree = "<group>"; };
 		0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskDetail.swift; sourceTree = "<group>"; };
-		0C981A6328EDD00A00B0BD5E /* RectsToIdentifyTappedPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectsToIdentifyTappedPosition.swift; sourceTree = "<group>"; };
+		0C981A6328EDD00A00B0BD5E /* PressureSensorOfTaskBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureSensorOfTaskBox.swift; sourceTree = "<group>"; };
 		0C981A6728EDE52F00B0BD5E /* Vertical24hTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vertical24hTimeline.swift; sourceTree = "<group>"; };
 		0C981A6928EF42B500B0BD5E /* TaskBoxOnCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskBoxOnCalender.swift; sourceTree = "<group>"; };
 		0C981A6B28EF436D00B0BD5E /* NewTaskBoxOnCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTaskBoxOnCalender.swift; sourceTree = "<group>"; };
@@ -106,7 +106,7 @@
 				0C74994728BAD8FB00D38458 /* DailyCalender.swift */,
 				0C981A6B28EF436D00B0BD5E /* NewTaskBoxOnCalender.swift */,
 				0C981A6928EF42B500B0BD5E /* TaskBoxOnCalender.swift */,
-				0C981A6328EDD00A00B0BD5E /* RectsToIdentifyTappedPosition.swift */,
+				0C981A6328EDD00A00B0BD5E /* PressureSensorOfTaskBox.swift */,
 				0C981A6728EDE52F00B0BD5E /* Vertical24hTimeline.swift */,
 				0C43412628E5CDF900E2CFDE /* ColonDelimitedTimeDivider.swift */,
 				0C43412228E4952100E2CFDE /* TaskBoxShape.swift */,
@@ -315,7 +315,7 @@
 				0CDA728F283E4E6800BA614B /* MicroTask+CoreDataClass.swift in Sources */,
 				0C99AC8028AC4E46001FA8D7 /* MicroTaskEditSheet.swift in Sources */,
 				0C0FD78B28BD1584002653A8 /* Calender.swift in Sources */,
-				0C981A6428EDD00A00B0BD5E /* RectsToIdentifyTappedPosition.swift in Sources */,
+				0C981A6428EDD00A00B0BD5E /* PressureSensorOfTaskBox.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

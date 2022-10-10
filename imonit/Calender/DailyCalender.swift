@@ -32,7 +32,7 @@ class NewTaskBoxData: ObservableObject {
 //    }
 //}
 
-class WhenScrollingToTaskBox: ObservableObject {
+class ForProgrammaticScrolling: ObservableObject {
     // For "toSctroll" When Double Tap Gesture
     @Published var scrollTarget: Int?
     // Fade in and out of ScrollView and task title
@@ -62,7 +62,7 @@ struct DailyCalender: View {
     
     // Observable Objects
     @StateObject private var newTaskBox = NewTaskBoxData()
-    @StateObject private var toSctollBox = WhenScrollingToTaskBox()
+    @StateObject private var programScroll = ForProgrammaticScrolling()
     
     // DailyCalenderBasicGeometry
     @State private var magnifyBy: Double = 1.0 //
@@ -86,25 +86,23 @@ struct DailyCalender: View {
         ZStack {
             ScrollViewReader { (scrollviewProxy: ScrollViewProxy) in
                 ScrollView {
-                    // 📜 MARK: Compartmentalize to allow programmatic scrolling
-                    RectsToIdentifyTappedPosition(
-                        newTaskBox: newTaskBox,
-                        scrollViewHeight: scrollViewHeight,
-                        magnifyBy: magnifyBy,
-                        selectedDate: selectedDate
-                    )
-                    .overlay(
-                        // 🎁 MARK: Add a TaskBox for new tasks when we tap the daily calender
-                        NewTaskBoxOnCalender(
-                            newTaskBox: newTaskBox,
-                            timelineDividerWidth: timelineDividerWidth
-                        ),
-                        alignment: .topLeading
-                    )
+                    // 👉 FIRST SCROLL VIEW OVERLAY
+                    // 📜 MARK: Place sensors to detect the position of the TaskBox to allow programmatic scrolling
+                    VStack(spacing: 0) {
+                        ForEach(0..<288, id: \.self) { obj in
+                            PressureSensorOfTaskBox(
+                                newTaskBox: newTaskBox,
+                                obj: obj,
+                                scrollViewHeight: scrollViewHeight,
+                                magnifyBy: magnifyBy,
+                                selectedDate: selectedDate
+                            )
+                        }
+                    }
                     // scrollTargetが更新された時 = 既存のTackBoxがDouble tapされた時の処理
-                    .onChange(of: toSctollBox.scrollTarget) { target in
+                    .onChange(of: programScroll.scrollTarget) { target in
                         if let target = target {
-                            toSctollBox.scrollTarget = nil
+                            programScroll.scrollTarget = nil
                             print("scrollTargetの変更を感知しました, target: \(target)")
                             withAnimation {
                                 scrollviewProxy.scrollTo(target, anchor: .top)
@@ -112,6 +110,7 @@ struct DailyCalender: View {
                         }
                     }
                     .overlay(
+                        // 👉 SECOND SCROLL VIEW OVERLAY
                         // 📜 MARK: Timeline 00:00~23:00
                         Vertical24hTimeline(
                             timelineDividerWidth: $timelineDividerWidth,
@@ -119,6 +118,7 @@ struct DailyCalender: View {
                             magnifyBy: magnifyBy
                         )
                         .overlay(
+                            // 👉 THIRD SCROLL VIEW OVERLAY
                             // 📜 MARK: TaskBox to be added on top of ScrollView
                             // ScrollViewの高さ取得 + 上乗せするTask Boxs
                             ZStack(alignment: .topTrailing) {
@@ -130,7 +130,7 @@ struct DailyCalender: View {
                                     // 🎁 MARK: Task Box
                                     TaskBoxOnCalender(
                                         task: task,
-                                        toSctollBox: toSctollBox,
+                                        programScroll: programScroll,
                                         scrollViewHeight: $scrollViewHeight, // GEO
                                         timelineDividerWidth: $timelineDividerWidth, // GEO
                                         magnifyBy: $magnifyBy, // GEO
@@ -151,7 +151,6 @@ struct DailyCalender: View {
                                         magnifyBy: $magnifyBy
                                     )
                                 }
-                                
                                 // ScrollViewの(コンテンツを含めた)高さをGeometryReaderで取得
                                 // この高さを1440(24h)で割って標準化した値を使うことで、
                                 // EventやXX:15などの時間表示を、ScrollViewの上に配置しやすくする
@@ -162,25 +161,34 @@ struct DailyCalender: View {
                                     return Color.clear
                                 }
                             }
+                            // 👉 fORTH SCROLL VIEW OVERLAY
                             // 💡MARK: Current Time Bar
                                 .overlay(
                                     CurrentTimeBar(scrollViewHeight: scrollViewHeight),
                                     alignment: .topLeading
                                 )
-                        ) 
+                        )
+                    )
+                    .overlay(
+                        // 🎁 MARK: Add a TaskBox for new tasks when we tap the daily calender
+                        NewTaskBoxOnCalender(
+                            newTaskBox: newTaskBox,
+                            timelineDividerWidth: timelineDividerWidth
+                        ),
+                        alignment: .topLeading
                     )
                 }
                 .coordinateSpace(name: "scroll")
                 .transaction { transaction in
                     transaction.animation = nil
                 }
-                .opacity(toSctollBox.cheatFadeInOut ? 0 : 1)
+                .opacity(programScroll.cheatFadeInOut ? 0 : 1)
             }
             .toolbar {
-                // MARK: 拡大率が30じゃなくなった & scrollTarget(int)がtaskの範囲から外れたら、Text("")にする
+                // 拡大率が30じゃなくなった & scrollTarget(int)がtaskの範囲から外れたら、Text("")にする
                 ToolbarItem(placement: .principal) {
-                    if toSctollBox.fadeState == .second  && magnifyBy == 30{
-                        Text(toSctollBox.selectedText!)
+                    if programScroll.fadeState == .second  && magnifyBy == 30{
+                        Text(programScroll.selectedText!)
                             .font(.footnote)
                             .bold()
                             .lineLimit(1)
@@ -191,8 +199,8 @@ struct DailyCalender: View {
                 }
             }
             // 一時的に画面中央にTask名を表示する
-            if toSctollBox.fadeState == .first {
-                if let wrappedText = toSctollBox.selectedText {
+            if programScroll.fadeState == .first {
+                if let wrappedText = programScroll.selectedText {
                     Text(String(wrappedText))
                         .font(.title2)
                         .bold()

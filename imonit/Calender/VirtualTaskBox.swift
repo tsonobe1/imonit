@@ -23,6 +23,16 @@ struct VirtualTaskBox: View {
     @State private var changedPosition = CGFloat.zero
     @State private var changedDate = Int.zero
     
+    func clamp<T: Comparable>(value: T, lowerLimit: T, upperLimit: T) -> T {
+        if value < lowerLimit {
+            return lowerLimit
+        }
+        if value > upperLimit {
+            return upperLimit
+        }
+        return value
+    }
+    
     var body: some View {
         ZStack(alignment: .top) {
             TaskBoxShape(
@@ -42,6 +52,7 @@ struct VirtualTaskBox: View {
                         if magnifyBy <= 3.0 {
                             changedPosition = (ceil(value.translation.height * 2 / 10) * 5)
                             changedDate = Int(ceil(value.translation.height * 2 / 10) * 10 / magnifyBy)
+                            print("changedPosition: \(changedPosition		)")
                         } else if magnifyBy <= 5 {
                             changedPosition = (ceil(value.translation.height / 5) * 5 * 2.5)
                             changedDate = Int(ceil(value.translation.height / 5) * 5 / magnifyBy * 5)
