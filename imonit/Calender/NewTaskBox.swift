@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NewTaskBoxOnCalender: View {
+struct NewTaskBox: View {
     @ObservedObject var newTaskBox: NewTaskBoxData
     var timelineDividerWidth: CGFloat
     

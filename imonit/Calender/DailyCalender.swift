@@ -33,7 +33,7 @@ class NewTaskBoxData: ObservableObject {
 //}
 
 class ForProgrammaticScrolling: ObservableObject {
-    // For "toSctroll" When Double Tap Gesture
+    // For "toScroll" When Double Tap Gesture
     @Published var scrollTarget: Int?
     // Fade in and out of ScrollView and task title
     @Published  var cheatFadeInOut: Bool = false
@@ -67,6 +67,7 @@ struct DailyCalender: View {
     // DailyCalenderBasicGeometry
     @State private var magnifyBy: Double = 1.0 //
     @State private var scrollViewHeight: CGFloat = CGFloat(0) //
+    @State private var scrollViewWidth: CGFloat = CGFloat(0) //
     @State private var timelineDividerWidth: CGFloat = CGFloat(0) // Get at Vertical24hTimeline //
     var aMinuteHeight: CGFloat { //
         scrollViewHeight / 1_440
@@ -78,7 +79,10 @@ struct DailyCalender: View {
     
     // 🖕Long pressed at TaskBox
     @State private var isActiveVirtualTaskBox = false
-    
+
+    @State private var scrollViewTop = CGFloat.zero
+    @State private var scrollViewBottom = CGFloat.zero
+
 
     var body: some View {
         // 📜 => Scroll Contents
@@ -90,7 +94,7 @@ struct DailyCalender: View {
                     // 📜 MARK: Place sensors to detect the position of the TaskBox to allow programmatic scrolling
                     VStack(spacing: 0) {
                         ForEach(0..<288, id: \.self) { obj in
-                            PressureSensorOfTaskBox(
+                            PressureSensor(
                                 newTaskBox: newTaskBox,
                                 obj: obj,
                                 scrollViewHeight: scrollViewHeight,
@@ -128,10 +132,11 @@ struct DailyCalender: View {
                                 // Coredataからfetchしたtasksをforで回して配置していく
                                 ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
                                     // 🎁 MARK: Task Box
-                                    TaskBoxOnCalender(
+                                    TaskBox(
                                         task: task,
                                         programScroll: programScroll,
                                         scrollViewHeight: $scrollViewHeight, // GEO
+                                        scrollViewWidth: scrollViewWidth, // GEO
                                         timelineDividerWidth: $timelineDividerWidth, // GEO
                                         magnifyBy: $magnifyBy, // GEO
                                         selectedItem: $selectedItem, // Nav
@@ -145,6 +150,7 @@ struct DailyCalender: View {
                                     // Longpress後の値変更用TaskBox
                                     VirtualTaskBox(
                                         scrollViewHeight: scrollViewHeight,
+                                        scrollViewWidth: scrollViewWidth,
                                         timelineDividerWidth: timelineDividerWidth,
                                         selectedItem: selectedItem,
                                         isActiveVirtualTaskBox: $isActiveVirtualTaskBox,
@@ -157,6 +163,7 @@ struct DailyCalender: View {
                                 GeometryReader { proxy -> Color in
                                     DispatchQueue.main.async {
                                         scrollViewHeight = proxy.frame(in: .global).size.height
+                                        scrollViewWidth = proxy.frame(in: .global).size.width
                                     }
                                     return Color.clear
                                 }
@@ -171,13 +178,22 @@ struct DailyCalender: View {
                     )
                     .overlay(
                         // 🎁 MARK: Add a TaskBox for new tasks when we tap the daily calender
-                        NewTaskBoxOnCalender(
+                        NewTaskBox(
                             newTaskBox: newTaskBox,
                             timelineDividerWidth: timelineDividerWidth
                         ),
                         alignment: .topLeading
                     )
                 }
+                .overlay(
+                    GeometryReader { proxy -> Color in
+                        DispatchQueue.main.async {
+                            scrollViewTop = proxy.frame(in: .local).minY
+                            scrollViewBottom = proxy.frame(in: .local).maxY
+                        }
+                        return Color.clear
+                    }
+                )
                 .coordinateSpace(name: "scroll")
                 .transaction { transaction in
                     transaction.animation = nil
@@ -242,6 +258,22 @@ struct DailyCalender: View {
                     )
                 }
             }
+            
+            
+            GeometryReader { _ in
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(.red)
+                    .opacity(0.6)
+                    .offset(y: scrollViewTop)
+                    .frame(height: 20)
+                
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(.green)
+                    .opacity(0.6)
+                    .offset(y: scrollViewBottom - 20)
+                    .frame(height: 20)
+            }
+
         }
     }
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PressureSensorOfTaskBox: View {
+struct PressureSensor: View {
     @ObservedObject var newTaskBox: NewTaskBoxData
     
     var obj: Int
