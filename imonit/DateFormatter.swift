@@ -49,3 +49,10 @@ func caluculateTimeInterval(startDate: Date, endDate: Date) -> CGFloat {
     let timeInterval = endDate.timeIntervalSince(startDate)
     return CGFloat(timeInterval / 60)
 }
+
+
+extension Date {
+    func isSameDay(otherDay: Date) -> Bool{
+        Calendar.current.isDate(self, equalTo: otherDay, toGranularity: .day)
+    }
+}

@@ -79,7 +79,9 @@ struct DailyCalender: View {
     
     // 🖕Long pressed at TaskBox
     @State private var isActiveVirtualTaskBox = false
-
+    @State private var isMovingVirtualTaskBox = false
+    
+    @State private var ScrollViewItSelfHeight = CGFloat.zero
     @State private var scrollViewTop = CGFloat.zero
     @State private var scrollViewBottom = CGFloat.zero
 
@@ -149,11 +151,14 @@ struct DailyCalender: View {
                                 if isActiveVirtualTaskBox {
                                     // Longpress後の値変更用TaskBox
                                     VirtualTaskBox(
+                                        ScrollViewItSelfHeight: ScrollViewItSelfHeight,
                                         scrollViewHeight: scrollViewHeight,
                                         scrollViewWidth: scrollViewWidth,
                                         timelineDividerWidth: timelineDividerWidth,
                                         selectedItem: selectedItem,
+                                        selectedDate: selectedDate,
                                         isActiveVirtualTaskBox: $isActiveVirtualTaskBox,
+                                        isMovingVirtualTaskBox: $isMovingVirtualTaskBox,
                                         magnifyBy: $magnifyBy
                                     )
                                 }
@@ -188,6 +193,7 @@ struct DailyCalender: View {
                 .overlay(
                     GeometryReader { proxy -> Color in
                         DispatchQueue.main.async {
+                            ScrollViewItSelfHeight = proxy.frame(in: .local).size.height
                             scrollViewTop = proxy.frame(in: .local).minY
                             scrollViewBottom = proxy.frame(in: .local).maxY
                         }
@@ -260,21 +266,44 @@ struct DailyCalender: View {
             }
             
             
-            GeometryReader { _ in
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(.red)
-                    .opacity(0.6)
-                    .offset(y: scrollViewTop)
-                    .frame(height: 20)
+//            GeometryReader { _ in
+            ZStack {
+                HStack {
+                    Rectangle()
+                        .fill(.red)
+                        .opacity(0.6)
+                        .frame(width: 30)
+                        .frame(maxHeight: .infinity)
+                    
+                    Spacer()
+                    
+                    Rectangle()
+                        .fill(.green)
+                        .opacity(0.6)
+                        .frame(width: 30)
+                        .frame(maxHeight: .infinity)
+                }
                 
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(.green)
-                    .opacity(0.6)
-                    .offset(y: scrollViewBottom - 20)
-                    .frame(height: 20)
+                VStack {
+                    Rectangle()
+                        .fill(.blue)
+                        .opacity(0.6)
+                        .frame(height: 30)
+                        .frame(maxWidth: .infinity)
+                    
+                    Spacer()
+                    
+                    Rectangle()
+                        .fill(.yellow)
+                        .opacity(0.6)
+                        .frame(height: 30)
+                        .frame(maxWidth: .infinity)
+                }
+//            }
             }
-
+            .zIndex(-10)
         }
+        .coordinateSpace(name: "parentSpace")
     }
 }
 
