@@ -7,11 +7,12 @@
 
 import SwiftUI
 
-struct TaskBoxOnCalender: View {
+struct TaskBox: View {
     var task: Task
     @ObservedObject var programScroll: ForProgrammaticScrolling
     
     @Binding var scrollViewHeight: CGFloat
+    var scrollViewWidth: CGFloat
     @Binding var timelineDividerWidth: CGFloat
     @Binding var magnifyBy: Double
     
@@ -90,8 +91,8 @@ struct TaskBoxOnCalender: View {
                 radius: 5,
                 top: aMinuteHeight * dateToMinute(date: task.startDate!),
                 bottom: aMinuteHeight * dateToMinute(date: task.endDate!),
-                leading: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                traling: UIScreen.main.bounds.maxX
+                leading: scrollViewWidth - timelineDividerWidth,
+                traling: scrollViewWidth
             )
             .fill(Color.orange)
             .opacity(0.35)

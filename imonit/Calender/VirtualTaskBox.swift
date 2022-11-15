@@ -10,71 +10,138 @@ import SwiftUI
 struct VirtualTaskBox: View {
     @Environment(\.managedObjectContext) private var viewContext
     
+    var ScrollViewItSelfHeight: CGFloat
     var scrollViewHeight: CGFloat
+    var scrollViewWidth: CGFloat
     var timelineDividerWidth: CGFloat
     let selectedItem: Task
+    let selectedDate: Date
     @Binding var isActiveVirtualTaskBox: Bool
+    @Binding var isMovingVirtualTaskBox: Bool
     @Binding var magnifyBy: Double
     
-    @State private var changedUpperSidePosition = CGFloat.zero
-    @State private var changedStartDate = Int.zero
-    @State private var changedLowerSidePosition = CGFloat.zero
-    @State private var changedEndDate = Int.zero
-    @State private var changedPosition = CGFloat.zero
-    @State private var changedDate = Int.zero
+    @State private var diffUpperSidePosition = CGFloat.zero
+    @State private var diffStartDateAsMinutes = Int.zero
+    @State private var diffLowerSidePosition = CGFloat.zero
+    @State private var diffEndDateAsMinutes = Int.zero
+    @State private var diffPosition = CGFloat.zero
     
-    func clamp<T: Comparable>(value: T, lowerLimit: T, upperLimit: T) -> T {
-        if value < lowerLimit {
-            return lowerLimit
-        }
-        if value > upperLimit {
-            return upperLimit
-        }
-        return value
+    @State private var diffDateAsMinutes = Int.zero
+    @State private var diffLeftPosition = CGFloat.zero
+    @State private var diffRightPosition = CGFloat.zero
+    
+    @State private var isOnOutsideTop = false
+    @State private var isOnOutsideBottom = false
+    @State private var isOnOutsideLeft = false
+    @State private var isOnOutsideRight = false
+    
+    @State private var modifiedStartDate = Date()
+    @State private var modifiedEndDate = Date()
+    @State private var startDayIsSame = true
+    @State private var endDayIsSame = true
+    
+    var isNotAcceptTaskBoxDragChanges: Bool {
+        !startDayIsSame || !endDayIsSame || isOnOutsideLeft || isOnOutsideRight
+    }
+
+    // 移動したPosition(CGFloat) = aと、移動した時間(分) = bを返す
+    func floorWithMultiple(_ movePosition: CGFloat, _ positionsMultiple: CGFloat, _ datesMultiple: Double) -> (movedPosition: CGFloat, movedMinute: Int) {
+        let x = movePosition / positionsMultiple
+        let y = floor(x)
+        let a = y * positionsMultiple
+        let b = Int(y * datesMultiple)
+        return (a, b)
     }
     
     var body: some View {
-        ZStack(alignment: .top) {
+        ZStack(alignment: .topLeading) {
+            let _ = print("isNotAcceptTaskBoxDragChanges: \(isNotAcceptTaskBoxDragChanges)")
             TaskBoxShape(
                 radius: 5,
-                top: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition + changedPosition,
-                bottom: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition + changedPosition,
-                leading: UIScreen.main.bounds.maxX - timelineDividerWidth,
-                traling: UIScreen.main.bounds.maxX
+                top: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + diffUpperSidePosition + diffPosition,
+                bottom: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + diffLowerSidePosition + diffPosition,
+                leading: scrollViewWidth - timelineDividerWidth + diffLeftPosition,
+                traling: scrollViewWidth + diffRightPosition
             )
-            .fill(.orange)
+            .fill(isNotAcceptTaskBoxDragChanges ? .gray : .orange)
             .opacity(0.5)
             .gesture(
                 // Position
                 DragGesture()
                     .onChanged { value in
-                        // ドラッグ中の処理
-                        if magnifyBy <= 3.0 {
-                            changedPosition = (ceil(value.translation.height * 2 / 10) * 5)
-                            changedDate = Int(ceil(value.translation.height * 2 / 10) * 10 / magnifyBy)
-                            print("changedPosition: \(changedPosition		)")
-                        } else if magnifyBy <= 5 {
-                            changedPosition = (ceil(value.translation.height / 5) * 5 * 2.5)
-                            changedDate = Int(ceil(value.translation.height / 5) * 5 / magnifyBy * 5)
-                        } else {
-                            changedPosition = (floor(value.translation.height) / 10) * 10
-                            changedDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
+                        isMovingVirtualTaskBox = true
+                        var movePosition: CGFloat = CGFloat.zero
+                        movePosition = value.translation.height
+                        
+                        // 拡大率に応じた値で切り捨てされた移動量と移動時間(分)を、flooredに入れる
+                        var floored = floorWithMultiple(movePosition, 7.5, 15)
+                        switch magnifyBy {
+                        case 1.0: floored = floorWithMultiple(movePosition, 7.5, 15)
+                        case 2.0: floored = floorWithMultiple(movePosition, 15, 15)
+                        case 5.0: floored = floorWithMultiple(movePosition, 12.5, 5)
+                        case 10.0: floored = floorWithMultiple(movePosition, 5, 1)
+                        case 30.0: floored = floorWithMultiple(movePosition, 15, 1)
+                        default: print("What?")
                         }
+                        diffPosition = floored.movedPosition
+                        diffDateAsMinutes = floored.movedMinute
+                        diffLeftPosition = value.translation.width
+                        diffRightPosition = value.translation.width
+
+                        modifiedStartDate = Calendar.current.date(byAdding: .minute, value: diffDateAsMinutes, to: selectedItem.startDate!)!
+                        modifiedEndDate = Calendar.current.date(byAdding: .minute, value: diffDateAsMinutes, to: selectedItem.endDate!)!
+                        startDayIsSame = selectedDate.isSameDay(otherDay: modifiedStartDate)
+                        endDayIsSame = selectedDate.isSameDay(otherDay: modifiedEndDate)
                     }
                     .onEnded { _ in
-                        do {
-                            let modifiedStartDate = Calendar.current.date(byAdding: .minute, value: changedDate, to: selectedItem.startDate!)!
-                            let modifiedEndDate = Calendar.current.date(byAdding: .minute, value: changedDate, to: selectedItem.endDate!)!
-                            selectedItem.startDate = modifiedStartDate
-                            selectedItem.endDate = modifiedEndDate
-                            try viewContext.save()
-                            changedPosition = CGFloat.zero
-                            changedDate = Int.zero
-                            withAnimation {
+                        if isNotAcceptTaskBoxDragChanges{
+                            diffPosition = CGFloat.zero
+                            diffDateAsMinutes = Int.zero
+                            isActiveVirtualTaskBox.toggle()
+                            isMovingVirtualTaskBox.toggle()
+                        } else {
+                            do {
+                                selectedItem.startDate = modifiedStartDate
+                                selectedItem.endDate = modifiedEndDate
+                                try viewContext.save()
+                                
+                                diffPosition = CGFloat.zero
+                                diffDateAsMinutes = Int.zero
                                 isActiveVirtualTaskBox.toggle()
+                                isMovingVirtualTaskBox.toggle()
+                            } catch let error as NSError {
+                                print("\(error), \(error.userInfo)")
                             }
-                        } catch let error as NSError {
-                            print("\(error), \(error.userInfo)")
+                        }
+                    }
+            )
+            // ScrollView(Contentを含まない)の4辺にある程度近づくと、フラグを立てる用のGesture
+            // simultaneousGestureにすることで、TaskBoxを移動するためのDragGestureと同時に機能させる
+            .simultaneousGesture(
+                DragGesture(coordinateSpace: .named("parentSpace"))
+                    .onChanged{ value in
+                        if value.location.y <= 30.0 {
+                            isOnOutsideTop = true
+                        }else if value.location.y > 30.0 {
+                            isOnOutsideTop = false
+                        }
+                        
+                        if value.location.y >= ScrollViewItSelfHeight - 30.0{
+                            isOnOutsideBottom = true
+                        }else if value.location.y < ScrollViewItSelfHeight - 30.0 {
+                            isOnOutsideBottom = false
+                        }
+                        
+                        if value.location.x <= 30.0 {
+                            isOnOutsideLeft = true
+                        }else if value.location.x > 30.0 {
+                            isOnOutsideLeft = false
+                        }
+                        
+                        if value.location.x >= scrollViewWidth - 30.0{
+                            isOnOutsideRight = true
+                        }else if value.location.x < scrollViewWidth - 30.0 {
+                            isOnOutsideRight = false
                         }
                     }
             )
@@ -89,15 +156,26 @@ struct VirtualTaskBox: View {
             Group {
                 // 🕛 StartDateの時間軸
                 HStack(alignment: .center) {
-                    Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedStartDate + changedDate, to: selectedItem.startDate!)!))
-                        .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                        .opacity(1)
-                        .background(
-                            Rectangle()
-                                .fill(.ultraThinMaterial)
-                                .opacity(0.6)
-                        )
-                    
+                    ZStack {
+                        Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: diffStartDateAsMinutes + diffDateAsMinutes - 30, to: selectedItem.startDate!)!))
+                            .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
+                            .opacity(1)
+                            .background(
+                                RoundedRectangle(cornerRadius: 5)
+                                    .fill(.ultraThinMaterial)
+                                    .opacity(0.6)
+                            )
+                            .offset(y: -15.0 * magnifyBy)
+                        
+                        Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: diffStartDateAsMinutes + diffDateAsMinutes, to: selectedItem.startDate!)!))
+                            .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
+                            .opacity(1)
+                            .background(
+                                RoundedRectangle(cornerRadius: 5)
+                                    .fill(.ultraThinMaterial)
+                                    .opacity(0.6)
+                            )
+                    }
                     Line()
                         .stroke(style: StrokeStyle(lineWidth: 3, dash: [5]))
                         .fill(.red)
@@ -105,19 +183,18 @@ struct VirtualTaskBox: View {
                         .opacity(0.6)
                 }
                 .foregroundColor(.red)
-                .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 6 + changedPosition)
+                .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + diffUpperSidePosition - 6 + diffPosition)
                 
                 // 🕛 EndDateの時間軸
                 HStack(alignment: .center) {
-                    Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: changedEndDate + changedDate, to: selectedItem.endDate!)!))
+                    Text(dateTimeFormatter(date: Calendar.current.date(byAdding: .minute, value: diffEndDateAsMinutes + diffDateAsMinutes, to: selectedItem.endDate!)!))
                         .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
                         .opacity(1)
                         .background(
-                            Rectangle()
+                            RoundedRectangle(cornerRadius: 5)
                                 .fill(.ultraThinMaterial)
                                 .opacity(0.6)
                         )
-                    
                     Line()
                         .stroke(style: StrokeStyle(lineWidth: 3, dash: [5]))
                         .fill(.red)
@@ -125,88 +202,123 @@ struct VirtualTaskBox: View {
                         .opacity(0.6)
                 }
                 .foregroundColor(.red)
-                .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition - 7 + changedPosition)
+                .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + diffLowerSidePosition - 7 + diffPosition)
             }
             
             // 🤐 StartDateの移動バー
-            HStack {
-                Spacer()
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.secondary)
-                    .opacity(0.6)
-                    .frame(width: 120, height: 20)
-                    .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + changedUpperSidePosition - 20)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { value in
-                                // ドラッグ中の処理
-                                if magnifyBy <= 3.0 {
-                                    changedUpperSidePosition = (ceil(value.translation.height * 2 / 10) * 5)
-                                    changedStartDate = Int(ceil(value.translation.height * 2 / 10) * 10 / magnifyBy)
-                                } else if magnifyBy <= 5 {
-                                    changedUpperSidePosition = (ceil(value.translation.height / 5) * 5 * 2.5)
-                                    changedStartDate = Int(ceil(value.translation.height / 5) * 5 / magnifyBy * 5)
-                                } else {
-                                    changedUpperSidePosition = (floor(value.translation.height) / 10) * 10
-                                    changedStartDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
-                                }
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.secondary)
+                .opacity(1)
+                .frame(width: 30, height: 30)
+                .offset(
+                    x: timelineDividerWidth + diffRightPosition,
+                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.startDate!) + diffUpperSidePosition - 30 + diffPosition
+                )
+                .gesture(
+                    DragGesture(coordinateSpace: .named("scroll")) // Scroll View
+                        .onChanged { value in
+                            var floored = floorWithMultiple(value.translation.height, 7.5, 15)
+                            switch magnifyBy {
+                            case 1.0: floored = floorWithMultiple(value.translation.height, 7.5, 15)
+                            case 2.0: floored = floorWithMultiple(value.translation.height, 15, 15)
+                            case 5.0: floored = floorWithMultiple(value.translation.height, 12.5, 5)
+                            case 10.0: floored = floorWithMultiple(value.translation.height, 5, 1)
+                            case 30.0: floored = floorWithMultiple(value.translation.height, 15, 1)
+                            default:
+                                print("What?")
                             }
-                            .onEnded { _ in
-                                do {
-                                    print("startDate: \(selectedItem.startDate!)")
-                                    let modifiedDate = Calendar.current.date(byAdding: .minute, value: changedStartDate, to: selectedItem.startDate!)!
+                            diffUpperSidePosition = floored.movedPosition
+                            diffStartDateAsMinutes = floored.movedMinute
+                            
+                            modifiedStartDate = Calendar.current.date(byAdding: .minute, value: diffStartDateAsMinutes, to: selectedItem.startDate!)!
+                            startDayIsSame = selectedDate.isSameDay(otherDay: modifiedStartDate)
+                        }
+                        .onEnded { _ in
+                            if !startDayIsSame {
+                                diffUpperSidePosition = CGFloat.zero
+                                diffStartDateAsMinutes = Int.zero
+                                isActiveVirtualTaskBox.toggle()
+                            } else {
+                            do {
+                                print("startDate: \(selectedItem.startDate!)")
+                                let modifiedDate = Calendar.current.date(byAdding: .minute, value: diffStartDateAsMinutes, to: selectedItem.startDate!)!
+                                if selectedItem.endDate! > modifiedDate {
                                     selectedItem.startDate = modifiedDate
                                     try viewContext.save()
-                                    changedUpperSidePosition = CGFloat.zero
-                                    changedStartDate = Int.zero
-                                    withAnimation {
-                                        isActiveVirtualTaskBox.toggle()
-                                    }
-                                } catch let error as NSError {
-                                    print("\(error), \(error.userInfo)")
                                 }
+
+                                diffUpperSidePosition = CGFloat.zero
+                                diffStartDateAsMinutes = Int.zero
+                                isActiveVirtualTaskBox.toggle()
+                            } catch let error as NSError {
+                                print("\(error), \(error.userInfo)")
                             }
-                    )
-            }
+                            }
+                        }
+                )
+            // scrollView上でDragGestureがしやすくなる
+                .simultaneousGesture(
+                    LongPressGesture()
+                        .onEnded { _ in
+                        }
+                )
             // 🤐 EndDateの移動バー
-            HStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.secondary)
-                    .opacity(0.6)
-                    .frame(width: 120, height: 20)
-                    .offset(x: UIScreen.main.bounds.maxX - timelineDividerWidth, y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + changedLowerSidePosition)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { value in
-                                if magnifyBy <= 3.0 {
-                                    changedLowerSidePosition = (ceil(value.translation.height * 2 / 10) * 5)
-                                    changedEndDate = Int(ceil(value.translation.height * 2 / 10) * 10 / magnifyBy)
-                                } else if magnifyBy <= 5 {
-                                    changedLowerSidePosition = (ceil(value.translation.height / 5) * 5 * 2.5)
-                                    changedEndDate = Int(ceil(value.translation.height / 5) * 5 / magnifyBy * 5)
-                                } else {
-                                    changedLowerSidePosition = (floor(value.translation.height) / 10) * 10
-                                    changedEndDate = Int((floor(value.translation.height) / 10) * 10 * 2 / magnifyBy)
-                                }
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.secondary)
+                .opacity(0.6)
+                .frame(width: 30, height: 30)
+                .offset(
+                    x: scrollViewWidth - timelineDividerWidth + diffLeftPosition,
+                    y: scrollViewHeight / 1_440 * dateToMinute(date: selectedItem.endDate!) + diffLowerSidePosition + diffPosition
+                )
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            // ドラッグ中の処理
+                            var floored = floorWithMultiple(value.translation.height, 7.5, 15)
+                            switch magnifyBy {
+                            case 1.0: floored = floorWithMultiple(value.translation.height, 7.5, 15)
+                            case 2.0: floored = floorWithMultiple(value.translation.height, 15, 15)
+                            case 5.0: floored = floorWithMultiple(value.translation.height, 12.5, 5)
+                            case 10.0: floored = floorWithMultiple(value.translation.height, 5, 1)
+                            case 30.0: floored = floorWithMultiple(value.translation.height, 15, 1)
+                            default:
+                                print("What?")
                             }
-                            .onEnded { _ in
-                                do {
-                                    print("startDate: \(selectedItem.endDate!)")
-                                    let modifiedDate = Calendar.current.date(byAdding: .minute, value: changedEndDate, to: selectedItem.endDate!)!
+                            diffLowerSidePosition = floored.movedPosition
+                            diffEndDateAsMinutes = floored.movedMinute
+                            
+                            modifiedStartDate = Calendar.current.date(byAdding: .minute, value: diffEndDateAsMinutes, to: selectedItem.endDate!)!
+                            endDayIsSame = selectedDate.isSameDay(otherDay: modifiedStartDate)
+                        }
+                        .onEnded { _ in
+                            if !endDayIsSame {
+                                diffLowerSidePosition = CGFloat.zero
+                                diffEndDateAsMinutes = Int.zero
+                                isActiveVirtualTaskBox.toggle()
+                            } else {
+                            do {
+                                print("startDate: \(selectedItem.endDate!)")
+                                let modifiedDate = Calendar.current.date(byAdding: .minute, value: diffEndDateAsMinutes, to: selectedItem.endDate!)!
+                                if selectedItem.startDate! < modifiedDate {
                                     selectedItem.endDate = modifiedDate
                                     try viewContext.save()
-                                    changedLowerSidePosition = CGFloat.zero
-                                    changedEndDate = Int.zero
-                                    withAnimation {
-                                        isActiveVirtualTaskBox.toggle()
-                                    }
-                                } catch let error as NSError {
-                                    print("\(error), \(error.userInfo)")
                                 }
+                                diffLowerSidePosition = CGFloat.zero
+                                diffEndDateAsMinutes = Int.zero
+                                isActiveVirtualTaskBox.toggle()
+                            } catch let error as NSError {
+                                print("\(error), \(error.userInfo)")
                             }
-                    )
-                Spacer()
-            }
+                        }
+                        }
+                )
+            // scrollView上でDragGestureがしやすくなる
+                .simultaneousGesture(
+                    LongPressGesture()
+                        .onEnded { _ in
+                        }
+                )
         }
         .zIndex(5)
     }
