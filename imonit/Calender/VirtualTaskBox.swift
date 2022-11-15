@@ -242,9 +242,11 @@ struct VirtualTaskBox: View {
                             do {
                                 print("startDate: \(selectedItem.startDate!)")
                                 let modifiedDate = Calendar.current.date(byAdding: .minute, value: diffStartDateAsMinutes, to: selectedItem.startDate!)!
-                                selectedItem.startDate = modifiedDate
-                                try viewContext.save()
-                                
+                                if selectedItem.endDate! > modifiedDate {
+                                    selectedItem.startDate = modifiedDate
+                                    try viewContext.save()
+                                }
+
                                 diffUpperSidePosition = CGFloat.zero
                                 diffStartDateAsMinutes = Int.zero
                                 isActiveVirtualTaskBox.toggle()
@@ -298,13 +300,13 @@ struct VirtualTaskBox: View {
                             do {
                                 print("startDate: \(selectedItem.endDate!)")
                                 let modifiedDate = Calendar.current.date(byAdding: .minute, value: diffEndDateAsMinutes, to: selectedItem.endDate!)!
-                                selectedItem.endDate = modifiedDate
-                                try viewContext.save()
+                                if selectedItem.startDate! < modifiedDate {
+                                    selectedItem.endDate = modifiedDate
+                                    try viewContext.save()
+                                }
                                 diffLowerSidePosition = CGFloat.zero
                                 diffEndDateAsMinutes = Int.zero
-                                withAnimation {
-                                    isActiveVirtualTaskBox.toggle()
-                                }
+                                isActiveVirtualTaskBox.toggle()
                             } catch let error as NSError {
                                 print("\(error), \(error.userInfo)")
                             }
