@@ -9,23 +9,21 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @State var showingAddMicroTaskTextField = false
-
+    @State private var selectedDate: Date = Date()
+    
     var body: some View {
-
-        TabView {
-            TaskList() // 1枚目の子ビュー
-                .tabItem {
-                    Image(systemName: "1.circle.fill") // タブバーの①
+        NavigationView {
+            VStack {
+//                WeeklyBar()
+                VStack {
+                    Text("Sat")
+                    Text(selectedDate.DateToString(format: "d"))
                 }
-
-            Calender()
-                .tabItem {
-                    Image(systemName: "calendar.badge.clock")
-                }
+                DailyCalender(selectedDate: selectedDate)
+            }
+            .navigationBarHidden(true)
         }
     }
-
 }
 
 private let itemFormatter: DateFormatter = {

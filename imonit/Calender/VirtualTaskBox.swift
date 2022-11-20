@@ -242,6 +242,7 @@ struct VirtualTaskBox: View {
                             do {
                                 print("startDate: \(selectedItem.startDate!)")
                                 let modifiedDate = Calendar.current.date(byAdding: .minute, value: diffStartDateAsMinutes, to: selectedItem.startDate!)!
+                                // StartDateの移動バーを、EndDateの移動バーより下に持ってった場合は、.saveしない
                                 if selectedItem.endDate! > modifiedDate {
                                     selectedItem.startDate = modifiedDate
                                     try viewContext.save()
@@ -300,6 +301,7 @@ struct VirtualTaskBox: View {
                             do {
                                 print("startDate: \(selectedItem.endDate!)")
                                 let modifiedDate = Calendar.current.date(byAdding: .minute, value: diffEndDateAsMinutes, to: selectedItem.endDate!)!
+                                // EndDateの移動バーを、StartDateの移動バーより上に持ってった場合は、.saveしない
                                 if selectedItem.startDate! < modifiedDate {
                                     selectedItem.endDate = modifiedDate
                                     try viewContext.save()

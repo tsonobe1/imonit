@@ -11,7 +11,7 @@ struct Calender: View {
     @State var selectedDate = Date()
     
     var body: some View {
-        NavigationView {
+        
             VStack {
                 DatePicker(selection: $selectedDate, label: { Text("Date") })
                 NavigationLink(destination: DailyCalender(selectedDate: selectedDate)) {
@@ -23,7 +23,7 @@ struct Calender: View {
             }
             .navigationTitle("Calender")
             .navigationBarTitleDisplayMode(.inline)
-        }
+        
     }
 }
 

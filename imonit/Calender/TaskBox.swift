@@ -108,6 +108,7 @@ struct TaskBox: View {
         .onTapGesture {
             selectedItem = task
             isNavigation.toggle()
+            print("TEST")
         }
         .simultaneousGesture(
             enableVirtualTaskBox(task)

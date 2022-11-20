@@ -89,7 +89,8 @@ struct DailyCalender: View {
     var body: some View {
         // 📜 => Scroll Contents
         // 🎁 => Task Box
-        ZStack {
+            
+        ZStack {  
             ScrollViewReader { (scrollviewProxy: ScrollViewProxy) in
                 ScrollView {
                     // 👉 FIRST SCROLL VIEW OVERLAY
@@ -264,8 +265,6 @@ struct DailyCalender: View {
                     )
                 }
             }
-            
-            
 //            GeometryReader { _ in
             ZStack {
                 HStack {
@@ -304,6 +303,7 @@ struct DailyCalender: View {
             .zIndex(-10)
         }
         .coordinateSpace(name: "parentSpace")
+        
     }
 }
 
