@@ -177,7 +177,9 @@ struct DailyCalender: View {
                             // 👉 fORTH SCROLL VIEW OVERLAY
                             // 💡MARK: Current Time Bar
                                 .overlay(
-                                    CurrentTimeBar(scrollViewHeight: scrollViewHeight),
+                                    CurrentTimeBar(scrollViewHeight: scrollViewHeight)
+                                        .opacity(isSameMonthDate(selectedDate, Date()) ? 1 : 0)
+                                    ,
                                     alignment: .topLeading
                                 )
                         )
@@ -266,41 +268,41 @@ struct DailyCalender: View {
                 }
             }
 //            GeometryReader { _ in
-            ZStack {
-                HStack {
-                    Rectangle()
-                        .fill(.red)
-                        .opacity(0.6)
-                        .frame(width: 30)
-                        .frame(maxHeight: .infinity)
-                    
-                    Spacer()
-                    
-                    Rectangle()
-                        .fill(.green)
-                        .opacity(0.6)
-                        .frame(width: 30)
-                        .frame(maxHeight: .infinity)
-                }
-                
-                VStack {
-                    Rectangle()
-                        .fill(.blue)
-                        .opacity(0.6)
-                        .frame(height: 30)
-                        .frame(maxWidth: .infinity)
-                    
-                    Spacer()
-                    
-                    Rectangle()
-                        .fill(.yellow)
-                        .opacity(0.6)
-                        .frame(height: 30)
-                        .frame(maxWidth: .infinity)
-                }
+//            ZStack {
+//                HStack {
+//                    Rectangle()
+//                        .fill(.red)
+//                        .opacity(0.6)
+//                        .frame(width: 30)
+//                        .frame(maxHeight: .infinity)
+//                    
+//                    Spacer()
+//                    
+//                    Rectangle()
+//                        .fill(.green)
+//                        .opacity(0.6)
+//                        .frame(width: 30)
+//                        .frame(maxHeight: .infinity)
+//                }
+//                
+//                VStack {
+//                    Rectangle()
+//                        .fill(.blue)
+//                        .opacity(0.6)
+//                        .frame(height: 30)
+//                        .frame(maxWidth: .infinity)
+//                    
+//                    Spacer()
+//                    
+//                    Rectangle()
+//                        .fill(.yellow)
+//                        .opacity(0.6)
+//                        .frame(height: 30)
+//                        .frame(maxWidth: .infinity)
+//                }
+////            }
 //            }
-            }
-            .zIndex(-10)
+//            .zIndex(-10)
         }
         .coordinateSpace(name: "parentSpace")
         

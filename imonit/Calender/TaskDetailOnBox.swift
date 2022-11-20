@@ -60,14 +60,13 @@ struct TaskDetailOnBox: View {
                             // Color Border
                             RoundedRectangle(cornerRadius: 40)
                             // microTaskのtimer分の長さのColor Border
-                                .frame(width: 8, height: scrollViewHeight / 1_440 * (CGFloat(microTask.timer / 60)), alignment: .top)
+                                .frame(width: 5, height: scrollViewHeight / 1_440 * (CGFloat(microTask.timer / 60)), alignment: .top)
                                 .foregroundColor(.orange)
-                                .opacity(0.5)
+                                .opacity(0.6)
                                 .fixedSize()
                             
                             // MicroTaskTitle ...... min
                             GeometryReader { metrics in
-                                
                                 HStack(alignment: .center, spacing: 0) {
                                     Text(microTask.microTask!)
                                         .font(.caption)
@@ -87,11 +86,13 @@ struct TaskDetailOnBox: View {
                                     Spacer()
                                 }
                                 .overlay(
+                                    // bar
                                     Rectangle()
                                         .offset(y: 0)
-                                        .frame(width: timelineDividerWidth, height: 2)
-                                        .foregroundColor(.orange)
-                                        .opacity(0.3),
+                                        .frame(width: timelineDividerWidth, height: 1)
+                                        .foregroundColor(.primary)
+                                        .colorInvert()
+                                        .opacity(1),
                                     alignment: .topTrailing
                                 )
                                 .frame(width: timelineDividerWidth - 8)
@@ -119,7 +120,7 @@ struct TaskDetailOnBox: View {
                 // Left Color Border
                 RoundedRectangle(cornerRadius: 40)
                     .frame(
-                        width: 8,
+                        width: 5,
                         height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
                         alignment: .topLeading
                     )

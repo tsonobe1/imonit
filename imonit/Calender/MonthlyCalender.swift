@@ -109,6 +109,10 @@ extension Date {
         self = Calendar.current.date(byAdding: .day, value: 1, to: self)!
     }
     
+    mutating func minusOneDay() {
+        self = Calendar.current.date(byAdding: .day, value: -1, to: self)!
+    }
+    
     // firstDayOfTheMonthをdiff月分ズラす
     func changeMonth(diff: Int) -> Date {
         Calendar.current.date(byAdding: .month, value: diff, to: self)!
