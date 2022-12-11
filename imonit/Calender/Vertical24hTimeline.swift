@@ -24,7 +24,7 @@ struct Vertical24hTimeline: View {
                         Text("\(String(format: "%02d", i)):00")
                         // 数字のweightを固定化してcomputed propertyが無限ループに陥らないようにする
                             .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)))
-                            .opacity(0.8)
+                            .opacity(0.6)
                         
                         // Divider
                         Rectangle()

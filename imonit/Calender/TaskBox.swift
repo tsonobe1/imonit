@@ -9,8 +9,9 @@ import SwiftUI
 
 struct TaskBox: View {
     var task: Task
+    var overlapCountWithTaskID: [UUID: Int]
     @ObservedObject var programScroll: ForProgrammaticScrolling
-    
+
     @Binding var scrollViewHeight: CGFloat
     var scrollViewWidth: CGFloat
     @Binding var timelineDividerWidth: CGFloat
@@ -100,9 +101,15 @@ struct TaskBox: View {
             // 📛 Task, MicroTask Details
             TaskDetailOnBox(
                 withChild: task,
-                scrollViewHeight: $scrollViewHeight,
+                scrollViewHeight: scrollViewHeight,
                 timelineDividerWidth: $timelineDividerWidth,
                 magnifyBy: $magnifyBy
+            )
+            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
+            .frame(
+                width: timelineDividerWidth,
+                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
+                alignment: .topLeading
             )
         }
         .onTapGesture {

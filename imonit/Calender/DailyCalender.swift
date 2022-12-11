@@ -84,11 +84,17 @@ struct DailyCalender: View {
     @State private var ScrollViewItSelfHeight = CGFloat.zero
     @State private var scrollViewTop = CGFloat.zero
     @State private var scrollViewBottom = CGFloat.zero
+    
+    // taskのidと、そのtaskがいくつのtaskと(時間帯が)重なっているかを格納したdict
+    var overlapCountWithTaskID: [UUID: Int] {
+        getOverlapCountWithTaskID(tasks: tasks)
+    }
 
 
     var body: some View {
         // 📜 => Scroll Contents
         // 🎁 => Task Box
+        var _ = print("overlapCountWithTaskID : \(overlapCountWithTaskID)")
             
         ZStack {
             ScrollViewReader { (scrollviewProxy: ScrollViewProxy) in
@@ -135,9 +141,9 @@ struct DailyCalender: View {
                                 // Coredataからfetchしたtasksをforで回して配置していく
                                 ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
                                     // 🎁 MARK: Task Box
-                                    let _ = print(index == 0 ? nil : self.tasks[index - 1])
                                     TaskBox(
                                         task: task,
+                                        overlapCountWithTaskID: overlapCountWithTaskID,
                                         programScroll: programScroll,
                                         scrollViewHeight: $scrollViewHeight, // GEO
                                         scrollViewWidth: scrollViewWidth, // GEO

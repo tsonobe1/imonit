@@ -18,17 +18,17 @@ struct Line: Shape {
 
 struct TaskDetailOnBox: View {
     @Environment(\.editMode) private var editMode
-    @Binding var scrollViewHeight: CGFloat
+    var scrollViewHeight: CGFloat
     @Binding var timelineDividerWidth: CGFloat
     @Binding var magnifyBy: Double
     
     // MARK: 親Viewで選択したTaskを使い、MicroTasksをFetchする
     @ObservedObject var task: Task
     @FetchRequest var microTasks: FetchedResults<MicroTask>
-    init(withChild task: Task, scrollViewHeight: Binding<CGFloat>, timelineDividerWidth: Binding<CGFloat>, magnifyBy: Binding<Double>) {
+    init(withChild task: Task, scrollViewHeight: CGFloat, timelineDividerWidth: Binding<CGFloat>, magnifyBy: Binding<Double>) {
         // showingAddMicroTaskTextFieldは、Addをタップした時にTaskのDateやDetailを隠すのに使う
         self.task = task
-        self._scrollViewHeight = scrollViewHeight
+        self.scrollViewHeight = scrollViewHeight
         self._timelineDividerWidth = timelineDividerWidth
         self._magnifyBy = magnifyBy
         _microTasks = FetchRequest(
@@ -107,13 +107,6 @@ struct TaskDetailOnBox: View {
                     }
                 }
             }
-            // TaskBoxの位置までズラす
-            .offset(y: ((scrollViewHeight / 1_440) * dateToMinute(date: task.startDate!)))
-            .frame(
-                width: timelineDividerWidth,
-                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                alignment: .topLeading
-            )
         } else {
             // MARK: pinch out時
             HStack(alignment: .top) {
@@ -221,12 +214,7 @@ struct TaskDetailOnBox: View {
                     }
                 }
             }
-            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
-            .frame(
-                width: timelineDividerWidth,
-                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                alignment: .topLeading
-            )
+            
         }
     }
 }
