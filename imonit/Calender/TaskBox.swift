@@ -5,18 +5,30 @@
 //  Created by 薗部拓人 on 2022/10/07.
 //
 
+public extension Color {
+
+    static func random(randomOpacity: Bool = true) -> Color {
+        Color(
+            red: .random(in: 0...1),
+            green: .random(in: 0...1),
+            blue: .random(in: 0...1),
+            opacity: randomOpacity ? .random(in: 1...1) : 1
+        )
+    }
+}
+
 import SwiftUI
 
 struct TaskBox: View {
     var task: Task
-    var overlapCountWithTaskID: [UUID: Int]
+    var overlapCountAndXAxisWithTaskID: [UUID: (maxOverlap: Int, xAxisOrder: Int)]
     @ObservedObject var programScroll: ForProgrammaticScrolling
-
+    
+    // programScrollを正常に動作させるために、scrollViewHeightはbindingしている
     @Binding var scrollViewHeight: CGFloat
     var scrollViewWidth: CGFloat
     @Binding var timelineDividerWidth: CGFloat
     @Binding var magnifyBy: Double
-    
     @Binding var selectedItem: Task
     @Binding var isNavigation: Bool
     @Binding var isActiveVirtualTaskBox: Bool
@@ -24,6 +36,25 @@ struct TaskBox: View {
         scrollViewHeight / 1_440
     }
     
+    // MARK: Property for Task Box Display ----------
+    var  taskDisplailableArea: CGFloat {
+        scrollViewWidth - timelineDividerWidth
+    }
+    var maxOverlap: CGFloat {
+        CGFloat(overlapCountAndXAxisWithTaskID[task.id!]!.maxOverlap)
+    }
+    var xAxisOrder: CGFloat {
+        CGFloat(overlapCountAndXAxisWithTaskID[task.id!]!.xAxisOrder)
+    }
+    
+    var leading: CGFloat {
+        taskDisplailableArea + (timelineDividerWidth / maxOverlap) * (xAxisOrder - 1)
+    }
+    var traling: CGFloat {
+        taskDisplailableArea + (timelineDividerWidth / maxOverlap) * xAxisOrder
+    }
+    // -----------------------------------------------
+        
     fileprivate func enableVirtualTaskBox(_ task: FetchedResults<Task>.Element) -> _EndedGesture<LongPressGesture> {
         return LongPressGesture()
             .onEnded { _ in
@@ -87,35 +118,42 @@ struct TaskBox: View {
 
     var body: some View {
         Group {
-            // 🧱 Tack Box Shape
+            // MARK: 🧱 Tack Box Shape
+            // Leading: xAxisTaskDisplayArea + (timelineDividerWidth / 4) * (taskのxAxisOrder - 1)
+            // Trailing: xAxisTaskDisplayArea + (timelineDividerWidth / 4) * (taskのxAxisOrder)
             TaskBoxShape(
                 radius: 5,
                 top: aMinuteHeight * dateToMinute(date: task.startDate!),
                 bottom: aMinuteHeight * dateToMinute(date: task.endDate!),
-                leading: scrollViewWidth - timelineDividerWidth,
-                traling: scrollViewWidth
+                leading: leading,
+                traling: traling
             )
-            .fill(Color.orange)
-            .opacity(0.35)
+            .fill(Color.random())
+            .opacity(0.9)
             
-            // 📛 Task, MicroTask Details
+            
+            // MARK: 📛 Task, MicroTask Details
             TaskDetailOnBox(
                 withChild: task,
                 scrollViewHeight: scrollViewHeight,
                 timelineDividerWidth: $timelineDividerWidth,
                 magnifyBy: $magnifyBy
             )
-            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
-            .frame(
-                width: timelineDividerWidth,
-                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                alignment: .topLeading
+            .offset(
+                x: taskDisplailableArea +   (timelineDividerWidth / maxOverlap) * (xAxisOrder - 1),
+                y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
             )
+            .frame(
+                width: timelineDividerWidth / maxOverlap,
+                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!)
+//                alignment: .topLeading
+            )
+
         }
+
         .onTapGesture {
             selectedItem = task
             isNavigation.toggle()
-            print("TEST")
         }
         .simultaneousGesture(
             enableVirtualTaskBox(task)
@@ -123,5 +161,7 @@ struct TaskBox: View {
         .highPriorityGesture(
             pinchInAndToSctrollDoubleTap(task)
         )
+        
     }
+    
 }

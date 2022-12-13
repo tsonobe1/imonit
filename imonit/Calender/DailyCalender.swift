@@ -86,16 +86,13 @@ struct DailyCalender: View {
     @State private var scrollViewBottom = CGFloat.zero
     
     // taskのidと、そのtaskがいくつのtaskと(時間帯が)重なっているかを格納したdict
-    var overlapCountWithTaskID: [UUID: Int] {
-        getOverlapCountWithTaskID(tasks: tasks)
+    var overlapCountAndXAxisWithTaskID: [UUID: (maxOverlap: Int, xAxisOrder: Int)] {
+        getOverlapCountAndXAxisWithTaskID(tasks: tasks)
     }
-
 
     var body: some View {
         // 📜 => Scroll Contents
         // 🎁 => Task Box
-        var _ = print("overlapCountWithTaskID : \(overlapCountWithTaskID)")
-            
         ZStack {
             ScrollViewReader { (scrollviewProxy: ScrollViewProxy) in
                 ScrollView {
@@ -134,26 +131,36 @@ struct DailyCalender: View {
                             // 👉 THIRD SCROLL VIEW OVERLAY
                             // 📜 MARK: TaskBox to be added on top of ScrollView
                             // ScrollViewの高さ取得 + 上乗せするTask Boxs
-                            ZStack(alignment: .topTrailing) {
+                            ZStack(alignment: .topLeading) {
                                 NavigationLink(destination: TaskDetail(task: selectedItem), isActive: self.$isNavigation) {
                                     EmptyView()
                                 }
-                                // Coredataからfetchしたtasksをforで回して配置していく
-                                ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
-                                    // 🎁 MARK: Task Box
-                                    TaskBox(
-                                        task: task,
-                                        overlapCountWithTaskID: overlapCountWithTaskID,
-                                        programScroll: programScroll,
-                                        scrollViewHeight: $scrollViewHeight, // GEO
-                                        scrollViewWidth: scrollViewWidth, // GEO
-                                        timelineDividerWidth: $timelineDividerWidth, // GEO
-                                        magnifyBy: $magnifyBy, // GEO
-                                        selectedItem: $selectedItem, // Nav
-                                        isNavigation: $isNavigation, // Nav
-                                        isActiveVirtualTaskBox: $isActiveVirtualTaskBox
-                                    )
-                                }
+                                    // Coredataからfetchしたtasksをforで回して配置していく
+                                    ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
+                                        // 🎁 MARK: Task Box
+                                        
+                                        VStack{
+                                            HStack{
+                                                Text("\(task.task!): \(overlapCountAndXAxisWithTaskID[task.id!]!.maxOverlap)重複")
+                                                Text("左から\(overlapCountAndXAxisWithTaskID[task.id!]!.xAxisOrder)番目")
+                                            }
+                                            .offset(y: CGFloat(index * 20))
+                                        }
+                                        
+                                        TaskBox(
+                                            task: task,
+                                            overlapCountAndXAxisWithTaskID: overlapCountAndXAxisWithTaskID,
+                                            programScroll: programScroll,
+                                            scrollViewHeight: $scrollViewHeight, // GEO
+                                            scrollViewWidth: scrollViewWidth, // GEO
+                                            timelineDividerWidth: $timelineDividerWidth, // GEO
+                                            magnifyBy: $magnifyBy, // GEO
+                                            selectedItem: $selectedItem, // Nav
+                                            isNavigation: $isNavigation, // Nav
+                                            isActiveVirtualTaskBox: $isActiveVirtualTaskBox
+                                        )
+                                    }
+                                
                                 
                                 // 🎁 MARK: Long pressed Task Box
                                 if isActiveVirtualTaskBox {

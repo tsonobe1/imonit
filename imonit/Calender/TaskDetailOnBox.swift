@@ -114,8 +114,8 @@ struct TaskDetailOnBox: View {
                 RoundedRectangle(cornerRadius: 40)
                     .frame(
                         width: 5,
-                        height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                        alignment: .topLeading
+                        height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!)
+//                        alignment: .topLeading
                     )
                     .foregroundColor(.orange)
                     .opacity(0.5)
