@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct ImonitApp: App {
     let persistenceController = PersistenceController.shared
+    var test = getOverlapCountAndXAxisWithTaskID2()
 
     var body: some Scene {
         WindowGroup {

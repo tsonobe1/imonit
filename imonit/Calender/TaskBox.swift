@@ -21,6 +21,8 @@ import SwiftUI
 
 struct TaskBox: View {
     var task: Task
+//    var prevTaskEndDate: Date
+//    var prev2TaskEndDate: Date
     var overlapCountAndXAxisWithTaskID: [UUID: (maxOverlap: Int, xAxisOrder: Int)]
     @ObservedObject var programScroll: ForProgrammaticScrolling
     
@@ -37,16 +39,19 @@ struct TaskBox: View {
     }
     
     // MARK: Property for Task Box Display ----------
-    var  taskDisplailableArea: CGFloat {
+    var taskDisplailableArea: CGFloat {
         scrollViewWidth - timelineDividerWidth
     }
     var maxOverlap: CGFloat {
         CGFloat(overlapCountAndXAxisWithTaskID[task.id!]!.maxOverlap)
     }
     var xAxisOrder: CGFloat {
-        CGFloat(overlapCountAndXAxisWithTaskID[task.id!]!.xAxisOrder)
+//        if (prevTaskEndDate >= task.startDate! && prev2TaskEndDate <= task.startDate!) {
+//            return CGFloat(overlapCountAndXAxisWithTaskID[task.id!]!.xAxisOrder) - 1
+//        }else {
+            return CGFloat(overlapCountAndXAxisWithTaskID[task.id!]!.xAxisOrder)
+//        }
     }
-    
     var leading: CGFloat {
         taskDisplailableArea + (timelineDividerWidth / maxOverlap) * (xAxisOrder - 1)
     }
@@ -128,8 +133,8 @@ struct TaskBox: View {
                 leading: leading,
                 traling: traling
             )
-            .fill(Color.random())
-            .opacity(0.9)
+            .fill(Color.orange)
+            .opacity(0.6)
             
             
             // MARK: 📛 Task, MicroTask Details

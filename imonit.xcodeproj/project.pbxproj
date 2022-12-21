@@ -22,6 +22,7 @@
 		0C5E3BED28C76B7D005D2312 /* TaskDetailOnBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5E3BEC28C76B7D005D2312 /* TaskDetailOnBox.swift */; };
 		0C74994828BAD8FB00D38458 /* DailyCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C74994728BAD8FB00D38458 /* DailyCalender.swift */; };
 		0C77D884294554830033AD5C /* TaskOverlapCountInRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C77D883294554830033AD5C /* TaskOverlapCountInRegion.swift */; };
+		0C7965E42951F32400DA31AD /* ComputeTaskBoxXAxisProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7965E32951F32400DA31AD /* ComputeTaskBoxXAxisProperties.swift */; };
 		0C7B88842846C7360035EC8A /* MicroTaskAddSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */; };
 		0C8AB3A6283FB9A80049B89D /* MicroTaskList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */; };
 		0C8AB3A82841640A0049B89D /* MicroTaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */; };
@@ -64,6 +65,7 @@
 		0C5E3BEC28C76B7D005D2312 /* TaskDetailOnBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailOnBox.swift; sourceTree = "<group>"; };
 		0C74994728BAD8FB00D38458 /* DailyCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCalender.swift; sourceTree = "<group>"; };
 		0C77D883294554830033AD5C /* TaskOverlapCountInRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskOverlapCountInRegion.swift; sourceTree = "<group>"; };
+		0C7965E32951F32400DA31AD /* ComputeTaskBoxXAxisProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComputeTaskBoxXAxisProperties.swift; sourceTree = "<group>"; };
 		0C7B88832846C7360035EC8A /* MicroTaskAddSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskAddSheet.swift; sourceTree = "<group>"; };
 		0C8AB3A5283FB9A80049B89D /* MicroTaskList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskList.swift; sourceTree = "<group>"; };
 		0C8AB3A72841640A0049B89D /* MicroTaskDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTaskDetail.swift; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 			isa = PBXGroup;
 			children = (
 				0CDA728B283E4E6800BA614B /* MicroTask+CoreDataClass.swift */,
+				0C7965E32951F32400DA31AD /* ComputeTaskBoxXAxisProperties.swift */,
 				0CDA728C283E4E6800BA614B /* MicroTask+CoreDataProperties.swift */,
 				0CDA728D283E4E6800BA614B /* Task+CoreDataClass.swift */,
 				0CDA728E283E4E6800BA614B /* Task+CoreDataProperties.swift */,
@@ -299,6 +302,7 @@
 				0C43412728E5CDF900E2CFDE /* ColonDelimitedTimeDivider.swift in Sources */,
 				0CDA7290283E4E6800BA614B /* MicroTask+CoreDataProperties.swift in Sources */,
 				0C28F83428B46861006B66DC /* MicroTaskAddModal.swift in Sources */,
+				0C7965E42951F32400DA31AD /* ComputeTaskBoxXAxisProperties.swift in Sources */,
 				0C04C7D5283CB61A00B36008 /* TaskDetail.swift in Sources */,
 				0C981A6A28EF42B500B0BD5E /* TaskBox.swift in Sources */,
 				0CA2CFD8283453F000B65F2B /* Persistence.swift in Sources */,

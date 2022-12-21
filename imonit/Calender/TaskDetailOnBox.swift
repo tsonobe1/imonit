@@ -60,7 +60,7 @@ struct TaskDetailOnBox: View {
                             // Color Border
                             RoundedRectangle(cornerRadius: 40)
                             // microTaskのtimer分の長さのColor Border
-                                .frame(width: 5, height: scrollViewHeight / 1_440 * (CGFloat(microTask.timer / 60)), alignment: .top)
+                                .frame(width: 5, height: scrollViewHeight / 1_440 * CGFloat(microTask.timer / 60), alignment: .top)
                                 .foregroundColor(.orange)
                                 .opacity(0.6)
                                 .fixedSize()

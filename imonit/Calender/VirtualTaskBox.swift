@@ -97,6 +97,7 @@ struct VirtualTaskBox: View {
                         switch magnifyBy {
                         case 1.0: floored = floorWithMultiple(movePosition, 7.5, 15)
                         case 2.0: floored = floorWithMultiple(movePosition, 15, 15)
+                        case 2.5: floored = floorWithMultiple(movePosition, 18.87, 15)
                         case 5.0: floored = floorWithMultiple(movePosition, 12.5, 5)
                         case 10.0: floored = floorWithMultiple(movePosition, 5, 1)
                         case 30.0: floored = floorWithMultiple(movePosition, 15, 1)
@@ -240,6 +241,7 @@ struct VirtualTaskBox: View {
                             switch magnifyBy {
                             case 1.0: floored = floorWithMultiple(value.translation.height, 7.5, 15)
                             case 2.0: floored = floorWithMultiple(value.translation.height, 15, 15)
+                            case 2.5: floored = floorWithMultiple(value.translation.height, 18.87, 15)
                             case 5.0: floored = floorWithMultiple(value.translation.height, 12.5, 5)
                             case 10.0: floored = floorWithMultiple(value.translation.height, 5, 1)
                             case 30.0: floored = floorWithMultiple(value.translation.height, 15, 1)
@@ -299,6 +301,7 @@ struct VirtualTaskBox: View {
                             switch magnifyBy {
                             case 1.0: floored = floorWithMultiple(value.translation.height, 7.5, 15)
                             case 2.0: floored = floorWithMultiple(value.translation.height, 15, 15)
+                            case 2.5: floored = floorWithMultiple(value.translation.height, 18.87, 15)
                             case 5.0: floored = floorWithMultiple(value.translation.height, 12.5, 5)
                             case 10.0: floored = floorWithMultiple(value.translation.height, 5, 1)
                             case 30.0: floored = floorWithMultiple(value.translation.height, 15, 1)

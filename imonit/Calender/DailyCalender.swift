@@ -65,7 +65,7 @@ struct DailyCalender: View {
     @StateObject private var programScroll = ForProgrammaticScrolling()
     
     // DailyCalenderBasicGeometry
-    @State private var magnifyBy: Double = 1.0 //
+    @State private var magnifyBy: Double = 2.5 //
     @State private var scrollViewHeight: CGFloat = CGFloat(0) //
     @State private var scrollViewWidth: CGFloat = CGFloat(0) //
     @State private var timelineDividerWidth: CGFloat = CGFloat(0) // Get at Vertical24hTimeline //
@@ -138,7 +138,6 @@ struct DailyCalender: View {
                                     // Coredataからfetchしたtasksをforで回して配置していく
                                     ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
                                         // 🎁 MARK: Task Box
-                                        
                                         VStack{
                                             HStack{
                                                 Text("\(task.task!): \(overlapCountAndXAxisWithTaskID[task.id!]!.maxOverlap)重複")
@@ -149,6 +148,8 @@ struct DailyCalender: View {
                                         
                                         TaskBox(
                                             task: task,
+//                                            prevTaskEndDate: index == 0 ? task.endDate! : tasks[index - 1].endDate!,
+//                                            prev2TaskEndDate: index == 0 || index == 1 ? task.endDate! : tasks[index - 2].endDate!,
                                             overlapCountAndXAxisWithTaskID: overlapCountAndXAxisWithTaskID,
                                             programScroll: programScroll,
                                             scrollViewHeight: $scrollViewHeight, // GEO
@@ -323,60 +324,3 @@ struct DailyCalender: View {
     }
 }
 
-
-//struct DailyCalender_Previews: PreviewProvider {
-//    static var previews: some View {
-//        let result: PersistenceController = PersistenceController(inMemory: true)
-//        let viewContext = result.container.viewContext
-//        // task
-//        let newTask = Task(context: viewContext)
-//        newTask.task = "Quis nostrud exercitation ullamco"
-//        newTask.isDone = false
-//        newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-//        newTask.createdAt = Date()
-//        newTask.id = UUID()
-//        newTask.startDate = Calendar.current.date(bySettingHour: 9, minute: 30, second: 0, of: Date())!
-//        newTask.endDate = Calendar.current.date(bySettingHour: 11, minute: 00, second: 0, of: Date())!
-//        newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
-//        newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-//
-//        // micro task
-//        let newMicroTask = MicroTask(context: viewContext)
-//        newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
-//        newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-//        newMicroTask.id = UUID()
-//        newMicroTask.isDone = false
-//        newMicroTask.timer = 10
-//        newMicroTask.createdAt = Date()
-//        newMicroTask.order = 0
-//        newMicroTask.satisfactionPredict = 5
-//        newMicroTask.satisfactionPredict = 5
-//        newMicroTask.task = newTask
-//
-//        let newMicroTask2 = MicroTask(context: viewContext)
-//        newMicroTask2.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
-//        newMicroTask2.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-//        newMicroTask2.id = UUID()
-//        newMicroTask2.isDone = false
-//        newMicroTask2.timer = 10
-//        newMicroTask2.createdAt = Date()
-//        newMicroTask2.order = 0
-//        newMicroTask2.satisfactionPredict = 5
-//        newMicroTask2.satisfactionPredict = 5
-//        newMicroTask2.task = newTask
-//
-//        // task2
-//        let newTask2 = Task(context: viewContext)
-//        newTask2.task = "Quis2 nostrud exercitation ullamco"
-//        newTask2.isDone = false
-//        newTask2.detail = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-//        newTask2.createdAt = Date()
-//        newTask2.id = UUID()
-//        newTask2.startDate = Calendar.current.date(bySettingHour: 14, minute: 45, second: 0, of: Date())!
-//        newTask2.endDate = Calendar.current.date(bySettingHour: 15, minute: 30, second: 0, of: Date())!
-//        newTask2.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
-//        newTask2.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-//
-//        return DailyCalender(selectedDate: Date())
-//    }
-//}
