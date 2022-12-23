@@ -49,6 +49,9 @@ class ForProgrammaticScrolling: ObservableObject {
 struct DailyCalender: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest var tasks: FetchedResults<Task>
+    var tasksArray: [Task] {
+        Array(tasks)
+    }
     var selectedDate: Date
     
     init(selectedDate: Date) {
@@ -86,8 +89,12 @@ struct DailyCalender: View {
     @State private var scrollViewBottom = CGFloat.zero
     
     // taskのidと、そのtaskがいくつのtaskと(時間帯が)重なっているかを格納したdict
-    var overlapCountAndXAxisWithTaskID: [UUID: (maxOverlap: Int, xAxisOrder: Int)] {
-        getOverlapCountAndXAxisWithTaskID(tasks: tasks)
+//    var overlapCountAndXAxisWithTaskID: [UUID: (maxOverlap: Int, xAxisOrder: Int)] {
+//        getOverlapCountAndXAxisWithTaskID(tasks: tasks)
+//    }
+
+    var taskBoxXAxisProperties: [UUID: (xPositionRatio: CGFloat, widthRatio: CGFloat)] {
+        getTaskBoxXAxisProperties(tasks: tasksArray)
     }
 
     var body: some View {
@@ -114,9 +121,9 @@ struct DailyCalender: View {
                         if let target = target {
                             programScroll.scrollTarget = nil
                             print("scrollTargetの変更を感知しました, target: \(target)")
-                            withAnimation {
+//                            withAnimation {
                                 scrollviewProxy.scrollTo(target, anchor: .top)
-                            }
+//                            }
                         }
                     }
                     .overlay(
@@ -138,19 +145,10 @@ struct DailyCalender: View {
                                     // Coredataからfetchしたtasksをforで回して配置していく
                                     ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
                                         // 🎁 MARK: Task Box
-                                        VStack{
-                                            HStack{
-                                                Text("\(task.task!): \(overlapCountAndXAxisWithTaskID[task.id!]!.maxOverlap)重複")
-                                                Text("左から\(overlapCountAndXAxisWithTaskID[task.id!]!.xAxisOrder)番目")
-                                            }
-                                            .offset(y: CGFloat(index * 20))
-                                        }
                                         
                                         TaskBox(
                                             task: task,
-//                                            prevTaskEndDate: index == 0 ? task.endDate! : tasks[index - 1].endDate!,
-//                                            prev2TaskEndDate: index == 0 || index == 1 ? task.endDate! : tasks[index - 2].endDate!,
-                                            overlapCountAndXAxisWithTaskID: overlapCountAndXAxisWithTaskID,
+                                            taskBoxXAxisProperties: taskBoxXAxisProperties,
                                             programScroll: programScroll,
                                             scrollViewHeight: $scrollViewHeight, // GEO
                                             scrollViewWidth: scrollViewWidth, // GEO
@@ -254,7 +252,7 @@ struct DailyCalender: View {
                 HStack { // --- 2
                     Spacer()
                     Button(action: {
-                        withAnimation(.linear){
+//                        withAnimation(.linear){
                             switch magnifyBy {
                             case 1:
                                 magnifyBy = 2
@@ -265,7 +263,7 @@ struct DailyCalender: View {
                             default:
                                 magnifyBy = 1
                             }
-                        }
+//                        }
                     }, label: {
                         Text("× \(Int(magnifyBy))")
                             .foregroundColor(.primary)

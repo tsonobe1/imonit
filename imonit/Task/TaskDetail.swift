@@ -24,7 +24,7 @@ struct TaskDetail: View {
     @State var showingAddMicroTaskTextField = false
     @State var showingEditSheet = false
     @State private var isOpenedDisclosure = true
-
+    
     var body: some View {
         VStack(alignment: .leading) {
             //
@@ -45,7 +45,7 @@ struct TaskDetail: View {
                             Image(systemName: "calendar.badge.clock")
                                 .symbolRenderingMode(.palette)
                                 .foregroundStyle(.red, .secondary)
-
+                            
                             VStack(alignment: .leading) {
                                 Text(dateFormatter(date: task.startDate!))
                                 HStack(spacing: 5) {
@@ -59,11 +59,11 @@ struct TaskDetail: View {
                         .font(.footnote)
                         .foregroundColor(.secondary)
                         .padding([.top, .bottom], 5)
-
+                        
                         Spacer()
-
+                        
                         // ✅ Done
-
+                        
                         BadgeCardView(title: "2020/07/11", value: "✓ Done", valueColor: Color.indigo)
                     }
                     // Details
@@ -95,7 +95,7 @@ struct TaskDetail: View {
                                 .foregroundColor(.secondary)
                                 .symbolVariant(.fill)
                                 .symbolRenderingMode(.hierarchical)
-
+                                
                             }
                             // 左に寄せる
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -133,10 +133,10 @@ import CoreData
 
 struct TaskDetail_Previews: PreviewProvider {
     static var previews: some View {
-
+        
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-
+        
         let newTask = Task(context: viewContext)
         newTask.task = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed"
         newTask.isDone = false
@@ -147,7 +147,7 @@ struct TaskDetail_Previews: PreviewProvider {
         newTask.endDate = Date()
         newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
         newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-
+        
         let newMicroTask = MicroTask(context: viewContext)
         newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
         newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
@@ -159,9 +159,9 @@ struct TaskDetail_Previews: PreviewProvider {
         newMicroTask.satisfactionPredict = 5
         newMicroTask.satisfactionPredict = 5
         newMicroTask.task = newTask
-
+        
         return NavigationView {
-
+            
             TaskDetail(task: newTask)
                 .environment(\.managedObjectContext, viewContext)
         }

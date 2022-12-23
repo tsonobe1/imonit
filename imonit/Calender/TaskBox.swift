@@ -5,25 +5,11 @@
 //  Created by 薗部拓人 on 2022/10/07.
 //
 
-public extension Color {
-
-    static func random(randomOpacity: Bool = true) -> Color {
-        Color(
-            red: .random(in: 0...1),
-            green: .random(in: 0...1),
-            blue: .random(in: 0...1),
-            opacity: randomOpacity ? .random(in: 1...1) : 1
-        )
-    }
-}
-
 import SwiftUI
 
 struct TaskBox: View {
     var task: Task
-//    var prevTaskEndDate: Date
-//    var prev2TaskEndDate: Date
-    var overlapCountAndXAxisWithTaskID: [UUID: (maxOverlap: Int, xAxisOrder: Int)]
+    var taskBoxXAxisProperties: [UUID: (xPositionRatio: CGFloat, widthRatio: CGFloat)]
     @ObservedObject var programScroll: ForProgrammaticScrolling
     
     // programScrollを正常に動作させるために、scrollViewHeightはbindingしている
@@ -42,34 +28,29 @@ struct TaskBox: View {
     var taskDisplailableArea: CGFloat {
         scrollViewWidth - timelineDividerWidth
     }
-    var maxOverlap: CGFloat {
-        CGFloat(overlapCountAndXAxisWithTaskID[task.id!]!.maxOverlap)
+    var xPositionRatio: CGFloat {
+        taskBoxXAxisProperties[task.id!]!.xPositionRatio
     }
-    var xAxisOrder: CGFloat {
-//        if (prevTaskEndDate >= task.startDate! && prev2TaskEndDate <= task.startDate!) {
-//            return CGFloat(overlapCountAndXAxisWithTaskID[task.id!]!.xAxisOrder) - 1
-//        }else {
-            return CGFloat(overlapCountAndXAxisWithTaskID[task.id!]!.xAxisOrder)
-//        }
+    var widthRatio: CGFloat {
+        taskBoxXAxisProperties[task.id!]!.widthRatio
     }
     var leading: CGFloat {
-        taskDisplailableArea + (timelineDividerWidth / maxOverlap) * (xAxisOrder - 1)
+        taskDisplailableArea + timelineDividerWidth * xPositionRatio
     }
     var traling: CGFloat {
-        taskDisplailableArea + (timelineDividerWidth / maxOverlap) * xAxisOrder
+        taskDisplailableArea + (timelineDividerWidth * xPositionRatio) + (timelineDividerWidth * widthRatio)
     }
-    // -----------------------------------------------
         
     fileprivate func enableVirtualTaskBox(_ task: FetchedResults<Task>.Element) -> _EndedGesture<LongPressGesture> {
         return LongPressGesture()
             .onEnded { _ in
                 selectedItem = task
-                withAnimation {
+//                withAnimation {
                     isActiveVirtualTaskBox.toggle()
                     // 触覚フィードバック
                     let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
                     impactHeavy.impactOccurred()
-                }
+//                }
             }
     }
     // 🖕 Pinch in When Double Tap Gesture
@@ -133,8 +114,9 @@ struct TaskBox: View {
                 leading: leading,
                 traling: traling
             )
-            .fill(Color.orange)
+            .fill(.blue.gradient)
             .opacity(0.6)
+//            .drawingGroup(opaque: true)
             
             
             // MARK: 📛 Task, MicroTask Details
@@ -145,15 +127,15 @@ struct TaskBox: View {
                 magnifyBy: $magnifyBy
             )
             .offset(
-                x: taskDisplailableArea +   (timelineDividerWidth / maxOverlap) * (xAxisOrder - 1),
+                x: taskDisplailableArea +  (timelineDividerWidth * xPositionRatio),
                 y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
             )
             .frame(
-                width: timelineDividerWidth / maxOverlap,
+                width: timelineDividerWidth * widthRatio,
                 height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!)
 //                alignment: .topLeading
             )
-
+            
         }
 
         .onTapGesture {
