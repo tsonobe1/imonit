@@ -49,6 +49,9 @@ class ForProgrammaticScrolling: ObservableObject {
 struct DailyCalender: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest var tasks: FetchedResults<Task>
+    var tasksArray: [Task] {
+        Array(tasks)
+    }
     var selectedDate: Date
     
     init(selectedDate: Date) {
@@ -65,7 +68,7 @@ struct DailyCalender: View {
     @StateObject private var programScroll = ForProgrammaticScrolling()
     
     // DailyCalenderBasicGeometry
-    @State private var magnifyBy: Double = 1.0 //
+    @State private var magnifyBy: Double = 2.5 //
     @State private var scrollViewHeight: CGFloat = CGFloat(0) //
     @State private var scrollViewWidth: CGFloat = CGFloat(0) //
     @State private var timelineDividerWidth: CGFloat = CGFloat(0) // Get at Vertical24hTimeline //
@@ -84,12 +87,19 @@ struct DailyCalender: View {
     @State private var ScrollViewItSelfHeight = CGFloat.zero
     @State private var scrollViewTop = CGFloat.zero
     @State private var scrollViewBottom = CGFloat.zero
+    
+    // taskのidと、そのtaskがいくつのtaskと(時間帯が)重なっているかを格納したdict
+//    var overlapCountAndXAxisWithTaskID: [UUID: (maxOverlap: Int, xAxisOrder: Int)] {
+//        getOverlapCountAndXAxisWithTaskID(tasks: tasks)
+//    }
 
+    var taskBoxXAxisProperties: [UUID: (xPositionRatio: CGFloat, widthRatio: CGFloat)] {
+        getTaskBoxXAxisProperties(tasks: tasksArray)
+    }
 
     var body: some View {
         // 📜 => Scroll Contents
         // 🎁 => Task Box
-            
         ZStack {
             ScrollViewReader { (scrollviewProxy: ScrollViewProxy) in
                 ScrollView {
@@ -111,9 +121,9 @@ struct DailyCalender: View {
                         if let target = target {
                             programScroll.scrollTarget = nil
                             print("scrollTargetの変更を感知しました, target: \(target)")
-                            withAnimation {
+//                            withAnimation {
                                 scrollviewProxy.scrollTo(target, anchor: .top)
-                            }
+//                            }
                         }
                     }
                     .overlay(
@@ -128,26 +138,28 @@ struct DailyCalender: View {
                             // 👉 THIRD SCROLL VIEW OVERLAY
                             // 📜 MARK: TaskBox to be added on top of ScrollView
                             // ScrollViewの高さ取得 + 上乗せするTask Boxs
-                            ZStack(alignment: .topTrailing) {
+                            ZStack(alignment: .topLeading) {
                                 NavigationLink(destination: TaskDetail(task: selectedItem), isActive: self.$isNavigation) {
                                     EmptyView()
                                 }
-                                // Coredataからfetchしたtasksをforで回して配置していく
-                                ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
-                                    // 🎁 MARK: Task Box
-                                    let _ = print(index == 0 ? nil : self.tasks[index - 1])
-                                    TaskBox(
-                                        task: task,
-                                        programScroll: programScroll,
-                                        scrollViewHeight: $scrollViewHeight, // GEO
-                                        scrollViewWidth: scrollViewWidth, // GEO
-                                        timelineDividerWidth: $timelineDividerWidth, // GEO
-                                        magnifyBy: $magnifyBy, // GEO
-                                        selectedItem: $selectedItem, // Nav
-                                        isNavigation: $isNavigation, // Nav
-                                        isActiveVirtualTaskBox: $isActiveVirtualTaskBox
-                                    )
-                                }
+                                    // Coredataからfetchしたtasksをforで回して配置していく
+                                    ForEach(Array(tasks.enumerated()), id: \.offset) { index, task in
+                                        // 🎁 MARK: Task Box
+                                        
+                                        TaskBox(
+                                            task: task,
+                                            taskBoxXAxisProperties: taskBoxXAxisProperties,
+                                            programScroll: programScroll,
+                                            scrollViewHeight: $scrollViewHeight, // GEO
+                                            scrollViewWidth: scrollViewWidth, // GEO
+                                            timelineDividerWidth: $timelineDividerWidth, // GEO
+                                            magnifyBy: $magnifyBy, // GEO
+                                            selectedItem: $selectedItem, // Nav
+                                            isNavigation: $isNavigation, // Nav
+                                            isActiveVirtualTaskBox: $isActiveVirtualTaskBox
+                                        )
+                                    }
+                                
                                 
                                 // 🎁 MARK: Long pressed Task Box
                                 if isActiveVirtualTaskBox {
@@ -240,7 +252,7 @@ struct DailyCalender: View {
                 HStack { // --- 2
                     Spacer()
                     Button(action: {
-                        withAnimation(.linear){
+//                        withAnimation(.linear){
                             switch magnifyBy {
                             case 1:
                                 magnifyBy = 2
@@ -251,7 +263,7 @@ struct DailyCalender: View {
                             default:
                                 magnifyBy = 1
                             }
-                        }
+//                        }
                     }, label: {
                         Text("× \(Int(magnifyBy))")
                             .foregroundColor(.primary)
@@ -310,60 +322,3 @@ struct DailyCalender: View {
     }
 }
 
-
-//struct DailyCalender_Previews: PreviewProvider {
-//    static var previews: some View {
-//        let result: PersistenceController = PersistenceController(inMemory: true)
-//        let viewContext = result.container.viewContext
-//        // task
-//        let newTask = Task(context: viewContext)
-//        newTask.task = "Quis nostrud exercitation ullamco"
-//        newTask.isDone = false
-//        newTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-//        newTask.createdAt = Date()
-//        newTask.id = UUID()
-//        newTask.startDate = Calendar.current.date(bySettingHour: 9, minute: 30, second: 0, of: Date())!
-//        newTask.endDate = Calendar.current.date(bySettingHour: 11, minute: 00, second: 0, of: Date())!
-//        newTask.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
-//        newTask.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-//
-//        // micro task
-//        let newMicroTask = MicroTask(context: viewContext)
-//        newMicroTask.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
-//        newMicroTask.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-//        newMicroTask.id = UUID()
-//        newMicroTask.isDone = false
-//        newMicroTask.timer = 10
-//        newMicroTask.createdAt = Date()
-//        newMicroTask.order = 0
-//        newMicroTask.satisfactionPredict = 5
-//        newMicroTask.satisfactionPredict = 5
-//        newMicroTask.task = newTask
-//
-//        let newMicroTask2 = MicroTask(context: viewContext)
-//        newMicroTask2.microTask = "Duis aute irure dolor in reprehenderit in voluptate"
-//        newMicroTask2.detail = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-//        newMicroTask2.id = UUID()
-//        newMicroTask2.isDone = false
-//        newMicroTask2.timer = 10
-//        newMicroTask2.createdAt = Date()
-//        newMicroTask2.order = 0
-//        newMicroTask2.satisfactionPredict = 5
-//        newMicroTask2.satisfactionPredict = 5
-//        newMicroTask2.task = newTask
-//
-//        // task2
-//        let newTask2 = Task(context: viewContext)
-//        newTask2.task = "Quis2 nostrud exercitation ullamco"
-//        newTask2.isDone = false
-//        newTask2.detail = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
-//        newTask2.createdAt = Date()
-//        newTask2.id = UUID()
-//        newTask2.startDate = Calendar.current.date(bySettingHour: 14, minute: 45, second: 0, of: Date())!
-//        newTask2.endDate = Calendar.current.date(bySettingHour: 15, minute: 30, second: 0, of: Date())!
-//        newTask2.influence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu"
-//        newTask2.benefit = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
-//
-//        return DailyCalender(selectedDate: Date())
-//    }
-//}

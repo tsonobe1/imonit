@@ -18,17 +18,17 @@ struct Line: Shape {
 
 struct TaskDetailOnBox: View {
     @Environment(\.editMode) private var editMode
-    @Binding var scrollViewHeight: CGFloat
+    var scrollViewHeight: CGFloat
     @Binding var timelineDividerWidth: CGFloat
     @Binding var magnifyBy: Double
     
     // MARK: 親Viewで選択したTaskを使い、MicroTasksをFetchする
     @ObservedObject var task: Task
     @FetchRequest var microTasks: FetchedResults<MicroTask>
-    init(withChild task: Task, scrollViewHeight: Binding<CGFloat>, timelineDividerWidth: Binding<CGFloat>, magnifyBy: Binding<Double>) {
+    init(withChild task: Task, scrollViewHeight: CGFloat, timelineDividerWidth: Binding<CGFloat>, magnifyBy: Binding<Double>) {
         // showingAddMicroTaskTextFieldは、Addをタップした時にTaskのDateやDetailを隠すのに使う
         self.task = task
-        self._scrollViewHeight = scrollViewHeight
+        self.scrollViewHeight = scrollViewHeight
         self._timelineDividerWidth = timelineDividerWidth
         self._magnifyBy = magnifyBy
         _microTasks = FetchRequest(
@@ -38,14 +38,14 @@ struct TaskDetailOnBox: View {
         )
     }
     
-    // MicroTaskのListの下部に表示
-    private var totalTime: Int {
-        var total = 0
-        for minute in microTasks {
-            total += Int(minute.timer / 60)
-        }
-        return total
-    }
+//    // MicroTaskのListの下部に表示
+//    private var totalTime: Int {
+//        var total = 0
+//        for minute in microTasks {
+//            total += Int(minute.timer / 60)
+//        }
+//        return total
+//    }
     
     @State private var taskTitleHeight: CGFloat = CGFloat.zero
     @State private var microTasksTitleHeight: CGFloat = CGFloat.zero
@@ -60,9 +60,9 @@ struct TaskDetailOnBox: View {
                             // Color Border
                             RoundedRectangle(cornerRadius: 40)
                             // microTaskのtimer分の長さのColor Border
-                                .frame(width: 5, height: scrollViewHeight / 1_440 * (CGFloat(microTask.timer / 60)), alignment: .top)
-                                .foregroundColor(.orange)
-                                .opacity(0.6)
+                                .frame(width: 5, height: scrollViewHeight / 1_440 * CGFloat(microTask.timer / 60), alignment: .top)
+                                .foregroundColor(.blue)
+                                .opacity(0.8)
                                 .fixedSize()
                             
                             // MicroTaskTitle ...... min
@@ -75,9 +75,9 @@ struct TaskDetailOnBox: View {
                                         .frame(width: metrics.size.width * 0.75, alignment: .leading)
                                         .opacity(1)
                                     
-                                    Spacer()
+//                                    Spacer()
                                     
-                                    Text("\(microTask.timer / 60) m")
+                                    Text("\(microTask.timer / 60)m")
                                         .font(.caption)
                                         .minimumScaleFactor(0.6)
                                         .frame(width: metrics.size.width * 0.20, alignment: .trailing)
@@ -89,10 +89,10 @@ struct TaskDetailOnBox: View {
                                     // bar
                                     Rectangle()
                                         .offset(y: 0)
-                                        .frame(width: timelineDividerWidth, height: 1)
+                                        .frame(width: timelineDividerWidth, height: 0.8)
                                         .foregroundColor(.primary)
                                         .colorInvert()
-                                        .opacity(1),
+                                        .opacity(0.9),
                                     alignment: .topTrailing
                                 )
                                 .frame(width: timelineDividerWidth - 8)
@@ -107,13 +107,6 @@ struct TaskDetailOnBox: View {
                     }
                 }
             }
-            // TaskBoxの位置までズラす
-            .offset(y: ((scrollViewHeight / 1_440) * dateToMinute(date: task.startDate!)))
-            .frame(
-                width: timelineDividerWidth,
-                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                alignment: .topLeading
-            )
         } else {
             // MARK: pinch out時
             HStack(alignment: .top) {
@@ -121,11 +114,11 @@ struct TaskDetailOnBox: View {
                 RoundedRectangle(cornerRadius: 40)
                     .frame(
                         width: 5,
-                        height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                        alignment: .topLeading
+                        height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!)
+                        //                        alignment: .topLeading
                     )
-                    .foregroundColor(.orange)
-                    .opacity(0.5)
+                    .foregroundColor(.blue)
+                    .opacity(0.8)
                     .fixedSize()
                 
                 VStack {
@@ -133,6 +126,7 @@ struct TaskDetailOnBox: View {
                         // TaskTitle
                         HStack(alignment: .top) {
                             Text(task.task!)
+                                .bold()
                                 .font(.subheadline)
                                 .minimumScaleFactor(0.5)
                                 .foregroundColor(.primary)
@@ -158,7 +152,7 @@ struct TaskDetailOnBox: View {
                                     HStack(alignment: .center) {
                                         RoundedRectangle(cornerRadius: 40)
                                             .frame(width: 4, alignment: .top)
-                                            .foregroundColor(.orange)
+                                            .foregroundColor(.blue)
                                             .opacity(0.6)
                                             .fixedSize()
                                         
@@ -174,7 +168,7 @@ struct TaskDetailOnBox: View {
                                                 .frame(height: 1)
                                                 .opacity(0.5)
                                             
-                                            Text("\(microTask.timer / 60) m")
+                                            Text("\(microTask.timer / 60)m")
                                                 .opacity(1)
                                                 .font(.caption)
                                                 .fixedSize()
@@ -221,12 +215,7 @@ struct TaskDetailOnBox: View {
                     }
                 }
             }
-            .offset(y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!))
-            .frame(
-                width: timelineDividerWidth,
-                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!),
-                alignment: .topLeading
-            )
+            
         }
     }
 }

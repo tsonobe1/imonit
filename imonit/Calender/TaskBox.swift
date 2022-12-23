@@ -9,13 +9,14 @@ import SwiftUI
 
 struct TaskBox: View {
     var task: Task
+    var taskBoxXAxisProperties: [UUID: (xPositionRatio: CGFloat, widthRatio: CGFloat)]
     @ObservedObject var programScroll: ForProgrammaticScrolling
     
+    // programScrollを正常に動作させるために、scrollViewHeightはbindingしている
     @Binding var scrollViewHeight: CGFloat
     var scrollViewWidth: CGFloat
     @Binding var timelineDividerWidth: CGFloat
     @Binding var magnifyBy: Double
-    
     @Binding var selectedItem: Task
     @Binding var isNavigation: Bool
     @Binding var isActiveVirtualTaskBox: Bool
@@ -23,16 +24,33 @@ struct TaskBox: View {
         scrollViewHeight / 1_440
     }
     
+    // MARK: Property for Task Box Display ----------
+    var taskDisplailableArea: CGFloat {
+        scrollViewWidth - timelineDividerWidth
+    }
+    var xPositionRatio: CGFloat {
+        taskBoxXAxisProperties[task.id!]!.xPositionRatio
+    }
+    var widthRatio: CGFloat {
+        taskBoxXAxisProperties[task.id!]!.widthRatio
+    }
+    var leading: CGFloat {
+        taskDisplailableArea + timelineDividerWidth * xPositionRatio
+    }
+    var traling: CGFloat {
+        taskDisplailableArea + (timelineDividerWidth * xPositionRatio) + (timelineDividerWidth * widthRatio)
+    }
+        
     fileprivate func enableVirtualTaskBox(_ task: FetchedResults<Task>.Element) -> _EndedGesture<LongPressGesture> {
         return LongPressGesture()
             .onEnded { _ in
                 selectedItem = task
-                withAnimation {
+//                withAnimation {
                     isActiveVirtualTaskBox.toggle()
                     // 触覚フィードバック
                     let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
                     impactHeavy.impactOccurred()
-                }
+//                }
             }
     }
     // 🖕 Pinch in When Double Tap Gesture
@@ -86,29 +104,43 @@ struct TaskBox: View {
 
     var body: some View {
         Group {
-            // 🧱 Tack Box Shape
+            // MARK: 🧱 Tack Box Shape
+            // Leading: xAxisTaskDisplayArea + (timelineDividerWidth / 4) * (taskのxAxisOrder - 1)
+            // Trailing: xAxisTaskDisplayArea + (timelineDividerWidth / 4) * (taskのxAxisOrder)
             TaskBoxShape(
                 radius: 5,
                 top: aMinuteHeight * dateToMinute(date: task.startDate!),
                 bottom: aMinuteHeight * dateToMinute(date: task.endDate!),
-                leading: scrollViewWidth - timelineDividerWidth,
-                traling: scrollViewWidth
+                leading: leading,
+                traling: traling
             )
-            .fill(Color.orange)
-            .opacity(0.35)
+            .fill(.blue.gradient)
+            .opacity(0.6)
+//            .drawingGroup(opaque: true)
             
-            // 📛 Task, MicroTask Details
+            
+            // MARK: 📛 Task, MicroTask Details
             TaskDetailOnBox(
                 withChild: task,
-                scrollViewHeight: $scrollViewHeight,
+                scrollViewHeight: scrollViewHeight,
                 timelineDividerWidth: $timelineDividerWidth,
                 magnifyBy: $magnifyBy
             )
+            .offset(
+                x: taskDisplailableArea +  (timelineDividerWidth * xPositionRatio),
+                y: scrollViewHeight / 1_440 * dateToMinute(date: task.startDate!)
+            )
+            .frame(
+                width: timelineDividerWidth * widthRatio,
+                height: scrollViewHeight / 1_440 * caluculateTimeInterval(startDate: task.startDate!, endDate: task.endDate!)
+//                alignment: .topLeading
+            )
+            
         }
+
         .onTapGesture {
             selectedItem = task
             isNavigation.toggle()
-            print("TEST")
         }
         .simultaneousGesture(
             enableVirtualTaskBox(task)
@@ -116,5 +148,7 @@ struct TaskBox: View {
         .highPriorityGesture(
             pinchInAndToSctrollDoubleTap(task)
         )
+        
     }
+    
 }

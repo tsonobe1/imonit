@@ -43,7 +43,7 @@ struct VirtualTaskBox: View {
     var isNotAcceptTaskBoxDragChanges: Bool {
         !startDayIsSame || !endDayIsSame || isOnOutsideLeft || isOnOutsideRight
     }
-
+    
     // 移動したPosition(CGFloat) = aと、移動した時間(分) = bを返す
     func floorWithMultiple(_ movePosition: CGFloat, _ positionsMultiple: CGFloat, _ datesMultiple: Double) -> (movedPosition: CGFloat, movedMinute: Int) {
         let x = movePosition / positionsMultiple
@@ -65,6 +65,25 @@ struct VirtualTaskBox: View {
             )
             .fill(isNotAcceptTaskBoxDragChanges ? .gray : .orange)
             .opacity(0.5)
+            // Box移動時に拡大率に応じたバイブレーションを起こす
+            .onChange(of: modifiedStartDate){ value in
+                switch magnifyBy {
+                case 1.0:
+                    let impact = UIImpactFeedbackGenerator(style: .medium)
+                    impact.impactOccurred()
+                case 2.0:
+                    let impact = UIImpactFeedbackGenerator(style: .medium)
+                    impact.impactOccurred()
+                case 5.0:
+                    let impact = UIImpactFeedbackGenerator(style: .light)
+                    impact.impactOccurred()
+                case 10.0, 30.0:
+                    let impact = UIImpactFeedbackGenerator(style: .soft)
+                    impact.impactOccurred()
+                default:
+                    print("impact default")
+                }
+            }
             .gesture(
                 // Position
                 DragGesture()
@@ -78,6 +97,7 @@ struct VirtualTaskBox: View {
                         switch magnifyBy {
                         case 1.0: floored = floorWithMultiple(movePosition, 7.5, 15)
                         case 2.0: floored = floorWithMultiple(movePosition, 15, 15)
+                        case 2.5: floored = floorWithMultiple(movePosition, 18.87, 15)
                         case 5.0: floored = floorWithMultiple(movePosition, 12.5, 5)
                         case 10.0: floored = floorWithMultiple(movePosition, 5, 1)
                         case 30.0: floored = floorWithMultiple(movePosition, 15, 1)
@@ -221,6 +241,7 @@ struct VirtualTaskBox: View {
                             switch magnifyBy {
                             case 1.0: floored = floorWithMultiple(value.translation.height, 7.5, 15)
                             case 2.0: floored = floorWithMultiple(value.translation.height, 15, 15)
+                            case 2.5: floored = floorWithMultiple(value.translation.height, 18.87, 15)
                             case 5.0: floored = floorWithMultiple(value.translation.height, 12.5, 5)
                             case 10.0: floored = floorWithMultiple(value.translation.height, 5, 1)
                             case 30.0: floored = floorWithMultiple(value.translation.height, 15, 1)
@@ -280,6 +301,7 @@ struct VirtualTaskBox: View {
                             switch magnifyBy {
                             case 1.0: floored = floorWithMultiple(value.translation.height, 7.5, 15)
                             case 2.0: floored = floorWithMultiple(value.translation.height, 15, 15)
+                            case 2.5: floored = floorWithMultiple(value.translation.height, 18.87, 15)
                             case 5.0: floored = floorWithMultiple(value.translation.height, 12.5, 5)
                             case 10.0: floored = floorWithMultiple(value.translation.height, 5, 1)
                             case 30.0: floored = floorWithMultiple(value.translation.height, 15, 1)

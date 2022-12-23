@@ -121,8 +121,7 @@ struct PressureSensor: View {
                                 
                                 newTaskBox.selectedArea = Double(obj)
                                 calcNewTaskPositionAndDate()
-                                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                                impactHeavy.impactOccurred()
+                                
                                 
                                 newTaskBox.startDate = newTaskBox.greCal.date(
                                     from: DateComponents(
